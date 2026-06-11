@@ -14,11 +14,26 @@ export async function demoLogin(): Promise<{ error: string } | never> {
   }
 
   const supabase = createClient();
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
   if (error) {
     return { error: "เข้าโหมด Demo ไม่สำเร็จ ลองใหม่อีกครั้งนะ" };
   }
 
-  redirect("/app/swipe");
+  // Ensure the demo account has a profiles row (not created by normal signup flow)
+  if (data.user) {
+    await supabase.from("profiles").upsert(
+      { id: data.user.id, display_name: "Demo User" },
+      { onConflict: "id", ignoreDuplicates: true }
+    );
+  }
+
+  // Route by whether the demo account already has a pet
+  const { data: pet } = await supabase
+    .from("pets")
+    .select("id")
+    .eq("owner_id", data.user!.id)
+    .maybeSingle();
+
+  redirect(pet ? "/app/swipe" : "/onboarding");
 }
