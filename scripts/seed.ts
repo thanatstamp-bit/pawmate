@@ -212,16 +212,71 @@ async function main() {
   }
   console.log("\n");
 
-  // ── Pre-likes pointing AT demo's pet ──────────────────────────────────────
+  // ── Breeding-compatible pets for demo ────────────────────────────────────
+  if (demo) {
+    const { data: dp } = await supabase
+      .from("pets")
+      .select("id, species, breed, sex, modes")
+      .eq("owner_id", demo.id)
+      .maybeSingle();
+
+    if (dp && dp.modes?.includes("breeding")) {
+      const oppSex = dp.sex === "male" ? "female" : "male";
+      const names = dp.species === "dog" ? DOG_NAMES : CAT_NAMES;
+      const photoFn = dp.species === "dog" ? dogPhoto : catPhoto;
+      console.log(`Creating 8 breeding-compatible pets (${dp.species}, ${dp.breed}, ${oppSex})...`);
+
+      for (let i = 0; i < 8; i++) {
+        const province = pick(PROVINCES_WEIGHTED);
+        const tags = pickN(TAGS, randInt(2, 4));
+        const name = names[(i + 5) % names.length];
+        const { data: bp, error } = await supabase
+          .from("pets")
+          .insert({
+            owner_id: seedUserId,
+            name,
+            species: dp.species,
+            breed: dp.breed,
+            sex: oppSex,
+            birth_month: `${randInt(2019, 2024)}-${String(randInt(1, 12)).padStart(2, "0")}-01`,
+            photos: [photoFn(200 + i), photoFn(250 + i)],
+            personality_tags: tags,
+            province,
+            district: null,
+            modes: ["playdate", "breeding"],
+            vaccinated: true,
+            neutered: false,
+            bio: `${name} เป็น${dp.species === "dog" ? "น้องหมา" : "แมว"}สายพันธุ์${dp.breed}ที่${tags[0]} อาศัยอยู่แถว${province}`,
+          })
+          .select("id")
+          .single();
+
+        if (error) { console.error(`Breeding pet ${i} error:`, error.message); continue; }
+        createdPetIds.push(bp!.id);
+
+        // Pre-like in breeding mode → demo pet
+        await supabase.from("likes").insert({
+          from_pet_id: bp!.id,
+          to_pet_id: dp.id,
+          mode: "breeding",
+        });
+        process.stdout.write("💕 ");
+      }
+      console.log("\n✅ Breeding pets + pre-likes created!\n");
+      demoPetId = dp.id;
+    }
+  }
+
+  // ── Pre-likes pointing AT demo's pet (playdate) ───────────────────────────
   if (demoPetId && createdPetIds.length > 0) {
-    console.log("Creating 10 pre-likes → demo pet...");
+    console.log("Creating 10 pre-likes (playdate) → demo pet...");
     const likers = createdPetIds.slice(0, 10);
     for (const fromId of likers) {
       await supabase.from("likes").insert({
         from_pet_id: fromId,
         to_pet_id: demoPetId,
         mode: "playdate",
-      });
+      }).then(() => {});  // ignore duplicate errors if re-running
       process.stdout.write("❤️  ");
     }
     console.log("\n✅ Pre-likes created — demo user will match instantly when they like back!\n");
