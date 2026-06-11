@@ -19,8 +19,8 @@ function thaiAuthError(message: string): string {
   if (message.includes("Email not confirmed"))
     return "กรุณายืนยันอีเมลก่อนเข้าสู่ระบบ (เช็คกล่องจดหมายนะ)";
   if (message.includes("valid email")) return "รูปแบบอีเมลไม่ถูกต้อง";
-  if (message.toLowerCase().includes("rate limit"))
-    return "ลองหลายครั้งเกินไป รอสักครู่แล้วลองใหม่นะ";
+  if (message.toLowerCase().includes("rate limit") || message.toLowerCase().includes("rate_limit"))
+    return "ส่งอีเมลบ่อยเกินไป รอสักครู่แล้วลองใหม่ หรือปิด Email Confirmation ใน Supabase Dashboard";
   return "เกิดข้อผิดพลาด ลองใหม่อีกครั้งนะ";
 }
 
