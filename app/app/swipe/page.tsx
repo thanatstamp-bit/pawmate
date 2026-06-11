@@ -65,6 +65,14 @@ export default function SwipePage() {
     if (!myPet) return;
     setLoading(true);
 
+    // Fetch pets already liked by myPet in this mode (across all sessions)
+    const { data: prevLikes } = await supabase
+      .from("likes")
+      .select("to_pet_id")
+      .eq("from_pet_id", myPet.id)
+      .eq("mode", mode);
+    const prevLikedIds = new Set((prevLikes ?? []).map((l) => l.to_pet_id));
+
     let query = supabase
       .from("pets")
       .select("id, name, species, breed, sex, birth_month, photos, personality_tags, province, district, vaccinated, neutered, bio")
@@ -83,7 +91,11 @@ export default function SwipePage() {
     const { data } = await query.limit(50);
     if (!data) { setLoading(false); return; }
 
-    const seen = new Set(Array.from(skippedIds.current).concat(Array.from(likedIds.current)));
+    const seen = new Set([
+      ...Array.from(skippedIds.current),
+      ...Array.from(likedIds.current),
+      ...Array.from(prevLikedIds),
+    ]);
     setCards(data.filter((p) => !seen.has(p.id)));
     setLoading(false);
   }, [myPet, mode, filters, supabase]);
