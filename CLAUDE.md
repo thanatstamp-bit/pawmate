@@ -1,266 +1,140 @@
-# 🐾 PawMate — Vibe Coding Kit (MVP)
+# CLAUDE.md
 
-> วิธีใช้: คัดลอก **Master Context** ไปวางเป็นข้อความแรกเสมอ (หรือบันทึกเป็นไฟล์ `CLAUDE.md` / `.cursorrules` ในโปรเจกต์)
-> จากนั้นป้อน **Phase Prompt** ทีละเฟส ตรวจผลงานให้ผ่านก่อนค่อยไปเฟสถัดไป
-> Prompt ทั้งหมดเขียนเป็นภาษาอังกฤษเพราะ AI coding tools ตอบสนองแม่นกว่า
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
----
+## Commands
 
-## 🎯 MASTER CONTEXT (paste this first, always)
+```bash
+npm run dev       # start dev server (localhost:3000)
+npm run build     # production build + type-check
+npm run lint      # ESLint via next lint
+npx tsc --noEmit  # type-check without building (use this to verify changes)
 
-```
-# PROJECT: PawMate — Pet Matchmaking Web App (Portfolio MVP)
+# Seed fake pets into Supabase (requires .env.local with service role key)
+npx ts-node --project scripts/tsconfig.json scripts/seed.ts
 
-## Overview
-PawMate is a "Tinder for pets" web app for dogs and cats in Thailand.
-Owners create a profile for their pet, then swipe through other pets in two modes:
-1. PLAYDATE mode — find pet friends nearby for meetups
-2. BREEDING mode — find a mate of the same breed, opposite sex
+# Seed pet-friendly playdate spots
+npx ts-node --project scripts/tsconfig.json scripts/seed-spots.ts
 
-This is a portfolio project: it must work end-to-end with real auth, database,
-and realtime chat, but does not need payment, moderation, or production-scale security.
-Polish and visual quality matter more than feature breadth.
-
-## Tech Stack (do not deviate)
-- Next.js 14+ (App Router) + TypeScript
-- Tailwind CSS
-- Supabase: Auth (email/password), Postgres DB, Storage (pet photos), Realtime (chat)
-- Deployed on Vercel
-- UI language: Thai (all user-facing text in Thai), code/comments in English
-
-## Design System
-- Mood: warm, playful, friendly, trustworthy — like a cozy pet café
-- Background: warm cream #FFF8F0
-- Primary (buttons, likes, highlights): coral #FF6B5B
-- Secondary (accents, success, playdate mode): teal #2EC4B6
-- Breeding mode accent: soft amber #FFB84C
-- Text: warm dark brown #2D2A26, muted #8A8580
-- Cards: white #FFFFFF, border-radius 20px, soft shadow (0 4px 16px rgba(0,0,0,0.06))
-- Fonts: "Nunito" for Latin, "IBM Plex Sans Thai" for Thai (load via next/font/google)
-- Buttons: fully rounded (pill shape), bold labels
-- Mobile-first: design for 390px width first, then scale up. Max content width 480px
-  for app pages (centered column on desktop), landing page can be full width.
-- Use paw/heart motifs sparingly. No emoji as UI icons — use lucide-react icons.
-
-## Database Schema (Supabase Postgres)
-- profiles: id (uuid, = auth.users.id), display_name, line_id (nullable), created_at
-- pets: id (uuid), owner_id (fk profiles), name, species ('dog'|'cat'), breed,
-  sex ('male'|'female'), birth_month (date), photos (text[] of storage URLs),
-  personality_tags (text[]), province, district,
-  modes (text[] containing 'playdate' and/or 'breeding'),
-  vaccinated (bool, nullable), neutered (bool, nullable), bio (text), created_at
-- likes: id, from_pet_id, to_pet_id, mode ('playdate'|'breeding'), created_at
-  — unique constraint on (from_pet_id, to_pet_id, mode)
-- matches: id, pet_a_id, pet_b_id, mode, created_at
-  — created automatically when likes exist in both directions for the same mode
-- messages: id, match_id (fk matches), sender_pet_id, content (text), created_at
-
-Rules:
-- One account = one pet (enforce in UI, not DB)
-- Enable Row Level Security on all tables; users can only modify their own rows,
-  but can SELECT any pet profile (needed for the swipe feed)
-- BREEDING feed filter: same species, same breed (default), opposite sex only
-- PLAYDATE feed filter: same species (default), any sex
-
-## Code Style
-- App Router with server components where possible, client components for interactivity
-- Keep components small, one file per component, in /components
-- Supabase client helpers in /lib/supabase
-- All user-facing strings in Thai
-- Handle loading and empty states for every data fetch — never show a blank screen
+# Seed vet hospitals (Care Hub → Hospital Finder)
+npx ts-node --project scripts/tsconfig.json scripts/seed-hospitals.ts
 ```
 
----
+No test suite exists — `npx tsc --noEmit` is the primary correctness check.
 
-## 🧱 PHASE 0 — Project Setup & Database
+## Architecture
 
-```
-Using the Master Context above:
+**Next.js 14 App Router + Supabase + Tailwind.** All user-facing text is in Thai; code/comments are in English.
 
-Set up the PawMate project from scratch.
+### Route layout
 
-1. Create a Next.js 14 App Router project with TypeScript and Tailwind CSS.
-2. Configure the design system: extend tailwind.config with the color palette
-   (cream, coral, teal, amber, brown) and set up Nunito + IBM Plex Sans Thai
-   via next/font/google.
-3. Install and configure the Supabase JS client (@supabase/supabase-js and
-   @supabase/ssr) with helper files for client/server usage in /lib/supabase.
-   Use environment variables NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY.
-4. Write a single SQL migration file (supabase/migrations/001_init.sql) that creates
-   all tables from the schema in the Master Context, including RLS policies and
-   the unique constraint on likes.
-5. Create a basic app shell: bottom navigation bar (mobile) with 4 tabs —
-   ปัดการ์ด (swipe), แมตช์ (matches), โปรไฟล์ (profile) — using lucide-react icons.
-   The nav only shows on authenticated app pages, not on landing/login.
-6. Add a root layout with the cream background and font setup.
+| Path | Description |
+|---|---|
+| `/` | Public landing page |
+| `/login` | Auth (email/password + demo button) |
+| `/onboarding` | 4-step pet profile wizard (protected) |
+| `/app/home` | Home page — active pet card + quick stats |
+| `/app/swipe` | Core swipe feed with mode toggle |
+| `/app/matches` | Matches list (chat tab + playdate tab) |
+| `/app/chat/[matchId]` | Realtime chat, scheduling, trust actions |
+| `/app/profile` | Pet profile preview + edit, multi-pet management, stats, account actions |
+| `/app/care` | Care Hub — ดูแล tab in bottom nav; 2×2 grid of care features |
+| `/app/care/hospitals` | Vet hospital finder — list/map toggle, filters, geolocation distance sort |
 
-Explain what each file does as you create it. Do not build any features yet.
-```
+The `/app/*` layout (`app/app/layout.tsx`) wraps all authenticated pages with a persistent `ConditionalAppHeader` (logo → /app/home) and `BottomNav` (5 tabs: หน้าแรก, ปัดการ์ด, แมตช์, ดูแล, โปรไฟล์). The chat page suppresses the global header because it has its own navigation header; the swipe page suppresses it too, to give the card deck maximum vertical space; `/app/care/*` suppresses it too — Care Hub and its sub-pages build their own back-arrow header (back → `/app/home` from the hub, back → `/app/care` from hospitals).
 
-✅ **เช็คก่อนไปต่อ:** โปรเจกต์รันได้ (`npm run dev`), เห็น app shell + nav, รัน SQL ใน Supabase dashboard ผ่านไม่มี error
+Middleware (`middleware.ts` → `lib/supabase/middleware.ts`) protects `/app/*` and `/onboarding` with a session check that redirects to `/login`.
 
----
+### Supabase client usage
 
-## 🔐 PHASE 1 — Auth + Demo Account
+- **Client components** → `import { createClient } from "@/lib/supabase/client"` (browser)
+- **Server components / actions** → `import { createClient } from "@/lib/supabase/server"` (cookies)
+- **Seed scripts only** → service role key (`SUPABASE_SERVICE_ROLE_KEY`), never in frontend
 
-```
-Using the Master Context above:
+Pet photos (Supabase Storage URLs, seed placeholder URLs) are rendered with plain `<img>` (each with an `eslint-disable-next-line @next/next/no-img-element` comment), not `next/image`. Only static local assets (e.g. `/logo.png`) go through `next/image`; `next.config.mjs`'s `images.remotePatterns` covers that case.
 
-Build authentication for PawMate.
+### Supabase query gotcha: bare `.maybeSingle()`
 
-1. Create /login page with two tabs: เข้าสู่ระบบ (login) and สมัครสมาชิก (signup),
-   using Supabase email/password auth. Thai labels, coral primary button,
-   card-style form centered on cream background.
-2. On signup success: create a row in `profiles`, then redirect to /onboarding.
-3. On login success: if the user has a pet, go to /app/swipe; if not, go to /onboarding.
-4. Add a prominent secondary button "🐾 ลองเล่นโหมด Demo" that signs in with a
-   fixed demo account (email/password from env vars DEMO_EMAIL / DEMO_PASSWORD)
-   and goes straight to /app/swipe. This is the most important button on the page.
-5. Protect all /app/* and /onboarding routes with middleware that redirects
-   unauthenticated users to /login.
-6. Add logout functionality (button placed in the profile page placeholder for now).
+Any query that might match more than one row for an account — e.g. "does this user have a pet?" — must call `.limit(1)` before `.maybeSingle()`. A bare `.maybeSingle()` errors on >1 rows; code that only destructures `data` (ignoring `error`) then sees `null`, indistinguishable from "no result." This has caused real, hard-to-spot bugs after multi-pet support shipped: an onboarding loop on login (`AuthForm.tsx`, `app/login/actions.ts`) and a seed script silently skipping pre-likes (`scripts/seed.ts`). Apply this rule anywhere a pet is looked up by `owner_id` without a specific pet `id`.
 
-Handle error states in Thai (wrong password, email already used, etc.)
+### Active pet pattern
+
+All app pages resolve the current user's active pet from `localStorage.getItem("pawmate_active_pet_id")` and fall back to the first pet by `created_at` if the stored ID is invalid. The profile page (`/app/profile`) sets this value when the user switches pets. Every page that queries per-pet data must follow this same two-step resolution:
+
+```ts
+const storedId = localStorage.getItem("pawmate_active_pet_id");
+// 1. Try stored ID (validate it belongs to this user)
+// 2. Fall back to first pet; update localStorage
 ```
 
-✅ **เช็คก่อนไปต่อ:** สมัคร/ล็อกอิน/ล็อกเอาต์ได้จริง, เข้า /app โดยไม่ล็อกอินแล้วโดนเด้งไป /login
+### Key library helpers
 
----
+- `lib/match.ts` — `checkAndCreateMatch()`: checks mutual likes and inserts a match row; handles the unique-constraint race condition
+- `lib/blocks.ts` — `getBlockedPetIds()`: returns a `Set<string>` of pet IDs blocked in either direction; used in swipe feed, matches list, and chat to hide content without deleting data
+- `lib/geo.ts` — `haversineKm()`: great-circle distance between two lat/lng points; used by the hospital finder's "ใกล้ฉัน" sort
 
-## 🐶 PHASE 2 — Onboarding (Create Pet Profile)
+### Swipe feed logic (`app/app/swipe/page.tsx`)
 
-```
-Using the Master Context above:
+The deck fetch always loads `prevLikedIds` from the DB (regardless of recycle mode) so liked cards never reappear. `skippedIds` (session `useRef`) are cleared on recycle so skipped cards cycle back. `likedIds` are never cleared — they mirror the DB. A demo counter (`swipeCount` + `forceNext` refs) triggers `create_demo_match` RPC after 3–7 swipes without a natural match.
 
-Build the /onboarding flow — a 4-step wizard to create a pet profile.
-Show a progress indicator (step 1/4) at the top. Each step is one screen
-with a large "ถัดไป" button. Allow going back. Mobile-first.
+### Realtime chat
 
-Step 1 — รูปและชื่อ: upload 1-4 photos to Supabase Storage (bucket: pet-photos,
-  public). Show upload previews in a 2x2 grid with the first photo marked as
-  รูปหลัก. Then a name input.
-Step 2 — ข้อมูลพื้นฐาน: species (หมา/แมว as two big selectable cards),
-  breed (searchable select — include ~20 common dog breeds and ~15 cat breeds
-  in Thai), sex (ผู้/เมีย), birth month+year picker (display age automatically).
-Step 3 — นิสัยและพื้นที่: personality tags as selectable chips (at least 12 options
-  e.g. ขี้เล่น ขี้อ้อน ใจดี ขี้กลัว พลังเยอะ ชอบนอน เข้ากับเด็กได้ ดุกับแปลกหน้า),
-  province dropdown (all 77 Thai provinces), district text input. Short bio textarea.
-Step 4 — โหมดที่เปิดรับ: two toggle cards — หาเพื่อนเล่น (teal) and หาคู่ผสมพันธุ์ (amber).
-  At least one required. If breeding is on, show extra fields: ฉีดวัคซีนแล้ว (yes/no),
-  ทำหมันแล้ว (yes/no — warn that neutered pets can't use breeding mode).
+`/app/chat/[matchId]` subscribes to Supabase Realtime on `messages` filtered by `match_id`. Messages sent by the local user are optimistically appended and de-duplicated by ID when the realtime event arrives.
 
-On submit: insert into `pets`, then redirect to /app/swipe.
-Validate every step before allowing ถัดไป. All copy in Thai, friendly tone.
-```
+### Hospital finder map (`components/care/HospitalMap.tsx`)
 
-✅ **เช็คก่อนไปต่อ:** สร้างโปรไฟล์ครบ 4 ขั้นได้, รูปขึ้น Storage จริง, ข้อมูลลงตาราง pets ถูกต้อง
+Uses `leaflet` + `react-leaflet` (pinned to v4 — v5 requires React 19) with free OpenStreetMap tiles, no API key. Loaded via `next/dynamic(() => import(...), { ssr: false })` from `app/app/care/hospitals/page.tsx` because Leaflet touches `window` at import time. Every marker supplies its own `L.divIcon` (a colored circle + number), so the component never falls back to Leaflet's default teardrop icon — sidesteps the well-known "default marker images 404 under webpack" issue without an `L.Icon.Default.mergeOptions()` path rewrite. Unlike the app's other full-screen bottom sheets, `HospitalDetailSheet` stops at `bottom-[60px]` (the bottom nav's height) instead of `inset-0`, so the nav stays visible/usable while the sheet is open — see the Hospital Finder Wireframe.
 
----
+## Database
 
-## 💘 PHASE 3 — Swipe Page + Match Logic
+Migrations live in `supabase/migrations/` and must be run manually in the Supabase SQL Editor (not via CLI). Never edit `001_init.sql`; add new numbered migration files.
 
-```
-Using the Master Context above:
+| Migration | Contents |
+|---|---|
+| `001_init.sql` | profiles, pets, likes, matches, messages + RLS + `owns_pet()` and `is_in_match()` helpers |
+| `002_storage_policies.sql` | Storage bucket RLS for pet photos |
+| `008_playdates.sql` | `playdate_spots`, `playdate_proposals` tables |
+| `009_demo_match.sql` | `create_demo_match()` SECURITY DEFINER RPC |
+| `010_trust.sql` | reviews, reports, blocks tables + RLS |
+| `011_reviews_delete.sql` | RLS DELETE policy so a reviewer can delete their own review |
+| `012_hospitals.sql` | `hospitals` table (Care Hub → Hospital Finder), public read-only RLS |
 
-Build /app/swipe — the core page of PawMate.
+Numbers are non-sequential (no `003`–`007`) — they reflect actual build order, not the phase numbering suggested in `CLAUDE-EXPANSION.md`. The next new migration should be `013_*.sql`.
 
-1. Mode toggle at the top: two pills — 🐕 หาเพื่อนเล่น (teal active state) and
-   ❤️ หาคู่ (amber active state). Only show modes that the user's pet has enabled.
-2. Card stack: fetch pets that (a) match the current mode's filter rules from
-   Master Context, (b) the user hasn't liked/skipped yet in this mode, (c) aren't
-   the user's own pet. Show one card at a time with the next card peeking behind.
-3. Card design: full-bleed main photo, gradient overlay at the bottom with
-   name, age, breed, province. Personality tags as small chips. Tap card to
-   expand a detail sheet showing all photos, bio, and breeding info (vaccinated/
-   neutered) when in breeding mode.
-4. Action buttons below the card: big circular ✖️ (skip, white with border) and
-   ❤️ (like, coral). Record skips locally (or in a `skips` table) so cards
-   don't repeat within the session.
-5. On like: insert into `likes`. Then check if the other pet already liked us
-   in the same mode — if yes, insert into `matches` and show a full-screen
-   match popup: "เป็นเพื่อนกันแล้ว! 🎉" (playdate) or "แมตช์กันแล้ว! 💕" (breeding),
-   with both pet photos side by side, a "ทักเลย" button (goes to chat) and
-   "ปัดต่อ" button. Add a fun scale/bounce animation with CSS or framer-motion.
-6. Filter button (top right): bottom sheet with species and province filters.
-7. Empty state when no cards remain: cute illustration placeholder + message
-   "การ์ดหมดแล้ว ลองเปลี่ยน filter หรือกลับมาใหม่นะ" + button to open filters.
+**RLS pattern**: `owns_pet(pet_id)` is a SECURITY DEFINER helper that checks `pets.owner_id = auth.uid()`. Use it in policies instead of inlining the join. `is_in_match(match_id)` checks that the caller's pet is a participant.
 
-Match creation logic must be in a single helper function with a clear comment
-explaining the mutual-like check.
-```
+**matches uniqueness**: `pet_a_id` and `pet_b_id` are stored in sorted order (`LEAST`/`GREATEST`) to satisfy the unique constraint and prevent `(A,B)` / `(B,A)` duplicates.
 
-✅ **เช็คก่อนไปต่อ:** ปัดได้ ไลก์แล้วลง DB, ลอง 2 บัญชีไลก์กัน → popup เด้ง + matches มีแถวใหม่
+**Block semantics**: never delete match or message rows on block. `getBlockedPetIds()` reads both directions and the caller filters in memory.
 
----
+## Design system (Tailwind)
 
-## 💬 PHASE 4 — Matches List + Realtime Chat
+Custom tokens in `tailwind.config.ts`:
+
+| Token | Value | Usage |
+|---|---|---|
+| `bg-cream` | `#FFF8F0` | Page backgrounds |
+| `coral` / `coral-dark` | `#FF6B5B` / `#E85647` | Primary actions, likes |
+| `teal` / `teal-dark` | `#2EC4B6` / `#26A89C` | Playdate mode accent |
+| `amber` / `amber-dark` | `#FFB84C` / `#F0A636` | Breeding mode accent |
+| `brown` / `brown-muted` | `#2D2A26` / `#8A8580` | Body text / secondary text |
+| `rounded-card` | `20px` | Card border radius |
+| `shadow-card` | `0 4px 16px rgba(0,0,0,0.06)` | Card elevation |
+
+Font: Prompt (covers Thai + Latin) via `var(--font-prompt)`. Icons: `lucide-react` only — no emoji as UI icons.
+
+Bottom sheets and modals above the swipe deck use `z-[60]`; match popup uses `z-[70]`. Bottom sheets use `env(safe-area-inset-bottom)` for safe area padding.
+
+## Future phases (not yet built)
+
+`CLAUDE-EXPANSION.md` is a prompt-kit roadmap for Phases 6–11: Trust Layer, Care Hub, vet hospital finder, lost-pet board, blood donation center, health book, and an optional tele-triage demo. Phase 6 (Trust Layer, `010_trust.sql`/`011_reviews_delete.sql`, `components/trust/*`) and Phase 7 (Care Hub + Vet Hospital Finder, `012_hospitals.sql`, `app/app/care/*`, `components/care/*`) are built. Phases 8–11 (lost-pet board, blood donation, health book, tele-triage) are not. If asked to build any of them, read `CLAUDE-EXPANSION.md` first — it has the DB schema, RLS rules, and per-phase build steps. Note its illustrative migration numbers (`003_hospitals.sql`, etc.) don't match what actually shipped — check the migration table above for the real numbers.
+
+## Environment variables
 
 ```
-Using the Master Context above:
-
-Build /app/matches and the chat experience.
-
-1. /app/matches: list all matches for the user's pet, newest first.
-   Each row: pet photo (circular), pet name, mode badge (เพื่อนเล่น teal /
-   หาคู่ amber), last message preview (or "เริ่มคุยกันเลย!"), and an unread dot
-   if the last message is from the other side and newer than the user's last visit.
-2. Tapping a match opens /app/chat/[matchId]: header with the other pet's
-   photo + name, message bubbles (mine: coral, right; theirs: white, left),
-   timestamps grouped by day in Thai (วันนี้, เมื่อวาน, or date).
-3. Message input: text only, send on Enter or button. Insert into `messages`.
-4. Realtime: subscribe to Supabase Realtime on the messages table filtered by
-   match_id so new messages appear instantly without refresh.
-5. Guard: users can only open chats for matches that include their own pet.
-6. Empty states: no matches yet → "ยังไม่มีแมตช์ ไปปัดการ์ดกันเถอะ!" with a button
-   to /app/swipe; empty chat → show the matched pets' photos and a prompt
-   suggestion like "ลองชวนนัดเดทที่สวนใกล้ๆ ดูสิ".
+NEXT_PUBLIC_SUPABASE_URL       # Supabase project URL
+NEXT_PUBLIC_SUPABASE_ANON_KEY  # Supabase anon/public key
+DEMO_EMAIL                     # Fixed demo account email (server-only)
+DEMO_PASSWORD                  # Fixed demo account password (server-only)
+SUPABASE_SERVICE_ROLE_KEY      # Seed scripts only — never expose to browser
 ```
-
-✅ **เช็คก่อนไปต่อ:** เปิด 2 browser คุยกัน ข้อความเด้ง realtime ทั้งสองฝั่ง
-
----
-
-## 🏠 PHASE 5 — Landing Page, Profile Page & Seed Data
-
-```
-Using the Master Context above:
-
-Finish the MVP with three tasks.
-
-TASK 1 — Landing page at / (public, full width, can be more expressive than app pages):
-- Hero: headline "หาเพื่อน หาคู่ ให้เจ้าตัวน้อยของคุณ", subheadline explaining the
-  two modes in one sentence, primary CTA "ลองเล่นเลย" (→ demo login) and secondary
-  "สมัครฟรี". Include a phone mockup frame showing a swipe card screenshot/illustration.
-- Section "ใช้งานยังไง" — 3 steps with icons: สร้างโปรไฟล์ → ปัดเลือก → แมตช์แล้วนัดเจอ
-- Section showing both modes side by side (teal card vs amber card) with playful copy
-- Footer: "Portfolio project by [NAME]" + links (GitHub, portfolio site)
-- Smooth scroll animations (intersection observer fade-ups), but keep it tasteful
-
-TASK 2 — /app/profile:
-- Show the user's pet profile as a preview card (same design as swipe card)
-- Edit button → reuse onboarding step components to edit each section
-- Mode toggles, logout button, and a "ลบบัญชี" link (with confirm dialog)
-
-TASK 3 — Seed data script:
-- Write a Node script (scripts/seed.ts) that creates ~45 fake pets:
-  25 dogs and 20 cats, mixed breeds/sexes/provinces (weight toward กรุงเทพฯ
-  and เชียงใหม่), realistic Thai pet names (น้องลาเต้, เจ้าถุงเงิน, มะลิ...),
-  varied personality tags and bios with personality, both modes represented.
-  Use https://placedog.net and https://placekitten.com style placeholder URLs
-  or a /public/seed-photos folder. Also create 8-10 likes pointing AT the demo
-  account's pet so the demo user gets instant matches when they like back.
-- Document how to run it in README.
-```
-
-✅ **เช็คงานจบ:** กดปุ่ม demo จาก landing → เจอการ์ดเพียบ → ไลก์ไม่กี่ทีก็ได้แมตช์ → คุยแชทได้ ครบ loop ใน 1 นาที
-
----
-
-## 🛠 เทคนิคการ Vibe Code ให้รอด
-
-1. **ทีละเฟส อย่าใจร้อน** — ตรวจ ✅ checkpoint ให้ผ่านก่อนไปเฟสถัดไปเสมอ ถ้าฐานพังแล้วสร้างต่อ จะพังทบต้น
-2. **เก็บ Master Context ไว้ในไฟล์ `CLAUDE.md`** ที่ root ของโปรเจกต์ — Claude Code จะอ่านอัตโนมัติทุกครั้ง ไม่ต้อง paste ซ้ำ
-3. **เจอ error ให้ paste error message ตรงๆ ทั้งก้อน** พร้อมบอกว่ากำลังทำอะไรอยู่ อย่าสรุปเอง
-4. **ขอให้มันอธิบาย** — พิมพ์ต่อท้ายว่า "explain what you changed and why" จะได้เรียนรู้ไปด้วย ไม่ใช่แค่ได้โค้ด
-5. **Commit ทุกครั้งที่จบเฟส** (`git commit`) — เป็น save point เหมือนเกม ถ้าเฟสถัดไปพังยับ ย้อนกลับได้
-6. **อย่าให้ AI แก้หลายอย่างพร้อมกัน** — บั๊ก 3 จุด ให้แก้ทีละจุด ไม่งั้นมันจะแก้จุดหนึ่งแล้วพังอีกจุด

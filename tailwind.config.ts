@@ -24,16 +24,18 @@ const config: Config = {
           DEFAULT: "#FFB84C",
           dark: "#F0A636",
         },
+        // Destructive/urgent trust actions only (block, delete review) — never
+        // used for primary actions like coral.
+        rose: "#E0445A",
         brown: {
           DEFAULT: "#2D2A26",
           muted: "#8A8580",
         },
       },
       fontFamily: {
-        // Nunito covers Latin, IBM Plex Sans Thai covers Thai glyphs
+        // Prompt covers both Thai and Latin in one family
         sans: [
-          "var(--font-nunito)",
-          "var(--font-ibm-plex-thai)",
+          "var(--font-prompt)",
           ...defaultTheme.fontFamily.sans,
         ],
       },

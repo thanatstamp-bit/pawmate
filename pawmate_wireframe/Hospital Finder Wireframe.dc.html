@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #D6D2CD; font-family: 'Prompt', sans-serif; }
+    @keyframes shimmer {
+      0%   { background-position: -600px 0; }
+      100% { background-position:  600px 0; }
+    }
+  </style>
+</helmet>
+
+<div style="min-height:100vh; padding:32px 24px 64px; display:flex; flex-direction:column; align-items:center; gap:16px;">
+
+  <span style="font-size:10px; font-weight:600; letter-spacing:0.1em; color:#8A8580; text-transform:uppercase; font-family:monospace; white-space:nowrap;">PawMate · /app/care/hospitals · Under Home branch · 390 px · Mid-fi wireframe</span>
+
+  <div style="display:flex; flex-direction:column; gap:8px;">
+
+    <!-- ══════════════════ ROW 1 ══════════════════ -->
+    <div style="display:flex; gap:24px;">
+      <div style="width:390px; text-align:center; font-size:10px; font-weight:600; letter-spacing:0.08em; color:#8A8580; font-family:monospace; text-transform:uppercase; white-space:nowrap;">① รายการ · Location granted</div>
+      <div style="width:390px; text-align:center; font-size:10px; font-weight:600; letter-spacing:0.08em; color:#8A8580; font-family:monospace; text-transform:uppercase; white-space:nowrap;">② แผนที่ · Map view · tap pin → sheet</div>
+    </div>
+
+    <div style="display:flex; gap:24px; align-items:flex-start;">
+
+      <!-- ════ FRAME 1 · LIST VIEW ════ -->
+      <div data-screen-label="① List View" style="width:390px; background:#FDFCFB; border-radius:24px; overflow:hidden; box-shadow:0 16px 56px rgba(0,0,0,0.22); display:flex; flex-direction:column;">
+
+        <!-- Header -->
+        <div style="height:56px; background:#FDFCFB; border-bottom:1px solid #EDEAE6; display:flex; align-items:center; padding:0 12px 0 4px; gap:4px; flex-shrink:0;">
+          <div style="width:44px; height:44px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2D2A26" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"></path></svg>
+          </div>
+          <span style="font-size:17px; font-weight:700; color:#2D2A26; flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">โรงพยาบาลสัตว์ใกล้ฉัน</span>
+          <div style="width:44px; height:44px;"></div>
+        </div>
+
+        <div style="flex:1; padding-bottom:20px;">
+
+          <!-- Segment: รายการ active -->
+          <div style="margin:16px 20px 0; background:#F5F3F0; border-radius:12px; padding:4px; display:flex; gap:4px;">
+            <div style="flex:1; height:36px; background:#FDFCFB; border-radius:9px; display:flex; align-items:center; justify-content:center; box-shadow:0 1px 3px rgba(0,0,0,0.09);">
+              <span style="font-size:14px; font-weight:600; color:#2D2A26;">รายการ</span>
+            </div>
+            <div style="flex:1; height:36px; display:flex; align-items:center; justify-content:center;">
+              <span style="font-size:14px; color:#8A8580;">แผนที่</span>
+            </div>
+          </div>
+
+          <!-- Filter row: 24h OFF -->
+          <div style="margin:12px 20px 0; display:flex; gap:8px; align-items:center;">
+            <div style="height:36px; background:#F5F3F0; border-radius:10px; padding:0 10px; display:flex; align-items:center; gap:5px; flex-shrink:0;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#5A5650" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+              <span style="font-size:13px; color:#2D2A26; white-space:nowrap;">กรุงเทพฯ</span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8A8580" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg>
+            </div>
+            <div style="height:36px; background:#F5F3F0; border-radius:10px; padding:0 10px; display:flex; align-items:center; gap:6px; flex-shrink:0;">
+              <span style="font-size:12px; color:#8A8580; white-space:nowrap;">เปิด 24 ชม.</span>
+              <div style="width:28px; height:16px; background:#D5D1CC; border-radius:8px; position:relative; flex-shrink:0;">
+                <div style="position:absolute; left:2px; top:2px; width:12px; height:12px; background:white; border-radius:50%;"></div>
+              </div>
+            </div>
+            <div style="flex:1; height:36px; background:#F5F3F0; border-radius:10px; padding:0 10px; display:flex; align-items:center; gap:6px; min-width:0;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg>
+              <span style="font-size:12px; color:#C5C0BB; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">ชื่อโรงพยาบาล</span>
+            </div>
+          </div>
+
+          <!-- Hospital cards -->
+          <div style="margin:16px 20px 0; display:flex; flex-direction:column; gap:10px;">
+
+            <!-- Card 1 · 24h -->
+            <div style="background:#FDFCFB; border:1px solid #EDEAE6; border-radius:16px; padding:14px 16px; display:flex; flex-direction:column; gap:8px;">
+              <div style="display:flex; align-items:flex-start; gap:8px;">
+                <span style="font-size:15px; font-weight:700; color:#2D2A26; flex:1; line-height:1.3;">โรงพยาบาลสัตว์กรุงเทพ</span>
+                <div style="background:rgba(255,107,91,0.12); border-radius:8px; padding:3px 8px; flex-shrink:0;">
+                  <span style="font-size:11px; font-weight:600; color:#FF6B5B; white-space:nowrap;">24 ชม.</span>
+                </div>
+              </div>
+              <div style="display:flex; align-items:center; justify-content:space-between;">
+                <div style="display:flex; align-items:center; gap:4px;">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#C5C0BB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                  <span style="font-size:12px; color:#8A8580;">บางรัก · กรุงเทพฯ</span>
+                </div>
+                <span style="font-size:12px; color:#B5B0AA;">1.2 กม.</span>
+              </div>
+              <div style="display:flex; flex-wrap:wrap; gap:6px;">
+                <div style="background:#F5F3F0; border-radius:8px; padding:3px 9px;"><span style="font-size:11px; color:#5A5650; white-space:nowrap;">ผ่าตัด</span></div>
+                <div style="background:#F5F3F0; border-radius:8px; padding:3px 9px;"><span style="font-size:11px; color:#5A5650; white-space:nowrap;">อายุรกรรม</span></div>
+                <div style="background:#F5F3F0; border-radius:8px; padding:3px 9px;"><span style="font-size:11px; color:#5A5650; white-space:nowrap;">ICU</span></div>
+              </div>
+            </div>
+
+            <!-- Card 2 · no 24h -->
+            <div style="background:#FDFCFB; border:1px solid #EDEAE6; border-radius:16px; padding:14px 16px; display:flex; flex-direction:column; gap:8px;">
+              <div style="display:flex; align-items:flex-start; gap:8px;">
+                <span style="font-size:15px; font-weight:700; color:#2D2A26; flex:1; line-height:1.3;">คลินิกสัตว์เลี้ยงนานา</span>
+              </div>
+              <div style="display:flex; align-items:center; justify-content:space-between;">
+                <div style="display:flex; align-items:center; gap:4px;">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#C5C0BB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                  <span style="font-size:12px; color:#8A8580;">พระโขนง · กรุงเทพฯ</span>
+                </div>
+                <span style="font-size:12px; color:#B5B0AA;">2.8 กม.</span>
+              </div>
+              <div style="display:flex; flex-wrap:wrap; gap:6px;">
+                <div style="background:#F5F3F0; border-radius:8px; padding:3px 9px;"><span style="font-size:11px; color:#5A5650; white-space:nowrap;">วัคซีน</span></div>
+                <div style="background:#F5F3F0; border-radius:8px; padding:3px 9px;"><span style="font-size:11px; color:#5A5650; white-space:nowrap;">ทำหมัน</span></div>
+                <div style="background:#F5F3F0; border-radius:8px; padding:3px 9px;"><span style="font-size:11px; color:#5A5650; white-space:nowrap;">ตรวจเลือด</span></div>
+              </div>
+            </div>
+
+            <!-- Card 3 · 24h -->
+            <div style="background:#FDFCFB; border:1px solid #EDEAE6; border-radius:16px; padding:14px 16px; display:flex; flex-direction:column; gap:8px;">
+              <div style="display:flex; align-items:flex-start; gap:8px;">
+                <span style="font-size:15px; font-weight:700; color:#2D2A26; flex:1; line-height:1.3;">รพ.สัตว์ลาดพร้าว 71</span>
+                <div style="background:rgba(255,107,91,0.12); border-radius:8px; padding:3px 8px; flex-shrink:0;">
+                  <span style="font-size:11px; font-weight:600; color:#FF6B5B; white-space:nowrap;">24 ชม.</span>
+                </div>
+              </div>
+              <div style="display:flex; align-items:center; justify-content:space-between;">
+                <div style="display:flex; align-items:center; gap:4px;">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#C5C0BB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                  <span style="font-size:12px; color:#8A8580;">ลาดพร้าว · กรุงเทพฯ</span>
+                </div>
+                <span style="font-size:12px; color:#B5B0AA;">4.1 กม.</span>
+              </div>
+              <div style="display:flex; flex-wrap:wrap; gap:6px;">
+                <div style="background:#F5F3F0; border-radius:8px; padding:3px 9px;"><span style="font-size:11px; color:#5A5650; white-space:nowrap;">ห้องปฏิบัติการ</span></div>
+                <div style="background:#F5F3F0; border-radius:8px; padding:3px 9px;"><span style="font-size:11px; color:#5A5650; white-space:nowrap;">ทันตกรรม</span></div>
+                <div style="background:#F5F3F0; border-radius:8px; padding:3px 9px;"><span style="font-size:11px; color:#5A5650; white-space:nowrap;">กายภาพ</span></div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Bottom nav -->
+        <div style="height:60px; border-top:1px solid #EDEAE6; display:grid; grid-template-columns:repeat(5,1fr); background:#FDFCFB; flex-shrink:0;">
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FF6B5B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg><span style="font-size:10px;font-weight:600;color:#FF6B5B;white-space:nowrap;">หน้าแรก</span></div>
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"></path><path d="M2 17l10 5 10-5"></path><path d="M2 12l10 5 10-5"></path></svg><span style="font-size:10px;color:#B5B0AA;white-space:nowrap;">ปัดการ์ด</span></div>
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg><span style="font-size:10px;color:#B5B0AA;white-space:nowrap;">แมตช์</span></div>
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg><span style="font-size:10px;color:#B5B0AA;white-space:nowrap;">แดชบอร์ด</span></div>
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg><span style="font-size:10px;color:#B5B0AA;white-space:nowrap;">โปรไฟล์</span></div>
+        </div>
+      </div>
+      <!-- /Frame 1 -->
+
+      <!-- ════ FRAME 2 · MAP VIEW ════ -->
+      <div data-screen-label="② Map View" style="width:390px; background:#FDFCFB; border-radius:24px; overflow:hidden; box-shadow:0 16px 56px rgba(0,0,0,0.22); display:flex; flex-direction:column;">
+
+        <!-- Header -->
+        <div style="height:56px; background:#FDFCFB; border-bottom:1px solid #EDEAE6; display:flex; align-items:center; padding:0 12px 0 4px; gap:4px; flex-shrink:0;">
+          <div style="width:44px; height:44px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2D2A26" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"></path></svg>
+          </div>
+          <span style="font-size:17px; font-weight:700; color:#2D2A26; flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">โรงพยาบาลสัตว์ใกล้ฉัน</span>
+          <div style="width:44px; height:44px;"></div>
+        </div>
+
+        <div style="flex:1;">
+          <!-- Segment: แผนที่ active -->
+          <div style="margin:16px 20px 0; background:#F5F3F0; border-radius:12px; padding:4px; display:flex; gap:4px;">
+            <div style="flex:1; height:36px; display:flex; align-items:center; justify-content:center;">
+              <span style="font-size:14px; color:#8A8580;">รายการ</span>
+            </div>
+            <div style="flex:1; height:36px; background:#FDFCFB; border-radius:9px; display:flex; align-items:center; justify-content:center; box-shadow:0 1px 3px rgba(0,0,0,0.09);">
+              <span style="font-size:14px; font-weight:600; color:#2D2A26;">แผนที่</span>
+            </div>
+          </div>
+
+          <!-- Filter row -->
+          <div style="margin:12px 20px 0; display:flex; gap:8px; align-items:center;">
+            <div style="height:36px; background:#F5F3F0; border-radius:10px; padding:0 10px; display:flex; align-items:center; gap:5px; flex-shrink:0;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#5A5650" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+              <span style="font-size:13px; color:#2D2A26; white-space:nowrap;">กรุงเทพฯ</span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8A8580" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg>
+            </div>
+            <div style="height:36px; background:#F5F3F0; border-radius:10px; padding:0 10px; display:flex; align-items:center; gap:6px; flex-shrink:0;">
+              <span style="font-size:12px; color:#8A8580; white-space:nowrap;">เปิด 24 ชม.</span>
+              <div style="width:28px; height:16px; background:#D5D1CC; border-radius:8px; position:relative; flex-shrink:0;">
+                <div style="position:absolute; left:2px; top:2px; width:12px; height:12px; background:white; border-radius:50%;"></div>
+              </div>
+            </div>
+            <div style="flex:1; height:36px; background:#F5F3F0; border-radius:10px; padding:0 10px; display:flex; align-items:center; gap:6px; min-width:0;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg>
+              <span style="font-size:12px; color:#C5C0BB; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">ชื่อโรงพยาบาล</span>
+            </div>
+          </div>
+
+          <!-- Map placeholder -->
+          <div style="margin:12px 20px 20px; border-radius:16px; overflow:hidden; position:relative; background:#EDE9E3; aspect-ratio:1.05;">
+            <svg style="position:absolute;inset:0;width:100%;height:100%;" viewBox="0 0 350 334" preserveAspectRatio="xMidYMid slice">
+              <rect width="350" height="334" fill="#EDE9E3"></rect>
+              <rect x="0" y="95" width="350" height="7" fill="#E4DED6"></rect>
+              <rect x="0" y="200" width="350" height="5" fill="#E4DED6"></rect>
+              <rect x="0" y="280" width="350" height="9" fill="#E0D9D0"></rect>
+              <rect x="85" y="0" width="7" height="334" fill="#E4DED6"></rect>
+              <rect x="195" y="0" width="5" height="334" fill="#E4DED6"></rect>
+              <rect x="275" y="0" width="9" height="334" fill="#E0D9D0"></rect>
+              <rect x="10" y="10" width="66" height="76" fill="#E8E3DC" rx="3"></rect>
+              <rect x="100" y="10" width="86" height="76" fill="#E8E3DC" rx="3"></rect>
+              <rect x="210" y="14" width="56" height="72" fill="#E8E3DC" rx="3"></rect>
+              <rect x="10" y="110" width="66" height="82" fill="#E8E3DC" rx="3"></rect>
+              <rect x="100" y="110" width="86" height="82" fill="#DCE6DC" rx="3"></rect>
+              <rect x="210" y="110" width="56" height="82" fill="#E8E3DC" rx="3"></rect>
+              <rect x="10" y="212" width="66" height="60" fill="#E8E3DC" rx="3"></rect>
+              <rect x="100" y="212" width="86" height="60" fill="#E8E3DC" rx="3"></rect>
+              <rect x="210" y="212" width="56" height="60" fill="#E8E3DC" rx="3"></rect>
+            </svg>
+            <!-- Legend -->
+            <div style="position:absolute;top:8px;left:8px;background:rgba(253,252,251,0.92);border-radius:8px;padding:6px 8px;display:flex;flex-direction:column;gap:4px;">
+              <div style="display:flex;align-items:center;gap:5px;"><div style="width:9px;height:9px;background:#FF6B5B;border-radius:50%;flex-shrink:0;"></div><span style="font-size:10px;color:#5A5650;white-space:nowrap;">เปิด 24 ชม.</span></div>
+              <div style="display:flex;align-items:center;gap:5px;"><div style="width:9px;height:9px;background:#5A5650;border-radius:50%;flex-shrink:0;"></div><span style="font-size:10px;color:#5A5650;white-space:nowrap;">ทั่วไป</span></div>
+            </div>
+            <!-- Map label -->
+            <div style="position:absolute;bottom:8px;right:8px;background:rgba(253,252,251,0.75);border-radius:5px;padding:3px 7px;"><span style="font-size:10px;color:#8A8580;font-family:monospace;">map placeholder</span></div>
+            <!-- Pin 1: coral 24h -->
+            <div style="position:absolute;top:42px;left:70px;display:flex;flex-direction:column;align-items:center;">
+              <div style="width:30px;height:30px;background:#FF6B5B;border-radius:50%;border:2.5px solid white;box-shadow:0 2px 7px rgba(0,0,0,0.22);display:flex;align-items:center;justify-content:center;">
+                <span style="font-size:11px;font-weight:700;color:white;line-height:1;">1</span>
+              </div>
+              <div style="width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:6px solid #FF6B5B;margin-top:-1px;"></div>
+            </div>
+            <!-- Pin 2: dark -->
+            <div style="position:absolute;top:142px;left:174px;display:flex;flex-direction:column;align-items:center;">
+              <div style="width:30px;height:30px;background:#5A5650;border-radius:50%;border:2.5px solid white;box-shadow:0 2px 7px rgba(0,0,0,0.22);display:flex;align-items:center;justify-content:center;">
+                <span style="font-size:11px;font-weight:700;color:white;line-height:1;">2</span>
+              </div>
+              <div style="width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:6px solid #5A5650;margin-top:-1px;"></div>
+            </div>
+            <!-- Pin 3: coral 24h -->
+            <div style="position:absolute;top:240px;left:32px;display:flex;flex-direction:column;align-items:center;">
+              <div style="width:30px;height:30px;background:#FF6B5B;border-radius:50%;border:2.5px solid white;box-shadow:0 2px 7px rgba(0,0,0,0.22);display:flex;align-items:center;justify-content:center;">
+                <span style="font-size:11px;font-weight:700;color:white;line-height:1;">3</span>
+              </div>
+              <div style="width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:6px solid #FF6B5B;margin-top:-1px;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom nav -->
+        <div style="height:60px; border-top:1px solid #EDEAE6; display:grid; grid-template-columns:repeat(5,1fr); background:#FDFCFB; flex-shrink:0;">
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FF6B5B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg><span style="font-size:10px;font-weight:600;color:#FF6B5B;white-space:nowrap;">หน้าแรก</span></div>
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"></path><path d="M2 17l10 5 10-5"></path><path d="M2 12l10 5 10-5"></path></svg><span style="font-size:10px;color:#B5B0AA;white-space:nowrap;">ปัดการ์ด</span></div>
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg><span style="font-size:10px;color:#B5B0AA;white-space:nowrap;">แมตช์</span></div>
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg><span style="font-size:10px;color:#B5B0AA;white-space:nowrap;">แดชบอร์ด</span></div>
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg><span style="font-size:10px;color:#B5B0AA;white-space:nowrap;">โปรไฟล์</span></div>
+        </div>
+      </div>
+      <!-- /Frame 2 -->
+
+    </div><!-- /Row 1 -->
+
+    <!-- ══════════════════ ROW 2 ══════════════════ -->
+    <div style="display:flex; gap:24px; margin-top:24px;">
+      <div style="width:390px; text-align:center; font-size:10px; font-weight:600; letter-spacing:0.08em; color:#8A8580; font-family:monospace; text-transform:uppercase; white-space:nowrap;">③ Bottom sheet · Hospital detail</div>
+      <div style="width:390px; text-align:center; font-size:10px; font-weight:600; letter-spacing:0.08em; color:#8A8580; font-family:monospace; text-transform:uppercase; white-space:nowrap;">④ Loading · Skeleton state</div>
+    </div>
+
+    <div style="display:flex; gap:24px; align-items:flex-start;">
+
+      <!-- ════ FRAME 3 · BOTTOM SHEET ════ -->
+      <div data-screen-label="③ Bottom Sheet" style="width:390px; background:#FDFCFB; border-radius:24px; overflow:hidden; box-shadow:0 16px 56px rgba(0,0,0,0.22); display:flex; flex-direction:column; position:relative;">
+
+        <!-- Header -->
+        <div style="height:56px; background:#FDFCFB; border-bottom:1px solid #EDEAE6; display:flex; align-items:center; padding:0 12px 0 4px; gap:4px; flex-shrink:0;">
+          <div style="width:44px; height:44px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2D2A26" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"></path></svg>
+          </div>
+          <span style="font-size:17px; font-weight:700; color:#2D2A26; flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">โรงพยาบาลสัตว์ใกล้ฉัน</span>
+          <div style="width:44px; height:44px;"></div>
+        </div>
+
+        <!-- Content: segment + filter + compressed map -->
+        <div style="flex:1; min-height:360px;">
+          <!-- Segment: map active -->
+          <div style="margin:16px 20px 0; background:#F5F3F0; border-radius:12px; padding:4px; display:flex; gap:4px;">
+            <div style="flex:1; height:36px; display:flex; align-items:center; justify-content:center;">
+              <span style="font-size:14px; color:#8A8580;">รายการ</span>
+            </div>
+            <div style="flex:1; height:36px; background:#FDFCFB; border-radius:9px; display:flex; align-items:center; justify-content:center; box-shadow:0 1px 3px rgba(0,0,0,0.09);">
+              <span style="font-size:14px; font-weight:600; color:#2D2A26;">แผนที่</span>
+            </div>
+          </div>
+          <!-- Filter -->
+          <div style="margin:12px 20px 0; display:flex; gap:8px; align-items:center;">
+            <div style="height:36px; background:#F5F3F0; border-radius:10px; padding:0 10px; display:flex; align-items:center; gap:5px; flex-shrink:0;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#5A5650" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+              <span style="font-size:13px; color:#2D2A26; white-space:nowrap;">กรุงเทพฯ</span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8A8580" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg>
+            </div>
+            <div style="height:36px; background:#F5F3F0; border-radius:10px; padding:0 10px; display:flex; align-items:center; gap:6px; flex-shrink:0;">
+              <span style="font-size:12px; color:#8A8580; white-space:nowrap;">เปิด 24 ชม.</span>
+              <div style="width:28px; height:16px; background:#D5D1CC; border-radius:8px; position:relative; flex-shrink:0;">
+                <div style="position:absolute; left:2px; top:2px; width:12px; height:12px; background:white; border-radius:50%;"></div>
+              </div>
+            </div>
+            <div style="flex:1; height:36px; background:#F5F3F0; border-radius:10px; padding:0 10px; display:flex; align-items:center; gap:6px; min-width:0;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg>
+              <span style="font-size:12px; color:#C5C0BB; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">ชื่อโรงพยาบาล</span>
+            </div>
+          </div>
+          <!-- Compressed map -->
+          <div style="margin:12px 20px 0; height:230px; border-radius:16px; overflow:hidden; position:relative; background:#EDE9E3;">
+            <svg style="position:absolute;inset:0;width:100%;height:100%;" viewBox="0 0 350 230" preserveAspectRatio="xMidYMid slice">
+              <rect width="350" height="230" fill="#EDE9E3"></rect>
+              <rect x="0" y="70" width="350" height="6" fill="#E4DED6"></rect>
+              <rect x="0" y="150" width="350" height="5" fill="#E4DED6"></rect>
+              <rect x="90" y="0" width="6" height="230" fill="#E4DED6"></rect>
+              <rect x="200" y="0" width="5" height="230" fill="#E4DED6"></rect>
+              <rect x="10" y="8" width="70" height="54" fill="#E8E3DC" rx="3"></rect>
+              <rect x="104" y="8" width="88" height="54" fill="#E8E3DC" rx="3"></rect>
+              <rect x="210" y="10" width="60" height="52" fill="#E8E3DC" rx="3"></rect>
+              <rect x="10" y="84" width="70" height="58" fill="#E8E3DC" rx="3"></rect>
+              <rect x="104" y="84" width="88" height="58" fill="#DCE6DC" rx="3"></rect>
+              <rect x="210" y="84" width="60" height="58" fill="#E8E3DC" rx="3"></rect>
+              <rect x="10" y="162" width="70" height="55" fill="#E8E3DC" rx="3"></rect>
+              <rect x="104" y="162" width="88" height="55" fill="#E8E3DC" rx="3"></rect>
+              <rect x="210" y="162" width="60" height="55" fill="#E8E3DC" rx="3"></rect>
+            </svg>
+            <!-- Pin 1 selected (larger + glow) -->
+            <div style="position:absolute;top:24px;left:60px;display:flex;flex-direction:column;align-items:center;">
+              <div style="width:36px;height:36px;background:#FF6B5B;border-radius:50%;border:3px solid white;box-shadow:0 0 0 4px rgba(255,107,91,0.25), 0 3px 10px rgba(0,0,0,0.25);display:flex;align-items:center;justify-content:center;">
+                <span style="font-size:13px;font-weight:700;color:white;line-height:1;">1</span>
+              </div>
+              <div style="width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-top:7px solid #FF6B5B;margin-top:-1px;"></div>
+            </div>
+            <!-- Pin 2 -->
+            <div style="position:absolute;top:94px;left:178px;display:flex;flex-direction:column;align-items:center;">
+              <div style="width:28px;height:28px;background:#5A5650;border-radius:50%;border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.2);display:flex;align-items:center;justify-content:center;">
+                <span style="font-size:10px;font-weight:700;color:white;line-height:1;">2</span>
+              </div>
+              <div style="width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:6px solid #5A5650;margin-top:-1px;"></div>
+            </div>
+            <!-- Pin 3 -->
+            <div style="position:absolute;top:165px;left:24px;display:flex;flex-direction:column;align-items:center;">
+              <div style="width:28px;height:28px;background:#FF6B5B;border-radius:50%;border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.2);display:flex;align-items:center;justify-content:center;">
+                <span style="font-size:10px;font-weight:700;color:white;line-height:1;">3</span>
+              </div>
+              <div style="width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:6px solid #FF6B5B;margin-top:-1px;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom nav (underneath the sheet) -->
+        <div style="height:60px; border-top:1px solid #EDEAE6; display:grid; grid-template-columns:repeat(5,1fr); background:#FDFCFB; flex-shrink:0;">
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FF6B5B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg><span style="font-size:10px;font-weight:600;color:#FF6B5B;white-space:nowrap;">หน้าแรก</span></div>
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"></path><path d="M2 17l10 5 10-5"></path><path d="M2 12l10 5 10-5"></path></svg><span style="font-size:10px;color:#B5B0AA;white-space:nowrap;">ปัดการ์ด</span></div>
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg><span style="font-size:10px;color:#B5B0AA;white-space:nowrap;">แมตช์</span></div>
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg><span style="font-size:10px;color:#B5B0AA;white-space:nowrap;">แดชบอร์ด</span></div>
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg><span style="font-size:10px;color:#B5B0AA;white-space:nowrap;">โปรไฟล์</span></div>
+        </div>
+
+        <!-- Scrim over header+content -->
+        <div style="position:absolute;top:56px;left:0;right:0;bottom:60px;background:rgba(0,0,0,0.22);z-index:9;pointer-events:none;border-radius:0;"></div>
+
+        <!-- Bottom sheet panel -->
+        <div style="position:absolute;left:0;right:0;bottom:60px;background:#FDFCFB;border-radius:20px 20px 0 0;z-index:10;padding:8px 20px 20px;box-shadow:0 -4px 24px rgba(0,0,0,0.13);">
+          <!-- Drag handle -->
+          <div style="width:36px;height:4px;background:#EDEAE6;border-radius:2px;margin:0 auto 14px;"></div>
+          <!-- Name + close -->
+          <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;">
+            <div style="flex:1;">
+              <span style="font-size:17px;font-weight:700;color:#2D2A26;line-height:1.3;display:block;">โรงพยาบาลสัตว์กรุงเทพ</span>
+              <div style="display:inline-flex;background:rgba(255,107,91,0.12);border-radius:7px;padding:2px 7px;margin-top:5px;">
+                <span style="font-size:11px;font-weight:600;color:#FF6B5B;white-space:nowrap;">24 ชม.</span>
+              </div>
+            </div>
+            <div style="width:32px;height:32px;background:#F5F3F0;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8A8580" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </div>
+          </div>
+          <!-- Address -->
+          <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:10px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:2px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+            <span style="font-size:13px;color:#5A5650;line-height:1.5;">123 ถ.สีลม แขวงสีลม เขตบางรัก กรุงเทพฯ 10500</span>
+          </div>
+          <!-- Phone row (tappable tel:) -->
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;padding:10px 12px;background:#F5F3F0;border-radius:12px;cursor:pointer;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5A5650" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.6 1.2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.81a16 16 0 0 0 6.29 6.29l.95-.95a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+            <span style="font-size:14px;color:#2D2A26;font-weight:500;flex:1;">02-234-5678</span>
+            <span style="font-size:10px;color:#B5B0AA;white-space:nowrap;font-family:monospace;">tel: tap to call</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"></path></svg>
+          </div>
+          <!-- Services chips -->
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;">
+            <div style="background:#F5F3F0;border-radius:8px;padding:3px 9px;"><span style="font-size:11px;color:#5A5650;white-space:nowrap;">ผ่าตัด</span></div>
+            <div style="background:#F5F3F0;border-radius:8px;padding:3px 9px;"><span style="font-size:11px;color:#5A5650;white-space:nowrap;">อายุรกรรม</span></div>
+            <div style="background:#F5F3F0;border-radius:8px;padding:3px 9px;"><span style="font-size:11px;color:#5A5650;white-space:nowrap;">ICU</span></div>
+          </div>
+          <!-- PRIMARY: นำทาง -->
+          <div style="height:52px;background:#FF6B5B;border-radius:16px;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg>
+            <span style="font-size:15px;font-weight:700;color:white;">นำทาง</span>
+          </div>
+        </div>
+
+      </div>
+      <!-- /Frame 3 -->
+
+      <!-- ════ FRAME 4 · LOADING SKELETON ════ -->
+      <div data-screen-label="④ Loading Skeleton" style="width:390px; background:#FDFCFB; border-radius:24px; overflow:hidden; box-shadow:0 16px 56px rgba(0,0,0,0.22); display:flex; flex-direction:column;">
+
+        <!-- Header -->
+        <div style="height:56px; background:#FDFCFB; border-bottom:1px solid #EDEAE6; display:flex; align-items:center; padding:0 12px 0 4px; gap:4px; flex-shrink:0;">
+          <div style="width:44px; height:44px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2D2A26" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"></path></svg>
+          </div>
+          <span style="font-size:17px; font-weight:700; color:#2D2A26; flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">โรงพยาบาลสัตว์ใกล้ฉัน</span>
+          <div style="width:44px; height:44px;"></div>
+        </div>
+
+        <div style="flex:1; padding-bottom:20px;">
+
+          <!-- Segment skeleton -->
+          <div style="margin:16px 20px 0; background:#F5F3F0; border-radius:12px; padding:4px; display:flex; gap:4px;">
+            <div style="flex:1; height:36px; background:linear-gradient(90deg,#EDEAE6 25%,#F5F3F0 50%,#EDEAE6 75%); background-size:600px 100%; animation:shimmer 1.5s infinite; border-radius:9px;"></div>
+            <div style="flex:1; height:36px; background:linear-gradient(90deg,#EDEAE6 25%,#F5F3F0 50%,#EDEAE6 75%); background-size:600px 100%; animation:shimmer 1.5s infinite 0.25s; border-radius:9px;"></div>
+          </div>
+
+          <!-- Filter skeleton -->
+          <div style="margin:12px 20px 0; display:flex; gap:8px;">
+            <div style="height:36px; width:110px; flex-shrink:0; background:linear-gradient(90deg,#EDEAE6 25%,#F5F3F0 50%,#EDEAE6 75%); background-size:600px 100%; animation:shimmer 1.5s infinite; border-radius:10px;"></div>
+            <div style="height:36px; width:108px; flex-shrink:0; background:linear-gradient(90deg,#EDEAE6 25%,#F5F3F0 50%,#EDEAE6 75%); background-size:600px 100%; animation:shimmer 1.5s infinite 0.1s; border-radius:10px;"></div>
+            <div style="flex:1; height:36px; background:linear-gradient(90deg,#EDEAE6 25%,#F5F3F0 50%,#EDEAE6 75%); background-size:600px 100%; animation:shimmer 1.5s infinite 0.2s; border-radius:10px;"></div>
+          </div>
+
+          <!-- 3 skeleton cards -->
+          <div style="margin:16px 20px 0; display:flex; flex-direction:column; gap:10px;">
+
+            <!-- Skeleton card A -->
+            <div style="background:#FDFCFB; border:1px solid #EDEAE6; border-radius:16px; padding:14px 16px; display:flex; flex-direction:column; gap:10px;">
+              <div style="display:flex; align-items:center; gap:8px;">
+                <div style="flex:1; height:18px; background:linear-gradient(90deg,#EDEAE6 25%,#F5F3F0 50%,#EDEAE6 75%); background-size:600px 100%; animation:shimmer 1.5s infinite; border-radius:6px;"></div>
+                <div style="width:52px; height:22px; flex-shrink:0; background:linear-gradient(90deg,#EDEAE6 25%,#F5F3F0 50%,#EDEAE6 75%); background-size:600px 100%; animation:shimmer 1.5s infinite; border-radius:8px;"></div>
+              </div>
+              <div style="height:14px; width:60%; background:linear-gradient(90deg,#EDEAE6 25%,#F5F3F0 50%,#EDEAE6 75%); background-size:600px 100%; animation:shimmer 1.5s infinite; border-radius:6px;"></div>
+              <div style="display:flex; gap:6px;">
+                <div style="height:22px; width:52px; background:linear-gradient(90deg,#EDEAE6 25%,#F5F3F0 50%,#EDEAE6 75%); background-size:600px 100%; animation:shimmer 1.5s infinite; border-radius:8px;"></div>
+                <div style="height:22px; width:68px; background:linear-gradient(90deg,#EDEAE6 25%,#F5F3F0 50%,#EDEAE6 75%); background-size:600px 100%; animation:shimmer 1.5s infinite; border-radius:8px;"></div>
+                <div style="height:22px; width:44px; background:linear-gradient(90deg,#EDEAE6 25%,#F5F3F0 50%,#EDEAE6 75%); background-size:600px 100%; animation:shimmer 1.5s infinite; border-radius:8px;"></div>
+              </div>
+            </div>
+
+            <!-- Skeleton card B -->
+            <div style="background:#FDFCFB; border:1px solid #EDEAE6; border-radius:16px; padding:14px 16px; display:flex; flex-direction:column; gap:10px;">
+              <div style="height:18px; width:75%; background:linear-gradient(90deg,#EDEAE6 25%,#F5F3F0 50%,#EDEAE6 75%); background-size:600px 100%; animation:shimmer 1.5s infinite 0.2s; border-radius:6px;"></div>
+              <div style="height:14px; width:55%; background:linear-gradient(90deg,#EDEAE6 25%,#F5F3F0 50%,#EDEAE6 75%); background-size:600px 100%; animation:shimmer 1.5s infinite 0.2s; border-radius:6px;"></div>
+              <div style="display:flex; gap:6px;">
+                <div style="height:22px; width:44px; background:linear-gradient(90deg,#EDEAE6 25%,#F5F3F0 50%,#EDEAE6 75%); background-size:600px 100%; animation:shimmer 1.5s infinite 0.2s; border-radius:8px;"></div>
+                <div style="height:22px; width:56px; background:linear-gradient(90deg,#EDEAE6 25%,#F5F3F0 50%,#EDEAE6 75%); background-size:600px 100%; animation:shimmer 1.5s infinite 0.2s; border-radius:8px;"></div>
+                <div style="height:22px; width:64px; background:linear-gradient(90deg,#EDEAE6 25%,#F5F3F0 50%,#EDEAE6 75%); background-size:600px 100%; animation:shimmer 1.5s infinite 0.2s; border-radius:8px;"></div>
+              </div>
+            </div>
+
+            <!-- Skeleton card C -->
+            <div style="background:#FDFCFB; border:1px solid #EDEAE6; border-radius:16px; padding:14px 16px; display:flex; flex-direction:column; gap:10px;">
+              <div style="display:flex; align-items:center; gap:8px;">
+                <div style="flex:1; height:18px; background:linear-gradient(90deg,#EDEAE6 25%,#F5F3F0 50%,#EDEAE6 75%); background-size:600px 100%; animation:shimmer 1.5s infinite 0.4s; border-radius:6px;"></div>
+                <div style="width:52px; height:22px; flex-shrink:0; background:linear-gradient(90deg,#EDEAE6 25%,#F5F3F0 50%,#EDEAE6 75%); background-size:600px 100%; animation:shimmer 1.5s infinite 0.4s; border-radius:8px;"></div>
+              </div>
+              <div style="height:14px; width:68%; background:linear-gradient(90deg,#EDEAE6 25%,#F5F3F0 50%,#EDEAE6 75%); background-size:600px 100%; animation:shimmer 1.5s infinite 0.4s; border-radius:6px;"></div>
+              <div style="display:flex; gap:6px;">
+                <div style="height:22px; width:76px; background:linear-gradient(90deg,#EDEAE6 25%,#F5F3F0 50%,#EDEAE6 75%); background-size:600px 100%; animation:shimmer 1.5s infinite 0.4s; border-radius:8px;"></div>
+                <div style="height:22px; width:52px; background:linear-gradient(90deg,#EDEAE6 25%,#F5F3F0 50%,#EDEAE6 75%); background-size:600px 100%; animation:shimmer 1.5s infinite 0.4s; border-radius:8px;"></div>
+                <div style="height:22px; width:44px; background:linear-gradient(90deg,#EDEAE6 25%,#F5F3F0 50%,#EDEAE6 75%); background-size:600px 100%; animation:shimmer 1.5s infinite 0.4s; border-radius:8px;"></div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Bottom nav -->
+        <div style="height:60px; border-top:1px solid #EDEAE6; display:grid; grid-template-columns:repeat(5,1fr); background:#FDFCFB; flex-shrink:0;">
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FF6B5B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg><span style="font-size:10px;font-weight:600;color:#FF6B5B;white-space:nowrap;">หน้าแรก</span></div>
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"></path><path d="M2 17l10 5 10-5"></path><path d="M2 12l10 5 10-5"></path></svg><span style="font-size:10px;color:#B5B0AA;white-space:nowrap;">ปัดการ์ด</span></div>
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg><span style="font-size:10px;color:#B5B0AA;white-space:nowrap;">แมตช์</span></div>
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg><span style="font-size:10px;color:#B5B0AA;white-space:nowrap;">แดชบอร์ด</span></div>
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg><span style="font-size:10px;color:#B5B0AA;white-space:nowrap;">โปรไฟล์</span></div>
+        </div>
+      </div>
+      <!-- /Frame 4 -->
+
+    </div><!-- /Row 2 -->
+
+    <!-- ══════════════════ ROW 3 ══════════════════ -->
+    <div style="display:flex; gap:24px; margin-top:24px;">
+      <div style="width:390px; text-align:center; font-size:10px; font-weight:600; letter-spacing:0.08em; color:#8A8580; font-family:monospace; text-transform:uppercase; white-space:nowrap;">⑤ Empty state · No filter match</div>
+      <div style="width:390px; text-align:center; font-size:10px; font-weight:600; letter-spacing:0.08em; color:#8A8580; font-family:monospace; text-transform:uppercase; white-space:nowrap;">⑥ Location denied · Province fallback</div>
+    </div>
+
+    <div style="display:flex; gap:24px; align-items:flex-start;">
+
+      <!-- ════ FRAME 5 · EMPTY STATE ════ -->
+      <div data-screen-label="⑤ Empty State" style="width:390px; background:#FDFCFB; border-radius:24px; overflow:hidden; box-shadow:0 16px 56px rgba(0,0,0,0.22); display:flex; flex-direction:column;">
+
+        <!-- Header -->
+        <div style="height:56px; background:#FDFCFB; border-bottom:1px solid #EDEAE6; display:flex; align-items:center; padding:0 12px 0 4px; gap:4px; flex-shrink:0;">
+          <div style="width:44px; height:44px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2D2A26" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"></path></svg>
+          </div>
+          <span style="font-size:17px; font-weight:700; color:#2D2A26; flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">โรงพยาบาลสัตว์ใกล้ฉัน</span>
+          <div style="width:44px; height:44px;"></div>
+        </div>
+
+        <div style="flex:1; padding-bottom:32px;">
+          <!-- Segment: รายการ active -->
+          <div style="margin:16px 20px 0; background:#F5F3F0; border-radius:12px; padding:4px; display:flex; gap:4px;">
+            <div style="flex:1; height:36px; background:#FDFCFB; border-radius:9px; display:flex; align-items:center; justify-content:center; box-shadow:0 1px 3px rgba(0,0,0,0.09);">
+              <span style="font-size:14px; font-weight:600; color:#2D2A26;">รายการ</span>
+            </div>
+            <div style="flex:1; height:36px; display:flex; align-items:center; justify-content:center;">
+              <span style="font-size:14px; color:#8A8580;">แผนที่</span>
+            </div>
+          </div>
+          <!-- Filter row: different province + 24h ON -->
+          <div style="margin:12px 20px 0; display:flex; gap:8px; align-items:center;">
+            <div style="height:36px; background:#F5F3F0; border-radius:10px; padding:0 10px; display:flex; align-items:center; gap:5px; flex-shrink:0;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#5A5650" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+              <span style="font-size:13px; color:#2D2A26; white-space:nowrap;">นครสวรรค์</span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8A8580" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg>
+            </div>
+            <!-- 24h toggle ON (coral) -->
+            <div style="height:36px; background:rgba(255,107,91,0.08); border:1px solid rgba(255,107,91,0.25); border-radius:10px; padding:0 10px; display:flex; align-items:center; gap:6px; flex-shrink:0;">
+              <span style="font-size:12px; color:#FF6B5B; font-weight:500; white-space:nowrap;">เปิด 24 ชม.</span>
+              <div style="width:28px; height:16px; background:#FF6B5B; border-radius:8px; position:relative; flex-shrink:0;">
+                <div style="position:absolute; right:2px; top:2px; width:12px; height:12px; background:white; border-radius:50%;"></div>
+              </div>
+            </div>
+            <div style="flex:1; height:36px; background:#F5F3F0; border-radius:10px; padding:0 10px; display:flex; align-items:center; gap:6px; min-width:0;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg>
+              <span style="font-size:12px; color:#C5C0BB; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">ชื่อโรงพยาบาล</span>
+            </div>
+          </div>
+          <!-- Empty state body -->
+          <div style="margin-top:52px; display:flex; flex-direction:column; align-items:center; gap:14px; padding:0 40px;">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#D5D1CC" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg>
+            <div style="text-align:center;">
+              <p style="font-size:16px; font-weight:700; color:#2D2A26; line-height:1.4;">ไม่พบโรงพยาบาล<br>ตามตัวกรอง</p>
+              <p style="font-size:13px; color:#8A8580; margin-top:8px; line-height:1.6; text-wrap:pretty;">ลองเปลี่ยนจังหวัด หรือปิดตัวกรอง "เปิด 24 ชม."</p>
+            </div>
+            <div style="height:44px; border:1.5px solid #FF6B5B; border-radius:14px; padding:0 24px; display:flex; align-items:center; justify-content:center; cursor:pointer; margin-top:4px;">
+              <span style="font-size:14px; font-weight:600; color:#FF6B5B; white-space:nowrap;">ล้างตัวกรอง</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom nav -->
+        <div style="height:60px; border-top:1px solid #EDEAE6; display:grid; grid-template-columns:repeat(5,1fr); background:#FDFCFB; flex-shrink:0;">
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FF6B5B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg><span style="font-size:10px;font-weight:600;color:#FF6B5B;white-space:nowrap;">หน้าแรก</span></div>
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"></path><path d="M2 17l10 5 10-5"></path><path d="M2 12l10 5 10-5"></path></svg><span style="font-size:10px;color:#B5B0AA;white-space:nowrap;">ปัดการ์ด</span></div>
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg><span style="font-size:10px;color:#B5B0AA;white-space:nowrap;">แมตช์</span></div>
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg><span style="font-size:10px;color:#B5B0AA;white-space:nowrap;">แดชบอร์ด</span></div>
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg><span style="font-size:10px;color:#B5B0AA;white-space:nowrap;">โปรไฟล์</span></div>
+        </div>
+      </div>
+      <!-- /Frame 5 -->
+
+      <!-- ════ FRAME 6 · LOCATION DENIED ════ -->
+      <div data-screen-label="⑥ Location Denied" style="width:390px; background:#FDFCFB; border-radius:24px; overflow:hidden; box-shadow:0 16px 56px rgba(0,0,0,0.22); display:flex; flex-direction:column;">
+
+        <!-- Header -->
+        <div style="height:56px; background:#FDFCFB; border-bottom:1px solid #EDEAE6; display:flex; align-items:center; padding:0 12px 0 4px; gap:4px; flex-shrink:0;">
+          <div style="width:44px; height:44px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2D2A26" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"></path></svg>
+          </div>
+          <span style="font-size:17px; font-weight:700; color:#2D2A26; flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">โรงพยาบาลสัตว์ใกล้ฉัน</span>
+          <div style="width:44px; height:44px;"></div>
+        </div>
+
+        <div style="flex:1; padding-bottom:20px;">
+          <!-- Segment: รายการ active -->
+          <div style="margin:16px 20px 0; background:#F5F3F0; border-radius:12px; padding:4px; display:flex; gap:4px;">
+            <div style="flex:1; height:36px; background:#FDFCFB; border-radius:9px; display:flex; align-items:center; justify-content:center; box-shadow:0 1px 3px rgba(0,0,0,0.09);">
+              <span style="font-size:14px; font-weight:600; color:#2D2A26;">รายการ</span>
+            </div>
+            <div style="flex:1; height:36px; display:flex; align-items:center; justify-content:center;">
+              <span style="font-size:14px; color:#8A8580;">แผนที่</span>
+            </div>
+          </div>
+          <!-- Filter row -->
+          <div style="margin:12px 20px 0; display:flex; gap:8px; align-items:center;">
+            <div style="height:36px; background:#F5F3F0; border-radius:10px; padding:0 10px; display:flex; align-items:center; gap:5px; flex-shrink:0;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#5A5650" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+              <span style="font-size:13px; color:#2D2A26; white-space:nowrap;">กรุงเทพฯ</span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8A8580" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg>
+            </div>
+            <div style="height:36px; background:#F5F3F0; border-radius:10px; padding:0 10px; display:flex; align-items:center; gap:6px; flex-shrink:0;">
+              <span style="font-size:12px; color:#8A8580; white-space:nowrap;">เปิด 24 ชม.</span>
+              <div style="width:28px; height:16px; background:#D5D1CC; border-radius:8px; position:relative; flex-shrink:0;">
+                <div style="position:absolute; left:2px; top:2px; width:12px; height:12px; background:white; border-radius:50%;"></div>
+              </div>
+            </div>
+            <div style="flex:1; height:36px; background:#F5F3F0; border-radius:10px; padding:0 10px; display:flex; align-items:center; gap:6px; min-width:0;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg>
+              <span style="font-size:12px; color:#C5C0BB; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">ชื่อโรงพยาบาล</span>
+            </div>
+          </div>
+          <!-- Location denied note (neutral, non-blocking) -->
+          <div style="margin:12px 20px 0; background:#F5F3F0; border-radius:12px; padding:10px 12px; display:flex; align-items:flex-start; gap:8px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8A8580" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+            <span style="font-size:12px; color:#8A8580; line-height:1.5; text-wrap:pretty;">ไม่สามารถเข้าถึงตำแหน่งของคุณ — เรียงผลตามจังหวัดของน้อง <strong style="color:#5A5650;">(กรุงเทพฯ)</strong></span>
+          </div>
+          <!-- Cards WITHOUT distance -->
+          <div style="margin:16px 20px 0; display:flex; flex-direction:column; gap:10px;">
+
+            <!-- Card 1 · 24h · no distance -->
+            <div style="background:#FDFCFB; border:1px solid #EDEAE6; border-radius:16px; padding:14px 16px; display:flex; flex-direction:column; gap:8px;">
+              <div style="display:flex; align-items:flex-start; gap:8px;">
+                <span style="font-size:15px; font-weight:700; color:#2D2A26; flex:1; line-height:1.3;">โรงพยาบาลสัตว์กรุงเทพ</span>
+                <div style="background:rgba(255,107,91,0.12); border-radius:8px; padding:3px 8px; flex-shrink:0;">
+                  <span style="font-size:11px; font-weight:600; color:#FF6B5B; white-space:nowrap;">24 ชม.</span>
+                </div>
+              </div>
+              <div style="display:flex; align-items:center; gap:4px;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#C5C0BB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                <span style="font-size:12px; color:#8A8580;">บางรัก · กรุงเทพฯ</span>
+              </div>
+              <div style="display:flex; flex-wrap:wrap; gap:6px;">
+                <div style="background:#F5F3F0; border-radius:8px; padding:3px 9px;"><span style="font-size:11px; color:#5A5650; white-space:nowrap;">ผ่าตัด</span></div>
+                <div style="background:#F5F3F0; border-radius:8px; padding:3px 9px;"><span style="font-size:11px; color:#5A5650; white-space:nowrap;">อายุรกรรม</span></div>
+                <div style="background:#F5F3F0; border-radius:8px; padding:3px 9px;"><span style="font-size:11px; color:#5A5650; white-space:nowrap;">ICU</span></div>
+              </div>
+            </div>
+
+            <!-- Card 2 · no 24h · no distance -->
+            <div style="background:#FDFCFB; border:1px solid #EDEAE6; border-radius:16px; padding:14px 16px; display:flex; flex-direction:column; gap:8px;">
+              <span style="font-size:15px; font-weight:700; color:#2D2A26; line-height:1.3;">คลินิกสัตว์เลี้ยงนานา</span>
+              <div style="display:flex; align-items:center; gap:4px;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#C5C0BB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                <span style="font-size:12px; color:#8A8580;">พระโขนง · กรุงเทพฯ</span>
+              </div>
+              <div style="display:flex; flex-wrap:wrap; gap:6px;">
+                <div style="background:#F5F3F0; border-radius:8px; padding:3px 9px;"><span style="font-size:11px; color:#5A5650; white-space:nowrap;">วัคซีน</span></div>
+                <div style="background:#F5F3F0; border-radius:8px; padding:3px 9px;"><span style="font-size:11px; color:#5A5650; white-space:nowrap;">ทำหมัน</span></div>
+                <div style="background:#F5F3F0; border-radius:8px; padding:3px 9px;"><span style="font-size:11px; color:#5A5650; white-space:nowrap;">ตรวจเลือด</span></div>
+              </div>
+            </div>
+
+            <!-- Card 3 · 24h · no distance -->
+            <div style="background:#FDFCFB; border:1px solid #EDEAE6; border-radius:16px; padding:14px 16px; display:flex; flex-direction:column; gap:8px;">
+              <div style="display:flex; align-items:flex-start; gap:8px;">
+                <span style="font-size:15px; font-weight:700; color:#2D2A26; flex:1; line-height:1.3;">รพ.สัตว์ลาดพร้าว 71</span>
+                <div style="background:rgba(255,107,91,0.12); border-radius:8px; padding:3px 8px; flex-shrink:0;">
+                  <span style="font-size:11px; font-weight:600; color:#FF6B5B; white-space:nowrap;">24 ชม.</span>
+                </div>
+              </div>
+              <div style="display:flex; align-items:center; gap:4px;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#C5C0BB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                <span style="font-size:12px; color:#8A8580;">ลาดพร้าว · กรุงเทพฯ</span>
+              </div>
+              <div style="display:flex; flex-wrap:wrap; gap:6px;">
+                <div style="background:#F5F3F0; border-radius:8px; padding:3px 9px;"><span style="font-size:11px; color:#5A5650; white-space:nowrap;">ห้องปฏิบัติการ</span></div>
+                <div style="background:#F5F3F0; border-radius:8px; padding:3px 9px;"><span style="font-size:11px; color:#5A5650; white-space:nowrap;">ทันตกรรม</span></div>
+                <div style="background:#F5F3F0; border-radius:8px; padding:3px 9px;"><span style="font-size:11px; color:#5A5650; white-space:nowrap;">กายภาพ</span></div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Bottom nav -->
+        <div style="height:60px; border-top:1px solid #EDEAE6; display:grid; grid-template-columns:repeat(5,1fr); background:#FDFCFB; flex-shrink:0;">
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FF6B5B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg><span style="font-size:10px;font-weight:600;color:#FF6B5B;white-space:nowrap;">หน้าแรก</span></div>
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"></path><path d="M2 17l10 5 10-5"></path><path d="M2 12l10 5 10-5"></path></svg><span style="font-size:10px;color:#B5B0AA;white-space:nowrap;">ปัดการ์ด</span></div>
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg><span style="font-size:10px;color:#B5B0AA;white-space:nowrap;">แมตช์</span></div>
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg><span style="font-size:10px;color:#B5B0AA;white-space:nowrap;">แดชบอร์ด</span></div>
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg><span style="font-size:10px;color:#B5B0AA;white-space:nowrap;">โปรไฟล์</span></div>
+        </div>
+      </div>
+      <!-- /Frame 6 -->
+
+    </div><!-- /Row 3 -->
+
+    <!-- ══════════════════ ANNOTATION KEY ══════════════════ -->
+    <div style="width:804px; border-radius:12px; background:rgba(0,0,0,0.07); padding:14px 16px; display:flex; flex-direction:column; gap:4px; margin-top:8px;">
+      <span style="font-size:10px; font-weight:700; letter-spacing:0.08em; color:#6A6560; text-transform:uppercase; font-family:monospace; display:block; margin-bottom:4px;">Annotations</span>
+      <span style="font-size:11px; color:#8A8580; font-family:monospace; line-height:1.9;">
+        · Nav: หน้าแรก always active (coral) — hospital finder is sub-page of Home · ← back arrow → /app/care<br>
+        · Segment: pill toggle, active tab has white bg + subtle shadow · inactive tab is muted text only<br>
+        · Filter row: จังหวัด dropdown (pre-filled from pet profile) · เปิด 24 ชม. toggle pill · flex-grow search field<br>
+        · ① List: cards sorted by distance (gps) · coral "24 ชม." badge on open_24h=true · services as muted chips<br>
+        · ② Map: schematic placeholder · coral pin = 24h · dark pin = regular · legend top-left · pin shape = circle+triangle<br>
+        · ③ Bottom sheet: slides up over map · scrim dims content · drag handle · tel: row opens native dialer · "นำทาง" = coral primary CTA opens OS maps<br>
+        · ④ Skeleton: shimmer on segment + filter + card lines · staggered animation-delay per card<br>
+        · ⑤ Empty: fired when API returns 0 results · filters shown in active state · "ล้างตัวกรอง" resets all filters<br>
+        · ⑥ Location denied: neutral info banner — app DOES NOT break · falls back to pet's registered province · no distance column shown
+      </span>
+    </div>
+
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {}
+</script>
+</body>
+</html>

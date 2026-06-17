@@ -1,13 +1,11 @@
 /**
- * Seed script — creates ~45 fake pets and pre-likes pointing at the demo account's pet.
+ * Seed script — creates ~100 fake pets and pre-likes pointing at the demo account's pet.
  *
- * Usage:
- *   1. Copy .env.local to this directory or ensure NEXT_PUBLIC_SUPABASE_URL,
- *      NEXT_PUBLIC_SUPABASE_ANON_KEY, DEMO_EMAIL, and SUPABASE_SERVICE_ROLE_KEY are set.
- *   2. npx ts-node --project tsconfig.json scripts/seed.ts
+ * Usage (run from the project root):
+ *   npx ts-node --project scripts/tsconfig.json scripts/seed.ts
  *
- * Requires SUPABASE_SERVICE_ROLE_KEY (secret key) to bypass RLS for bulk inserts.
- * Never commit the service role key to git.
+ * Requires .env.local with NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY,
+ * and DEMO_EMAIL. The service role key bypasses RLS — never commit it to git.
  */
 
 import { createClient } from "@supabase/supabase-js";
@@ -49,6 +47,11 @@ const DOG_NAMES = [
   "เจ้าชาเขียว", "น้องเฮเซล", "เจ้าโกโก้", "น้องท็อฟฟี่", "เจ้าพุดดิ้ง",
   "น้องไอติม", "เจ้าชีส", "น้องน้ำตาล", "เจ้าแคนดี้", "น้องมาร์ชเมลโล่",
   "เจ้าบิสกิต", "น้องนัท", "เจ้าวานิลา", "น้องกาแฟ", "เจ้าโอรีโอ้",
+  "น้องเบเกิล", "เจ้าพาย", "น้องวิปครีม", "เจ้าซินนามอน", "น้องมัฟฟิน",
+  "เจ้าโดนัท", "น้องทาร์ต", "เจ้าครัวซองต์", "น้องสโคน", "เจ้าเอแคลร์",
+  "น้องมาการง", "เจ้าทรัฟเฟิล", "น้องครีมชีส", "เจ้าพีนัทบัตเตอร์", "น้องเจลลี่",
+  "เจ้าฟัดจ์", "น้องบรูเล่", "เจ้าแพนเค้ก", "น้องชูครีม", "เจ้าเมลอน",
+  "น้องสตรอเบอร์รี่", "เจ้าบลูเบอร์รี่", "น้องราสเบอร์รี่", "เจ้าแบล็กเคอร์แรนท์", "น้องแอปเปิ้ล",
 ];
 
 const CAT_NAMES = [
@@ -56,11 +59,17 @@ const CAT_NAMES = [
   "เจ้าโซระ", "น้องคิริ", "เจ้าอาโอะ", "น้องนาชิ", "เจ้าโมโม่",
   "น้องอิจิโกะ", "เจ้าโทฟุ", "น้องดาวิ", "เจ้าพลอย", "น้องแพรว",
   "เจ้ามุก", "น้องไข่มุก", "เจ้าทับทิม", "น้องมรกต", "เจ้าโอปอล",
+  "น้องนิล", "เจ้าเพชร", "น้องบุษย์", "เจ้าแก้วตา", "น้องกามิ",
+  "เจ้าอุซากิ", "น้องคิสุ", "เจ้าริน", "น้องมิยะ", "เจ้าอาคิ",
+  "น้องฮารุ", "เจ้านัตสึ", "น้องฟุยุ", "เจ้าโรส", "น้องลิลลี่",
+  "เจ้าเดซี่", "น้องไอริส", "เจ้าไวโอเล็ต", "น้องออร์คิด", "เจ้าแจสมีน",
+  "น้องทิวลิป", "เจ้าลาเวนเดอร์", "น้องดาหลา", "เจ้าชมพู่", "น้องมะปราง",
 ];
 
 const TAGS = [
   "ขี้เล่น", "ขี้อ้อน", "ใจดี", "ขี้กลัว", "พลังเยอะ",
   "ชอบนอน", "เข้ากับเด็กได้", "ฉลาด", "ซุกซน", "เชื่อฟัง",
+  "ชอบน้ำ", "กลัวน้ำ", "ชอบเดินเล่น", "ดุกับแปลกหน้า", "เข้ากับแมวได้",
 ];
 
 const PROVINCES_WEIGHTED = [
@@ -94,16 +103,23 @@ function randInt(min: number, max: number): number {
 async function main() {
   console.log("🐾 PawMate seed script starting...\n");
 
-  // Find demo account's pet (if it exists) for pre-likes
-  const { data: demoUser } = await supabase.auth.admin.listUsers();
-  const demo = demoUser?.users.find((u) => u.email === demoEmail);
+  // Find demo account's pet (if it exists) for pre-likes.
+  // Keep the full user list around — also used below to find every real
+  // (non-seed-bot) pet that needs a breeding-compatible cohort.
+  const { data: usersPage } = await supabase.auth.admin.listUsers();
+  const allUsers = usersPage?.users ?? [];
+  const demo = allUsers.find((u) => u.email === demoEmail);
   let demoPetId: string | null = null;
 
   if (demo) {
+    // limit(1) before maybeSingle() — the demo account can own multiple
+    // pets (multi-pet support); a bare maybeSingle() errors on >1 rows and
+    // silently looks like "no pet", skipping pre-likes entirely.
     const { data: dp } = await supabase
       .from("pets")
       .select("id, species, breed, sex")
       .eq("owner_id", demo.id)
+      .limit(1)
       .maybeSingle();
     if (dp) {
       demoPetId = dp.id;
@@ -132,9 +148,9 @@ async function main() {
 
   const createdPetIds: string[] = [];
 
-  // ── Dogs (25) ──────────────────────────────────────────────────────────────
-  console.log("Creating 25 dogs...");
-  for (let i = 0; i < 25; i++) {
+  // ── Dogs (45) ──────────────────────────────────────────────────────────────
+  console.log("Creating 45 dogs...");
+  for (let i = 0; i < 45; i++) {
     const sex = i % 2 === 0 ? "male" : "female";
     const breed = pick(DOG_BREEDS);
     const province = pick(PROVINCES_WEIGHTED);
@@ -172,9 +188,9 @@ async function main() {
   }
   console.log("\n");
 
-  // ── Cats (20) ──────────────────────────────────────────────────────────────
-  console.log("Creating 20 cats...");
-  for (let i = 0; i < 20; i++) {
+  // ── Cats (40) ──────────────────────────────────────────────────────────────
+  console.log("Creating 40 cats...");
+  for (let i = 0; i < 40; i++) {
     const sex = i % 2 === 0 ? "female" : "male";
     const breed = pick(CAT_BREEDS);
     const province = pick(PROVINCES_WEIGHTED);
@@ -212,59 +228,67 @@ async function main() {
   }
   console.log("\n");
 
-  // ── Breeding-compatible pets for demo ────────────────────────────────────
-  if (demo) {
-    const { data: dp } = await supabase
-      .from("pets")
-      .select("id, species, breed, sex, modes")
-      .eq("owner_id", demo.id)
-      .maybeSingle();
+  // ── Breeding-compatible pets for every real pet with breeding mode on ───
+  // Generate a cohort per pet (not just "the" demo pet) — once multi-pet
+  // support shipped, any pet whose breed/sex didn't match the single pet
+  // this used to key off of had zero opposite-sex candidates, so its
+  // breeding deck ran dry the moment the few naturally-random same-breed
+  // matches in the general pool got liked.
+  const realUserIds = new Set(
+    allUsers.filter((u) => !u.email?.endsWith("@pawmate.internal")).map((u) => u.id)
+  );
+  const { data: breedingPets } = await supabase
+    .from("pets")
+    .select("id, owner_id, species, breed, sex, modes")
+    .contains("modes", ["breeding"]);
+  const realBreedingPets = (breedingPets ?? []).filter((p) => realUserIds.has(p.owner_id));
 
-    if (dp && dp.modes?.includes("breeding")) {
-      const oppSex = dp.sex === "male" ? "female" : "male";
-      const names = dp.species === "dog" ? DOG_NAMES : CAT_NAMES;
-      const photoFn = dp.species === "dog" ? dogPhoto : catPhoto;
-      console.log(`Creating 8 breeding-compatible pets (${dp.species}, ${dp.breed}, ${oppSex})...`);
+  for (const dp of realBreedingPets) {
+    const oppSex = dp.sex === "male" ? "female" : "male";
+    const names = dp.species === "dog" ? DOG_NAMES : CAT_NAMES;
+    const photoFn = dp.species === "dog" ? dogPhoto : catPhoto;
+    const cohortNames = pickN(names, 8);
+    console.log(`Creating 8 breeding-compatible pets for ${dp.id} (${dp.species}, ${dp.breed}, ${oppSex})...`);
 
-      for (let i = 0; i < 8; i++) {
-        const province = pick(PROVINCES_WEIGHTED);
-        const tags = pickN(TAGS, randInt(2, 4));
-        const name = names[(i + 5) % names.length];
-        const { data: bp, error } = await supabase
-          .from("pets")
-          .insert({
-            owner_id: seedUserId,
-            name,
-            species: dp.species,
-            breed: dp.breed,
-            sex: oppSex,
-            birth_month: `${randInt(2019, 2024)}-${String(randInt(1, 12)).padStart(2, "0")}-01`,
-            photos: [photoFn(200 + i), photoFn(250 + i)],
-            personality_tags: tags,
-            province,
-            district: null,
-            modes: ["playdate", "breeding"],
-            vaccinated: true,
-            neutered: false,
-            bio: `${name} เป็น${dp.species === "dog" ? "น้องหมา" : "แมว"}สายพันธุ์${dp.breed}ที่${tags[0]} อาศัยอยู่แถว${province}`,
-          })
-          .select("id")
-          .single();
+    for (let i = 0; i < 8; i++) {
+      const province = pick(PROVINCES_WEIGHTED);
+      const tags = pickN(TAGS, randInt(2, 4));
+      const name = cohortNames[i];
+      const { data: bp, error } = await supabase
+        .from("pets")
+        .insert({
+          owner_id: seedUserId,
+          name,
+          species: dp.species,
+          breed: dp.breed,
+          sex: oppSex,
+          birth_month: `${randInt(2019, 2024)}-${String(randInt(1, 12)).padStart(2, "0")}-01`,
+          photos: [photoFn(300 + i), photoFn(350 + i)],
+          personality_tags: tags,
+          province,
+          district: null,
+          modes: ["playdate", "breeding"],
+          vaccinated: true,
+          neutered: false,
+          bio: `${name} เป็น${dp.species === "dog" ? "น้องหมา" : "แมว"}สายพันธุ์${dp.breed}ที่${tags[0]} อาศัยอยู่แถว${province}`,
+        })
+        .select("id")
+        .single();
 
-        if (error) { console.error(`Breeding pet ${i} error:`, error.message); continue; }
-        createdPetIds.push(bp!.id);
+      if (error) { console.error(`Breeding pet for ${dp.id} error:`, error.message); continue; }
+      createdPetIds.push(bp!.id);
 
-        // Pre-like in breeding mode → demo pet
-        await supabase.from("likes").insert({
-          from_pet_id: bp!.id,
-          to_pet_id: dp.id,
-          mode: "breeding",
-        });
-        process.stdout.write("💕 ");
-      }
-      console.log("\n✅ Breeding pets + pre-likes created!\n");
-      demoPetId = dp.id;
+      // Pre-like in breeding mode → this pet
+      await supabase.from("likes").insert({
+        from_pet_id: bp!.id,
+        to_pet_id: dp.id,
+        mode: "breeding",
+      });
+      process.stdout.write("💕 ");
     }
+  }
+  if (realBreedingPets.length > 0) {
+    console.log("\n✅ Breeding-compatible pets + pre-likes created for all real pets!\n");
   }
 
   // ── Pre-likes pointing AT demo's pet (playdate) ───────────────────────────
@@ -282,7 +306,7 @@ async function main() {
     console.log("\n✅ Pre-likes created — demo user will match instantly when they like back!\n");
   }
 
-  console.log(`\n🎉 Seed complete! Created ${createdPetIds.length} pets.`);
+  console.log(`\n🎉 Seed complete! Created ${createdPetIds.length} pets (45 dogs + 40 cats + breeding-compatible).`);
   console.log(`   Seed user ID: ${seedUserId}`);
   console.log("   To clean up seed data, delete the seed user from Supabase Auth dashboard.\n");
 }

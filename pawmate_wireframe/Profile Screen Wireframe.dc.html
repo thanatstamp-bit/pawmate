@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #D6D2CD; font-family: 'Prompt', sans-serif; }
+  </style>
+</helmet>
+
+<div style="min-height: 100vh; padding: 32px 24px 64px; display: flex; flex-direction: column; align-items: center; gap: 16px; overflow-x: auto;">
+
+  <span style="font-size: 10px; font-weight: 600; letter-spacing: 0.1em; color: #8A8580; text-transform: uppercase; font-family: monospace; white-space: nowrap;">PawMate · Pet Profile /app/profile · 390px · Mid-fi wireframe</span>
+
+  <div style="display: flex; flex-direction: column; gap: 8px;">
+
+    <!-- Labels -->
+    <div style="display: flex; gap: 24px;">
+      <div style="width: 390px; text-align: center; font-size: 10px; font-weight: 600; letter-spacing: 0.08em; color: #8A8580; font-family: monospace; text-transform: uppercase; white-space: nowrap;">A · Preview / Read</div>
+      <div style="width: 390px; text-align: center; font-size: 10px; font-weight: 600; letter-spacing: 0.08em; color: #8A8580; font-family: monospace; text-transform: uppercase; white-space: nowrap;">B · Edit mode</div>
+      <div style="width: 390px; text-align: center; font-size: 10px; font-weight: 600; letter-spacing: 0.08em; color: #8A8580; font-family: monospace; text-transform: uppercase; white-space: nowrap;">C · Loading · Skeletons</div>
+      <div style="width: 390px; text-align: center; font-size: 10px; font-weight: 600; letter-spacing: 0.08em; color: #8A8580; font-family: monospace; text-transform: uppercase; white-space: nowrap;">D · Empty · No profile yet</div>
+      <div style="width: 390px; text-align: center; font-size: 10px; font-weight: 600; letter-spacing: 0.08em; color: #FF6B5B; font-family: monospace; text-transform: uppercase; white-space: nowrap;">E · บันทึกแล้ว · Toast</div>
+    </div>
+
+    <div style="display: flex; gap: 24px; align-items: flex-start;">
+
+      <!-- ════ A · PREVIEW / READ ════ -->
+      <div style="width: 390px; background: #FDFCFB; border-radius: 24px; overflow: hidden; box-shadow: 0 16px 56px rgba(0,0,0,0.22); display: flex; flex-direction: column;">
+
+        <!-- Header -->
+        <div style="height: 56px; background: #FDFCFB; border-bottom: 1px solid #EDEAE6; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; flex-shrink: 0;">
+          <div style="display: flex; align-items: center; gap: 7px;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2D2A26" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="3" r="1.5"></circle><circle cx="15" cy="3" r="1.5"></circle><circle cx="4" cy="9" r="1.5"></circle><circle cx="20" cy="9" r="1.5"></circle><path d="M12 10c-3 3-6 3.5-6 7a6 6 0 0 0 12 0c0-3.5-3-4-6-7z"></path></svg>
+            <span style="font-size: 17px; font-weight: 700; color: #2D2A26; white-space: nowrap;">PawMate</span>
+          </div>
+          <div style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2D2A26" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+          </div>
+        </div>
+
+        <!-- Scrollable content -->
+        <div style="flex: 1;">
+
+          <!-- Photo carousel -->
+          <div style="position: relative; height: 280px; background: #E0DDD8; flex-shrink: 0;">
+            <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 8px;">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="m21 15-5-5L5 21"></path></svg>
+              <span style="font-size: 10px; color: #B5B0AA; font-family: monospace;">pet photo 1 / 3</span>
+            </div>
+            <!-- Dot indicators -->
+            <div style="position: absolute; bottom: 14px; left: 0; right: 0; display: flex; justify-content: center; gap: 6px;">
+              <div style="width: 8px; height: 8px; border-radius: 50%; background: white;"></div>
+              <div style="width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.45);"></div>
+              <div style="width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.45);"></div>
+            </div>
+          </div>
+
+          <!-- Info section -->
+          <div style="padding: 20px 20px 24px;">
+
+            <!-- Name + age -->
+            <div style="display: flex; align-items: baseline; gap: 8px; margin-bottom: 10px;">
+              <h2 style="font-size: 26px; font-weight: 700; color: #2D2A26;">บัดดี้</h2>
+              <span style="font-size: 16px; color: #8A8580; font-weight: 500;">• 3 ปี</span>
+            </div>
+
+            <!-- Mode badges -->
+            <div style="display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap;">
+              <span style="display: inline-flex; align-items: center; gap: 5px; background: rgba(46,196,182,0.10); border: 1.5px solid rgba(46,196,182,0.35); color: #26A89C; border-radius: 20px; padding: 5px 12px; font-size: 12px; font-weight: 600; white-space: nowrap;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                หาเพื่อนเล่น
+              </span>
+              <span style="display: inline-flex; align-items: center; gap: 5px; background: rgba(255,184,76,0.10); border: 1.5px solid rgba(255,184,76,0.40); color: #b08000; border-radius: 20px; padding: 5px 12px; font-size: 12px; font-weight: 600; white-space: nowrap;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                หาคู่
+              </span>
+            </div>
+
+            <!-- Breed / sex row -->
+            <div style="display: flex; gap: 16px; margin-bottom: 14px;">
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8A8580" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg>
+                <span style="font-size: 14px; color: #5A5650; font-weight: 500;">โกลเด้น รีทรีฟเวอร์</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8A8580" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"></path></svg>
+                <span style="font-size: 14px; color: #5A5650; font-weight: 500;">เพศผู้</span>
+              </div>
+            </div>
+
+            <!-- Vaccine / neuter pills -->
+            <div style="display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap;">
+              <span style="display: inline-flex; align-items: center; gap: 4px; background: rgba(46,196,182,0.09); border: 1px solid rgba(46,196,182,0.3); color: #26A89C; border-radius: 20px; padding: 4px 10px; font-size: 12px; font-weight: 600; white-space: nowrap;">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                ฉีดวัคซีนแล้ว
+              </span>
+              <span style="display: inline-flex; align-items: center; gap: 4px; background: rgba(46,196,182,0.09); border: 1px solid rgba(46,196,182,0.3); color: #26A89C; border-radius: 20px; padding: 4px 10px; font-size: 12px; font-weight: 600; white-space: nowrap;">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                ทำหมันแล้ว
+              </span>
+            </div>
+
+            <!-- Edit button -->
+            <div style="height: 52px; background: #FF6B5B; border-radius: 16px; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; box-shadow: 0 4px 12px rgba(255,107,91,0.25);">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+              <span style="font-size: 17px; font-weight: 600; color: white; white-space: nowrap;">แก้ไขโปรไฟล์</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom nav — โปรไฟล์ active -->
+        <div style="height: 60px; border-top: 1px solid #EDEAE6; display: grid; grid-template-columns: repeat(5, 1fr); background: #FDFCFB; flex-shrink: 0;">
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg><span style="font-size: 10px; color: #B5B0AA; white-space: nowrap;">หน้าแรก</span></div>
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"></path><path d="M2 17l10 5 10-5"></path><path d="M2 12l10 5 10-5"></path></svg><span style="font-size: 10px; color: #B5B0AA; white-space: nowrap;">ปัดการ์ด</span></div>
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg><span style="font-size: 10px; color: #B5B0AA; white-space: nowrap;">แมตช์</span></div>
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg><span style="font-size: 10px; color: #B5B0AA; white-space: nowrap;">แดชบอร์ด</span></div>
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FF6B5B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg><span style="font-size: 10px; font-weight: 600; color: #FF6B5B; white-space: nowrap;">โปรไฟล์</span></div>
+        </div>
+      </div>
+      <!-- /A -->
+
+      <!-- ════ B · EDIT MODE ════ -->
+      <div style="width: 390px; background: #FDFCFB; border-radius: 24px; overflow: hidden; box-shadow: 0 16px 56px rgba(0,0,0,0.22); display: flex; flex-direction: column;">
+
+        <!-- Edit header (replaces global header while in edit) -->
+        <div style="height: 56px; background: #FDFCFB; border-bottom: 1px solid #EDEAE6; display: grid; grid-template-columns: max-content 1fr max-content; align-items: center; padding: 0 8px 0 4px; flex-shrink: 0; gap: 8px;">
+          <div style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2D2A26" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"></path></svg>
+          </div>
+          <span style="font-size: 16px; font-weight: 700; color: #2D2A26; text-align: center;">แก้ไขโปรไฟล์น้อง</span>
+          <div style="width: 44px; height: 44px;"></div>
+        </div>
+
+        <!-- Scrollable form -->
+        <div style="flex: 1; padding: 20px 20px 100px; display: flex; flex-direction: column; gap: 20px;">
+
+          <!-- Photo manager -->
+          <div>
+            <label style="font-size: 13px; font-weight: 600; color: #2D2A26; display: block; margin-bottom: 10px;">รูปน้อง <span style="color: #B5B0AA; font-weight: 400;">(ลากเพื่อเรียงลำดับ)</span></label>
+            <div style="display: flex; gap: 10px;">
+              <!-- Main photo (slot 1) -->
+              <div style="width: 92px; flex-shrink: 0;">
+                <div style="height: 92px; background: #E0DDD8; border-radius: 14px; border: 2.5px solid #FF6B5B; display: flex; align-items: center; justify-content: center; position: relative;">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="m21 15-5-5L5 21"></path></svg>
+                  <!-- Remove badge -->
+                  <div style="position: absolute; top: -6px; right: -6px; width: 20px; height: 20px; border-radius: 50%; background: #E0445A; display: flex; align-items: center; justify-content: center; border: 2px solid #FDFCFB;">
+                    <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"></path></svg>
+                  </div>
+                </div>
+                <div style="margin-top: 5px; text-align: center;"><span style="font-size: 10px; font-weight: 700; color: #FF6B5B; white-space: nowrap;">รูปหลัก</span></div>
+              </div>
+              <!-- Slot 2 -->
+              <div style="width: 92px; flex-shrink: 0;">
+                <div style="height: 92px; background: #E5E2DE; border-radius: 14px; border: 2px solid #EDEAE6; display: flex; align-items: center; justify-content: center; position: relative;">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#C5C0BB" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="m21 15-5-5L5 21"></path></svg>
+                  <div style="position: absolute; top: -6px; right: -6px; width: 20px; height: 20px; border-radius: 50%; background: #E0445A; display: flex; align-items: center; justify-content: center; border: 2px solid #FDFCFB;">
+                    <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"></path></svg>
+                  </div>
+                </div>
+                <div style="margin-top: 5px; text-align: center;"><span style="font-size: 10px; color: #B5B0AA; cursor: pointer; white-space: nowrap;">ตั้งเป็นหลัก</span></div>
+              </div>
+              <!-- Add slot -->
+              <div style="width: 92px; height: 92px; border-radius: 14px; border: 2px dashed #D5D1CC; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; cursor: pointer; flex-shrink: 0; background: #F9F8F6;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                <span style="font-size: 10px; color: #B5B0AA;">เพิ่มรูป</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- ชื่อน้อง -->
+          <div>
+            <label style="font-size: 13px; font-weight: 600; color: #2D2A26; display: block; margin-bottom: 7px;">ชื่อน้อง</label>
+            <div style="height: 48px; background: #F5F3F0; border-radius: 12px; border: 1.5px solid #EDEAE6; display: flex; align-items: center; padding: 0 14px;">
+              <span style="font-size: 15px; color: #2D2A26;">บัดดี้</span>
+            </div>
+          </div>
+
+          <!-- สายพันธุ์ -->
+          <div>
+            <label style="font-size: 13px; font-weight: 600; color: #2D2A26; display: block; margin-bottom: 7px;">สายพันธุ์</label>
+            <div style="height: 48px; background: #F5F3F0; border-radius: 12px; border: 1.5px solid #EDEAE6; display: flex; align-items: center; justify-content: space-between; padding: 0 14px;">
+              <span style="font-size: 15px; color: #2D2A26;">โกลเด้น รีทรีฟเวอร์</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </div>
+          </div>
+
+          <!-- เดือน/ปีเกิด -->
+          <div>
+            <label style="font-size: 13px; font-weight: 600; color: #2D2A26; display: block; margin-bottom: 7px;">เดือน/ปีเกิด <span style="color: #B5B0AA; font-weight: 400;">(ใช้คำนวณอายุ)</span></label>
+            <div style="display: flex; gap: 10px;">
+              <div style="flex: 1; height: 48px; background: #F5F3F0; border-radius: 12px; border: 1.5px solid #EDEAE6; display: flex; align-items: center; justify-content: space-between; padding: 0 14px; cursor: pointer;">
+                <span style="font-size: 15px; color: #2D2A26;">มีนาคม</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </div>
+              <div style="flex: 1; height: 48px; background: #F5F3F0; border-radius: 12px; border: 1.5px solid #EDEAE6; display: flex; align-items: center; justify-content: space-between; padding: 0 14px; cursor: pointer;">
+                <span style="font-size: 15px; color: #2D2A26;">2022</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </div>
+            </div>
+            <span style="font-size: 12px; color: #B5B0AA; margin-top: 5px; display: block;">อายุที่คำนวณได้: 4 ปี 3 เดือน</span>
+          </div>
+
+          <!-- เพศ -->
+          <div>
+            <label style="font-size: 13px; font-weight: 600; color: #2D2A26; display: block; margin-bottom: 7px;">เพศ</label>
+            <div style="display: flex; gap: 10px;">
+              <div style="flex: 1; height: 48px; background: #FF6B5B; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+                <span style="font-size: 15px; font-weight: 600; color: white; white-space: nowrap;">ผู้</span>
+              </div>
+              <div style="flex: 1; height: 48px; background: #F5F3F0; border-radius: 12px; border: 1.5px solid #EDEAE6; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+                <span style="font-size: 15px; font-weight: 500; color: #8A8580; white-space: nowrap;">เมีย</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- โหมด (multi-select) -->
+          <div>
+            <label style="font-size: 13px; font-weight: 600; color: #2D2A26; display: block; margin-bottom: 7px;">โหมด <span style="color: #B5B0AA; font-weight: 400;">(เลือกได้มากกว่า 1)</span></label>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+              <!-- หาเพื่อนเล่น — selected -->
+              <div style="height: 52px; border: 2px solid #2EC4B6; border-radius: 14px; background: rgba(46,196,182,0.06); display: flex; align-items: center; padding: 0 14px; gap: 12px; cursor: pointer;">
+                <div style="width: 22px; height: 22px; border-radius: 6px; background: #2EC4B6; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </div>
+                <span style="font-size: 14px; font-weight: 600; color: #2D2A26; flex: 1;">หาเพื่อนเล่น</span>
+              </div>
+              <!-- หาคู่ — selected -->
+              <div style="height: 52px; border: 2px solid #FFB84C; border-radius: 14px; background: rgba(255,184,76,0.06); display: flex; align-items: center; padding: 0 14px; gap: 12px; cursor: pointer;">
+                <div style="width: 22px; height: 22px; border-radius: 6px; background: #FFB84C; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </div>
+                <span style="font-size: 14px; font-weight: 600; color: #2D2A26; flex: 1;">หาคู่ผสมพันธุ์</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- วัคซีน / ทำหมัน toggles -->
+          <div style="display: flex; flex-direction: column; gap: 12px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; height: 48px; background: #F5F3F0; border-radius: 12px; padding: 0 14px;">
+              <span style="font-size: 14px; font-weight: 500; color: #2D2A26;">ฉีดวัคซีนแล้ว</span>
+              <!-- Toggle ON -->
+              <div style="width: 44px; height: 26px; background: #2EC4B6; border-radius: 13px; display: flex; align-items: center; padding: 0 3px; cursor: pointer; justify-content: flex-end;">
+                <div style="width: 20px; height: 20px; border-radius: 50%; background: white; box-shadow: 0 1px 4px rgba(0,0,0,0.2);"></div>
+              </div>
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between; height: 48px; background: #F5F3F0; border-radius: 12px; padding: 0 14px;">
+              <span style="font-size: 14px; font-weight: 500; color: #2D2A26;">ทำหมันแล้ว</span>
+              <!-- Toggle ON -->
+              <div style="width: 44px; height: 26px; background: #2EC4B6; border-radius: 13px; display: flex; align-items: center; padding: 0 3px; cursor: pointer; justify-content: flex-end;">
+                <div style="width: 20px; height: 20px; border-radius: 50%; background: white; box-shadow: 0 1px 4px rgba(0,0,0,0.2);"></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Fixed bottom bar: ยกเลิก + บันทึก -->
+        <div style="position: relative; padding: 12px 20px 20px; background: #FDFCFB; border-top: 1px solid #EDEAE6; display: flex; gap: 10px; flex-shrink: 0;">
+          <div style="flex: 1; height: 52px; border: 1.5px solid #D5D1CC; border-radius: 16px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+            <span style="font-size: 16px; font-weight: 500; color: #5A5650; white-space: nowrap;">ยกเลิก</span>
+          </div>
+          <div style="flex: 2; height: 52px; background: #FF6B5B; border-radius: 16px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 12px rgba(255,107,91,0.25);">
+            <span style="font-size: 17px; font-weight: 600; color: white; white-space: nowrap;">บันทึก</span>
+          </div>
+        </div>
+
+      </div>
+      <!-- /B -->
+
+      <!-- ════ C · LOADING ════ -->
+      <div style="width: 390px; background: #FDFCFB; border-radius: 24px; overflow: hidden; box-shadow: 0 16px 56px rgba(0,0,0,0.22); display: flex; flex-direction: column;">
+        <div style="height: 56px; background: #FDFCFB; border-bottom: 1px solid #EDEAE6; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; flex-shrink: 0;">
+          <div style="display: flex; align-items: center; gap: 7px;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2D2A26" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="3" r="1.5"></circle><circle cx="15" cy="3" r="1.5"></circle><circle cx="4" cy="9" r="1.5"></circle><circle cx="20" cy="9" r="1.5"></circle><path d="M12 10c-3 3-6 3.5-6 7a6 6 0 0 0 12 0c0-3.5-3-4-6-7z"></path></svg><span style="font-size: 17px; font-weight: 700; color: #2D2A26;">PawMate</span></div>
+        </div>
+        <div style="flex: 1;">
+          <!-- Photo skeleton -->
+          <div style="height: 280px; background: #E5E2DE;"></div>
+          <div style="padding: 20px;">
+            <!-- Name skeleton -->
+            <div style="height: 28px; width: 140px; background: #E5E2DE; border-radius: 6px; margin-bottom: 14px;"></div>
+            <!-- Badges skeleton -->
+            <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+              <div style="height: 32px; width: 120px; background: #EDEAE6; border-radius: 20px;"></div>
+              <div style="height: 32px; width: 80px; background: #EDEAE6; border-radius: 20px;"></div>
+            </div>
+            <!-- Breed row skeleton -->
+            <div style="display: flex; gap: 12px; margin-bottom: 16px;">
+              <div style="height: 14px; width: 160px; background: #E5E2DE; border-radius: 4px;"></div>
+              <div style="height: 14px; width: 60px; background: #E5E2DE; border-radius: 4px;"></div>
+            </div>
+            <!-- Pills skeleton -->
+            <div style="display: flex; gap: 8px; margin-bottom: 28px;">
+              <div style="height: 28px; width: 110px; background: #EDEAE6; border-radius: 20px;"></div>
+              <div style="height: 28px; width: 90px; background: #EDEAE6; border-radius: 20px;"></div>
+            </div>
+            <!-- Button skeleton -->
+            <div style="height: 52px; background: #E5E2DE; border-radius: 16px;"></div>
+          </div>
+        </div>
+        <div style="height: 60px; border-top: 1px solid #EDEAE6; display: grid; grid-template-columns: repeat(5, 1fr); background: #FDFCFB; flex-shrink: 0;">
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg><span style="font-size: 10px; color: #B5B0AA;">หน้าแรก</span></div>
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"></path><path d="M2 17l10 5 10-5"></path><path d="M2 12l10 5 10-5"></path></svg><span style="font-size: 10px; color: #B5B0AA;">ปัดการ์ด</span></div>
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg><span style="font-size: 10px; color: #B5B0AA;">แมตช์</span></div>
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg><span style="font-size: 10px; color: #B5B0AA;">แดชบอร์ด</span></div>
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FF6B5B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg><span style="font-size: 10px; font-weight: 600; color: #FF6B5B;">โปรไฟล์</span></div>
+        </div>
+      </div>
+      <!-- /C -->
+
+      <!-- ════ D · EMPTY ════ -->
+      <div style="width: 390px; background: #FDFCFB; border-radius: 24px; overflow: hidden; box-shadow: 0 16px 56px rgba(0,0,0,0.22); display: flex; flex-direction: column; min-height: 560px;">
+        <div style="height: 56px; background: #FDFCFB; border-bottom: 1px solid #EDEAE6; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; flex-shrink: 0;">
+          <div style="display: flex; align-items: center; gap: 7px;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2D2A26" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="3" r="1.5"></circle><circle cx="15" cy="3" r="1.5"></circle><circle cx="4" cy="9" r="1.5"></circle><circle cx="20" cy="9" r="1.5"></circle><path d="M12 10c-3 3-6 3.5-6 7a6 6 0 0 0 12 0c0-3.5-3-4-6-7z"></path></svg><span style="font-size: 17px; font-weight: 700; color: #2D2A26;">PawMate</span></div>
+        </div>
+        <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px 24px; text-align: center;">
+          <div style="width: 80px; height: 80px; border-radius: 50%; background: #F0EEEB; display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="3" r="1.5"></circle><circle cx="15" cy="3" r="1.5"></circle><circle cx="4" cy="9" r="1.5"></circle><circle cx="20" cy="9" r="1.5"></circle><path d="M12 10c-3 3-6 3.5-6 7a6 6 0 0 0 12 0c0-3.5-3-4-6-7z"></path></svg>
+          </div>
+          <h3 style="font-size: 20px; font-weight: 700; color: #2D2A26; margin-bottom: 8px;">ยังไม่มีโปรไฟล์น้อง</h3>
+          <p style="font-size: 14px; color: #8A8580; line-height: 1.6; margin-bottom: 28px;">สร้างโปรไฟล์ให้น้องของคุณ<br>เพื่อเริ่มต้นหาคู่หรือเพื่อนเล่น</p>
+          <div style="height: 52px; background: #FF6B5B; border-radius: 16px; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; width: 100%; box-shadow: 0 4px 12px rgba(255,107,91,0.25);">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <span style="font-size: 16px; font-weight: 600; color: white; white-space: nowrap;">สร้างโปรไฟล์น้อง</span>
+          </div>
+        </div>
+        <div style="height: 60px; border-top: 1px solid #EDEAE6; display: grid; grid-template-columns: repeat(5, 1fr); background: #FDFCFB; flex-shrink: 0;">
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg><span style="font-size: 10px; color: #B5B0AA;">หน้าแรก</span></div>
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"></path><path d="M2 17l10 5 10-5"></path><path d="M2 12l10 5 10-5"></path></svg><span style="font-size: 10px; color: #B5B0AA;">ปัดการ์ด</span></div>
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg><span style="font-size: 10px; color: #B5B0AA;">แมตช์</span></div>
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg><span style="font-size: 10px; color: #B5B0AA;">แดชบอร์ด</span></div>
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FF6B5B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg><span style="font-size: 10px; font-weight: 600; color: #FF6B5B;">โปรไฟล์</span></div>
+        </div>
+      </div>
+      <!-- /D -->
+
+      <!-- ════ E · TOAST ════ -->
+      <div style="width: 390px; background: #FDFCFB; border-radius: 24px; overflow: hidden; box-shadow: 0 16px 56px rgba(0,0,0,0.22); display: flex; flex-direction: column; position: relative; min-height: 560px;">
+
+        <!-- Same preview content, dimmed slightly to frame toast -->
+        <div style="height: 56px; background: #FDFCFB; border-bottom: 1px solid #EDEAE6; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; flex-shrink: 0; opacity: 0.6;">
+          <div style="display: flex; align-items: center; gap: 7px;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2D2A26" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="3" r="1.5"></circle><circle cx="15" cy="3" r="1.5"></circle><circle cx="4" cy="9" r="1.5"></circle><circle cx="20" cy="9" r="1.5"></circle><path d="M12 10c-3 3-6 3.5-6 7a6 6 0 0 0 12 0c0-3.5-3-4-6-7z"></path></svg><span style="font-size: 17px; font-weight: 700; color: #2D2A26;">PawMate</span></div>
+        </div>
+        <div style="height: 280px; background: #E0DDD8; opacity: 0.5; flex-shrink: 0;"></div>
+        <div style="flex: 1; padding: 16px 20px; opacity: 0.4;">
+          <div style="height: 24px; width: 120px; background: #E5E2DE; border-radius: 6px; margin-bottom: 12px;"></div>
+          <div style="display: flex; gap: 8px; margin-bottom: 14px;"><div style="height: 30px; width: 120px; background: #EDEAE6; border-radius: 20px;"></div><div style="height: 30px; width: 80px; background: #EDEAE6; border-radius: 20px;"></div></div>
+        </div>
+        <div style="height: 60px; border-top: 1px solid #EDEAE6; display: grid; grid-template-columns: repeat(5, 1fr); background: #FDFCFB; flex-shrink: 0; opacity: 0.6;">
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg><span style="font-size: 10px; color: #B5B0AA;">หน้าแรก</span></div>
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"></path><path d="M2 17l10 5 10-5"></path><path d="M2 12l10 5 10-5"></path></svg><span style="font-size: 10px; color: #B5B0AA;">ปัดการ์ด</span></div>
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg><span style="font-size: 10px; color: #B5B0AA;">แมตช์</span></div>
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg><span style="font-size: 10px; color: #B5B0AA;">แดชบอร์ด</span></div>
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FF6B5B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg><span style="font-size: 10px; font-weight: 600; color: #FF6B5B;">โปรไฟล์</span></div>
+        </div>
+
+        <!-- Toast overlay (positioned near bottom, above nav) -->
+        <div style="position: absolute; bottom: 76px; left: 16px; right: 16px; background: #2D2A26; border-radius: 14px; padding: 12px 16px; display: flex; align-items: center; gap: 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.25);">
+          <div style="width: 28px; height: 28px; border-radius: 50%; background: #2EC4B6; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          </div>
+          <span style="font-size: 14px; font-weight: 600; color: white; flex: 1;">บันทึกแล้ว</span>
+          <span style="font-size: 12px; color: rgba(255,255,255,0.5);">หายใน 3 วิ.</span>
+        </div>
+      </div>
+      <!-- /E -->
+
+    </div>
+
+    <!-- Annotation key -->
+    <div style="width: 2046px; border-radius: 12px; background: rgba(0,0,0,0.07); padding: 14px 16px; display: flex; flex-direction: column; gap: 4px;">
+      <span style="font-size: 10px; font-weight: 700; letter-spacing: 0.08em; color: #6A6560; text-transform: uppercase; font-family: monospace; display: block; margin-bottom: 4px;">Annotations</span>
+      <span style="font-size: 11px; color: #8A8580; font-family: monospace; line-height: 1.8;">
+        · A Preview: photo carousel (3 dots) · name+age · mode badges teal/amber · breed + sex row · vaccine/neuter pills · coral "แก้ไขโปรไฟล์" CTA · โปรไฟล์ tab active<br>
+        · B Edit: custom edit header (× close · title · spacer) replaces global header · photo manager: coral border=main, × badge removes, "ตั้งเป็นหลัก" promotes, dashed + = add slot · drag-handle hint in label<br>
+        · B fields: ชื่อ text input · สายพันธุ์ searchable select · เดือน/ปีเกิด 2-dropdown → computed age helper · เพศ toggle (selected=coral fill) · โหมด multi-select (teal/amber check) · vaccine/neuter toggles<br>
+        · B bottom bar FIXED: ghost ยกเลิก (1fr) + coral บันทึก (2fr) — always above safe area<br>
+        · C: photo area + info rows all skeleton · button skeleton · nav visible<br>
+        · D: paw icon · "ยังไม่มีโปรไฟล์น้อง" · coral "สร้างโปรไฟล์น้อง" → onboarding wizard<br>
+        · E: toast slides up above nav (bottom 76px) · dark bg · teal check · "หายใน 3 วิ." auto-dismiss · returns to preview (A) on dismiss
+      </span>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

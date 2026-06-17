@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { PawPrint, Users, Heart, ArrowRight, CheckCircle2 } from "lucide-react";
 
 export default function LandingPage() {
@@ -10,9 +11,7 @@ export default function LandingPage() {
         <div className="pointer-events-none absolute -right-20 top-32 h-60 w-60 rounded-full bg-teal/10 blur-3xl" />
         <div className="relative mx-auto max-w-lg">
           <div className="mb-5 flex justify-center">
-            <div className="flex h-20 w-20 items-center justify-center rounded-full bg-coral text-white shadow-lg">
-              <PawPrint size={40} />
-            </div>
+            <Image src="/logo.png" alt="PawMate" width={120} height={120} className="drop-shadow-lg" />
           </div>
           <h1 className="text-4xl font-bold leading-tight text-brown">
             หาเพื่อน หาคู่

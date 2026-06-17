@@ -2,11 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { PawPrint, Heart, User } from "lucide-react";
+import { Home, PawPrint, Heart, HeartPulse, User } from "lucide-react";
 
 const tabs = [
+  { href: "/app/home", label: "หน้าแรก", icon: Home },
   { href: "/app/swipe", label: "ปัดการ์ด", icon: PawPrint },
   { href: "/app/matches", label: "แมตช์", icon: Heart },
+  { href: "/app/care", label: "ดูแล", icon: HeartPulse },
   { href: "/app/profile", label: "โปรไฟล์", icon: User },
 ];
 

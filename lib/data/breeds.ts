@@ -1,3 +1,48 @@
+// Maps breed name to size category for client-side filtering
+export const BREED_SIZE_MAP: Record<string, "small" | "medium" | "large"> = {
+  // Small dogs (< ~10 kg)
+  "ชิวาวา": "small",
+  "ปอมเมอเรเนียน": "small",
+  "ชิสุ (Shih Tzu)": "small",
+  "มาลทีส": "small",
+  "ยอร์คเชียร์ เทอร์เรีย": "small",
+  "ดัชชุนด์": "small",
+  "สปิตซ์": "small",
+  // Medium dogs (10–25 kg)
+  "พุดเดิ้ล": "medium",
+  "บีเกิ้ล": "medium",
+  "คอร์กี้": "medium",
+  "ชาร์ เพย์": "medium",
+  "บอร์เดอร์ คอลลี่": "medium",
+  "ฝรั่งเศส บูลด็อก": "medium",
+  "มิกซ์ (ลูกผสม)": "medium",
+  // Large dogs (> 25 kg)
+  "ลาบราดอร์ รีทรีฟเวอร์": "large",
+  "โกลเด้น รีทรีฟเวอร์": "large",
+  "ไซบีเรียน ฮัสกี้": "large",
+  "เยอรมัน เชพเพิร์ด": "large",
+  "ซามอยด์": "large",
+  "อากิตะ": "large",
+  "ไทยแท้ (Thai Ridgeback)": "large",
+  // Small cats (< ~4 kg)
+  "มันชกิ้น": "small",
+  "สฟิงซ์": "small",
+  // Medium cats (most breeds 4–6 kg)
+  "วิเชียรมาศ (Siamese)": "medium",
+  "เปอร์เซีย": "medium",
+  "บริติช ชอร์ตแฮร์": "medium",
+  "สก็อตติช โฟลด์": "medium",
+  "รัสเซียน บลู": "medium",
+  "อเมริกัน ชอร์ตแฮร์": "medium",
+  "เบงกอล": "medium",
+  "อะบิสซิเนียน": "medium",
+  "โคราช (ไทย)": "medium",
+  // Large cats (> 6 kg, notably heavy breeds)
+  "เมนคูน": "large",
+  "เรกดอลล์": "large",
+  "นอร์เวเจียน ฟอเรสต์": "large",
+};
+
 export const DOG_BREEDS = [
   "ไทยแท้ (Thai Ridgeback)",
   "ลาบราดอร์ รีทรีฟเวอร์",

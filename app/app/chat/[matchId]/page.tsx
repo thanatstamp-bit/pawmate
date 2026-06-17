@@ -1,9 +1,18 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { ChevronLeft, Send } from "lucide-react";
+import { ChevronLeft, Send, CalendarDays, MoreVertical, User, Star, Flag, Ban, Check } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { getBlockedPetIds } from "@/lib/blocks";
+import ScheduleSheet from "@/components/playdates/ScheduleSheet";
+import ProposalBanner, { type ProposalData } from "@/components/playdates/ProposalBanner";
+import PetProfileSheet from "@/components/chat/PetProfileSheet";
+import ReviewModal from "@/components/trust/ReviewModal";
+import ReportSheet from "@/components/trust/ReportSheet";
+import BlockConfirm from "@/components/trust/BlockConfirm";
+import Toast from "@/components/trust/Toast";
+import type { PetCardData } from "@/components/swipe/PetCard";
 
 type Message = {
   id: string;
@@ -12,10 +21,12 @@ type Message = {
   created_at: string;
 };
 
-type OtherPet = {
-  id: string;
-  name: string;
-  photos: string[];
+type OtherPet = PetCardData;
+
+type ToastData = {
+  title: string;
+  subtitle?: string;
+  icon?: React.ReactNode;
 };
 
 function getDayLabel(iso: string): string {
@@ -40,38 +51,68 @@ export default function ChatPage() {
   const router = useRouter();
   const supabase = createClient();
 
-  const [myPetId, setMyPetId] = useState<string | null>(null);
-  const [otherPet, setOtherPet] = useState<OtherPet | null>(null);
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState("");
-  const [sending, setSending] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [myPetId,      setMyPetId]      = useState<string | null>(null);
+  const [otherPet,     setOtherPet]     = useState<OtherPet | null>(null);
+  const [matchMode,    setMatchMode]    = useState<"playdate" | "breeding">("playdate");
+  const [messages,     setMessages]     = useState<Message[]>([]);
+  const [proposal,     setProposal]     = useState<ProposalData | null>(null);
+  const [input,        setInput]        = useState("");
+  const [sending,      setSending]      = useState(false);
+  const [loading,      setLoading]      = useState(true);
+  const [scheduleOpen, setScheduleOpen] = useState(false);
+  const [menuOpen,     setMenuOpen]     = useState(false);
+  const [profileOpen,  setProfileOpen]  = useState(false);
+  const [reviewOpen,   setReviewOpen]   = useState(false);
+  const [reportOpen,   setReportOpen]   = useState(false);
+  const [blockOpen,    setBlockOpen]    = useState(false);
+  const [toast,        setToast]        = useState<ToastData | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
-  // Scroll to bottom whenever messages change
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  // Load the latest pending/accepted proposal for this match
+  const fetchProposal = useCallback(async () => {
+    const { data } = await supabase
+      .from("playdate_proposals")
+      .select(`
+        id, proposer_pet_id, proposed_at, custom_location, note, status,
+        spot:playdate_spots(name, district)
+      `)
+      .eq("match_id", matchId)
+      .in("status", ["pending", "accepted"])
+      .order("created_at", { ascending: false })
+      .limit(1);
+    setProposal((data?.[0] as ProposalData | undefined) ?? null);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [matchId]);
+
   useEffect(() => {
     async function load() {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+      const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      const { data: myPet } = await supabase
-        .from("pets")
-        .select("id")
-        .eq("owner_id", user.id)
-        .maybeSingle();
+      const storedId = localStorage.getItem("pawmate_active_pet_id");
+      let myPet: { id: string } | null = null;
+      if (storedId) {
+        const { data } = await supabase
+          .from("pets").select("id")
+          .eq("owner_id", user.id).eq("id", storedId).maybeSingle();
+        myPet = data;
+      }
+      if (!myPet) {
+        const { data } = await supabase
+          .from("pets").select("id")
+          .eq("owner_id", user.id).limit(1).maybeSingle();
+        myPet = data;
+      }
 
       if (!myPet) { router.replace("/app/matches"); return; }
 
-      // Load match and verify user is part of it
       const { data: match } = await supabase
         .from("matches")
-        .select("id, pet_a_id, pet_b_id")
+        .select("id, pet_a_id, pet_b_id, mode")
         .eq("id", matchId)
         .maybeSingle();
 
@@ -80,30 +121,39 @@ export default function ChatPage() {
         return;
       }
 
+      const otherId = match.pet_a_id === myPet.id ? match.pet_b_id : match.pet_a_id;
+      setMatchMode(match.mode);
+
+      // Block guard: if either side blocked the other, this chat is no longer accessible.
+      const blockedIds = await getBlockedPetIds(supabase, myPet.id);
+      if (blockedIds.has(otherId)) { router.replace("/app/matches"); return; }
+
       setMyPetId(myPet.id);
 
-      // Load the other pet
-      const otherId =
-        match.pet_a_id === myPet.id ? match.pet_b_id : match.pet_a_id;
       const { data: other } = await supabase
         .from("pets")
-        .select("id, name, photos")
+        .select("id, name, species, breed, sex, birth_month, photos, personality_tags, province, district, vaccinated, neutered, bio")
         .eq("id", otherId)
         .single();
       setOtherPet(other);
 
-      // Load existing messages
       const { data: msgs } = await supabase
         .from("messages")
         .select("id, content, sender_pet_id, created_at")
         .eq("match_id", matchId)
         .order("created_at", { ascending: true });
       setMessages(msgs ?? []);
+
       setLoading(false);
     }
     load();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [matchId]);
+
+  // Load proposal after initial data is ready
+  useEffect(() => {
+    if (!loading) fetchProposal();
+  }, [loading, fetchProposal]);
 
   // Realtime subscription for new messages
   useEffect(() => {
@@ -112,16 +162,10 @@ export default function ChatPage() {
       .channel(`chat-${matchId}`)
       .on(
         "postgres_changes",
-        {
-          event: "INSERT",
-          schema: "public",
-          table: "messages",
-          filter: `match_id=eq.${matchId}`,
-        },
+        { event: "INSERT", schema: "public", table: "messages", filter: `match_id=eq.${matchId}` },
         (payload) => {
           const newMsg = payload.new as Message;
           setMessages((prev) => {
-            // Avoid duplicates (our own send is already added optimistically)
             if (prev.some((m) => m.id === newMsg.id)) return prev;
             return [...prev, newMsg];
           });
@@ -141,16 +185,11 @@ export default function ChatPage() {
 
     const { data: sent } = await supabase
       .from("messages")
-      .insert({
-        match_id: matchId,
-        sender_pet_id: myPetId,
-        content: text,
-      })
+      .insert({ match_id: matchId, sender_pet_id: myPetId, content: text })
       .select("id, content, sender_pet_id, created_at")
       .single();
 
     if (sent) {
-      // Add optimistically — realtime will dedup if it also fires
       setMessages((prev) =>
         prev.some((m) => m.id === sent.id) ? prev : [...prev, sent]
       );
@@ -178,11 +217,8 @@ export default function ChatPage() {
   for (const msg of messages) {
     const label = getDayLabel(msg.created_at);
     const last = grouped[grouped.length - 1];
-    if (last?.dayLabel === label) {
-      last.msgs.push(msg);
-    } else {
-      grouped.push({ dayLabel: label, msgs: [msg] });
-    }
+    if (last?.dayLabel === label) last.msgs.push(msg);
+    else grouped.push({ dayLabel: label, msgs: [msg] });
   }
 
   return (
@@ -204,10 +240,81 @@ export default function ChatPage() {
               alt={otherPet.name}
               className="h-10 w-10 rounded-full object-cover"
             />
-            <span className="font-bold text-brown">{otherPet.name}</span>
+            <span className="flex-1 font-bold text-brown">{otherPet.name}</span>
           </>
         )}
+        {/* Calendar button — available for both playdate and breeding matches */}
+        {myPetId && (
+          <button
+            type="button"
+            onClick={() => setScheduleOpen(true)}
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-teal/10 text-teal hover:bg-teal/20"
+            title="นัดหมาย"
+          >
+            <CalendarDays size={18} />
+          </button>
+        )}
+
+        {/* Overflow menu — review / report / block */}
+        {myPetId && otherPet && (
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setMenuOpen((o) => !o)}
+              className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-cream"
+              title="ตัวเลือกเพิ่มเติม"
+            >
+              <MoreVertical size={20} className="text-brown-muted" />
+            </button>
+            {menuOpen && (
+              <>
+                {/* Click-away backdrop */}
+                <div className="fixed inset-0 z-40" onClick={() => setMenuOpen(false)} />
+                <div className="absolute right-0 top-11 z-50 w-52 overflow-hidden rounded-2xl bg-white py-1 shadow-card">
+                  <button
+                    type="button"
+                    onClick={() => { setMenuOpen(false); setProfileOpen(true); }}
+                    className="flex w-full items-center gap-2.5 px-4 py-3 text-left text-sm font-semibold text-brown hover:bg-cream"
+                  >
+                    <User size={16} className="text-brown-muted" /> ดูโปรไฟล์
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setMenuOpen(false); setReviewOpen(true); }}
+                    className="flex w-full items-center gap-2.5 px-4 py-3 text-left text-sm font-semibold text-brown hover:bg-cream"
+                  >
+                    <Star size={16} className="text-amber" /> ให้คะแนนหลังนัดเจอ
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setMenuOpen(false); setReportOpen(true); }}
+                    className="flex w-full items-center gap-2.5 px-4 py-3 text-left text-sm font-semibold text-brown hover:bg-cream"
+                  >
+                    <Flag size={16} className="text-brown-muted" /> รายงาน
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setMenuOpen(false); setBlockOpen(true); }}
+                    className="flex w-full items-center gap-2.5 px-4 py-3 text-left text-sm font-semibold text-coral hover:bg-cream"
+                  >
+                    <Ban size={16} /> บล็อก
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        )}
       </div>
+
+      {/* Active proposal banner */}
+      {proposal && myPetId && (
+        <ProposalBanner
+          proposal={proposal}
+          myPetId={myPetId}
+          matchId={matchId}
+          onRefetch={fetchProposal}
+        />
+      )}
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto px-4 py-4">
@@ -222,12 +329,19 @@ export default function ChatPage() {
             <p className="text-sm text-brown-muted">
               ลองชวนนัดเดทที่สวนใกล้ๆ ดูสิ 🐾
             </p>
+            <button
+              type="button"
+              onClick={() => setScheduleOpen(true)}
+              className="flex items-center gap-1.5 rounded-full bg-teal/10 px-4 py-2 text-sm font-bold text-teal"
+            >
+              <CalendarDays size={15} />
+              นัดหมาย
+            </button>
           </div>
         )}
 
         {grouped.map(({ dayLabel, msgs }) => (
           <div key={dayLabel}>
-            {/* Day divider */}
             <div className="my-4 flex items-center gap-3">
               <div className="h-px flex-1 bg-black/8" />
               <span className="text-xs text-brown-muted">{dayLabel}</span>
@@ -249,11 +363,7 @@ export default function ChatPage() {
                     }`}
                   >
                     <p className="text-sm leading-relaxed">{msg.content}</p>
-                    <p
-                      className={`mt-1 text-right text-[10px] ${
-                        isMine ? "text-white/70" : "text-brown-muted"
-                      }`}
-                    >
+                    <p className={`mt-1 text-right text-[10px] ${isMine ? "text-white/70" : "text-brown-muted"}`}>
                       {formatTime(msg.created_at)}
                     </p>
                   </div>
@@ -287,6 +397,84 @@ export default function ChatPage() {
           </button>
         </div>
       </div>
+
+      {/* Schedule sheet */}
+      {scheduleOpen && myPetId && otherPet && (
+        <ScheduleSheet
+          matchId={matchId}
+          myPetId={myPetId}
+          province={otherPet.province || "กรุงเทพมหานคร"}
+          onClose={() => setScheduleOpen(false)}
+          onSuccess={() => {
+            setScheduleOpen(false);
+            fetchProposal();
+          }}
+        />
+      )}
+
+      {/* Pet profile sheet */}
+      {profileOpen && otherPet && (
+        <PetProfileSheet
+          pet={otherPet}
+          mode={matchMode}
+          onClose={() => setProfileOpen(false)}
+        />
+      )}
+
+      {/* Review modal */}
+      {reviewOpen && myPetId && otherPet && (
+        <ReviewModal
+          matchId={matchId}
+          reviewerPetId={myPetId}
+          reviewedPetId={otherPet.id}
+          petName={otherPet.name}
+          onClose={() => setReviewOpen(false)}
+          onSuccess={() => {
+            setReviewOpen(false);
+            setToast({ title: "บันทึกรีวิวแล้ว 🌟" });
+          }}
+          onDeleted={() => {
+            setReviewOpen(false);
+            setToast({ title: "ลบรีวิวแล้ว" });
+          }}
+        />
+      )}
+
+      {/* Report sheet */}
+      {reportOpen && myPetId && otherPet && (
+        <ReportSheet
+          reporterPetId={myPetId}
+          reportedPetId={otherPet.id}
+          onClose={() => setReportOpen(false)}
+          onSubmitted={() => {
+            setReportOpen(false);
+            setToast({
+              title: "ส่งรายงานแล้ว",
+              subtitle: "ทีมงานจะตรวจสอบภายใน 24 ชม.",
+              icon: <Check size={15} className="text-teal" />,
+            });
+          }}
+        />
+      )}
+
+      {/* Block confirm */}
+      {blockOpen && myPetId && otherPet && (
+        <BlockConfirm
+          blockerPetId={myPetId}
+          blockedPetId={otherPet.id}
+          onClose={() => setBlockOpen(false)}
+          onBlocked={() => router.push("/app/matches")}
+        />
+      )}
+
+      {toast && (
+        <Toast
+          title={toast.title}
+          subtitle={toast.subtitle}
+          icon={toast.icon}
+          onDone={() => setToast(null)}
+        />
+      )}
     </div>
   );
 }

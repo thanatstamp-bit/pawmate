@@ -1,19 +1,12 @@
 import type { Metadata } from "next";
-import { Nunito, IBM_Plex_Sans_Thai } from "next/font/google";
+import { Prompt } from "next/font/google";
 import "./globals.css";
 
-// Nunito handles Latin text and numbers
-const nunito = Nunito({
-  subsets: ["latin"],
-  variable: "--font-nunito",
-  display: "swap",
-});
-
-// IBM Plex Sans Thai handles Thai glyphs (not a variable font, so weights are explicit)
-const ibmPlexSansThai = IBM_Plex_Sans_Thai({
+// Prompt covers both Thai and Latin in one family — clean, modern, widely used in Thai apps
+const prompt = Prompt({
   subsets: ["thai", "latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-ibm-plex-thai",
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-prompt",
   display: "swap",
 });
 
@@ -29,7 +22,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="th" className={`${nunito.variable} ${ibmPlexSansThai.variable}`}>
+    <html lang="th" className={prompt.variable}>
       <body className="font-sans">{children}</body>
     </html>
   );

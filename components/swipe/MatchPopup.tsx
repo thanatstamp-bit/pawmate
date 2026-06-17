@@ -27,7 +27,7 @@ export default function MatchPopup({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/60 p-6">
+    <div className="fixed inset-0 z-[70] flex flex-col items-center justify-center bg-black/60 p-6">
       <div
         className="w-full max-w-[360px] animate-[popIn_0.4s_cubic-bezier(0.34,1.56,0.64,1)] rounded-[28px] bg-white p-7 text-center shadow-2xl"
         style={{

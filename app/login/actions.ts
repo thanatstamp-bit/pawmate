@@ -29,10 +29,14 @@ export async function demoLogin(): Promise<{ error: string } | never> {
   }
 
   // Route by whether the demo account already has a pet
+  // (limit(1) before maybeSingle() — the demo account can have multiple
+  // pets, and a bare maybeSingle() errors on >1 rows, silently looking
+  // like "no pet" and bouncing back to onboarding)
   const { data: pet } = await supabase
     .from("pets")
     .select("id")
     .eq("owner_id", data.user!.id)
+    .limit(1)
     .maybeSingle();
 
   redirect(pet ? "/app/swipe" : "/onboarding");

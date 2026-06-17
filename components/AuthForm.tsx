@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { demoLogin } from "@/app/login/actions";
@@ -31,6 +31,8 @@ const inputClass =
 
 export default function AuthForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirect");
   const supabase = createClient();
 
   const [tab, setTab] = useState<Tab>("login");
@@ -58,12 +60,16 @@ export default function AuthForm() {
       return;
     }
     // Route by whether this account already has a pet profile
+    // (limit(1) before maybeSingle() — accounts can own multiple pets,
+    // and a bare maybeSingle() errors on >1 rows, silently looking like
+    // "no pet" and bouncing the user back into onboarding)
     const { data: pet } = await supabase
       .from("pets")
       .select("id")
       .eq("owner_id", data.user.id)
+      .limit(1)
       .maybeSingle();
-    router.push(pet ? "/app/swipe" : "/onboarding");
+    router.push(redirectTo ?? (pet ? "/app/swipe" : "/onboarding"));
     router.refresh();
   }
 

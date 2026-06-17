@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #D6D2CD; font-family: 'Prompt', sans-serif; }
+  </style>
+</helmet>
+
+<div style="min-height: 100vh; padding: 32px 24px 64px; display: flex; flex-direction: column; align-items: center; gap: 16px; overflow-x: auto;">
+
+  <span style="font-size: 10px; font-weight: 600; letter-spacing: 0.1em; color: #8A8580; text-transform: uppercase; font-family: monospace; white-space: nowrap;">PawMate · Matches List /app/matches · 390px · Mid-fi wireframe</span>
+
+  <div style="display: flex; flex-direction: column; gap: 8px;">
+
+    <!-- State labels -->
+    <div style="display: flex; gap: 24px;">
+      <div style="width: 390px; text-align: center; font-size: 10px; font-weight: 600; letter-spacing: 0.08em; color: #8A8580; font-family: monospace; text-transform: uppercase; white-space: nowrap;">① แชท tab · Default</div>
+      <div style="width: 390px; text-align: center; font-size: 10px; font-weight: 600; letter-spacing: 0.08em; color: #8A8580; font-family: monospace; text-transform: uppercase; white-space: nowrap;">② นัดเล่น tab · Playdates</div>
+      <div style="width: 390px; text-align: center; font-size: 10px; font-weight: 600; letter-spacing: 0.08em; color: #8A8580; font-family: monospace; text-transform: uppercase; white-space: nowrap;">③ Loading · Skeletons</div>
+      <div style="width: 390px; text-align: center; font-size: 10px; font-weight: 600; letter-spacing: 0.08em; color: #8A8580; font-family: monospace; text-transform: uppercase; white-space: nowrap;">④ Empty · No matches</div>
+    </div>
+
+    <!-- Frames row -->
+    <div style="display: flex; gap: 24px; align-items: flex-start;">
+
+      <!-- ════ FRAME 1 · แชท TAB ════ -->
+      <div style="width: 390px; background: #FDFCFB; border-radius: 24px; overflow: hidden; box-shadow: 0 16px 56px rgba(0,0,0,0.22); display: flex; flex-direction: column;">
+
+        <!-- Header -->
+        <div style="height: 56px; background: #FDFCFB; border-bottom: 1px solid #EDEAE6; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; flex-shrink: 0;">
+          <div style="display: flex; align-items: center; gap: 7px;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2D2A26" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="3" r="1.5"></circle><circle cx="15" cy="3" r="1.5"></circle><circle cx="4" cy="9" r="1.5"></circle><circle cx="20" cy="9" r="1.5"></circle><path d="M12 10c-3 3-6 3.5-6 7a6 6 0 0 0 12 0c0-3.5-3-4-6-7z"></path></svg>
+            <span style="font-size: 17px; font-weight: 700; color: #2D2A26; white-space: nowrap;">PawMate</span>
+          </div>
+          <div style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2D2A26" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+          </div>
+        </div>
+
+        <!-- Title + tab bar -->
+        <div style="padding: 20px 20px 0; flex-shrink: 0;">
+          <h2 style="font-size: 22px; font-weight: 700; color: #2D2A26; margin-bottom: 16px;">แมตช์ของคุณ</h2>
+          <div style="display: flex; border-bottom: 1px solid #EDEAE6;">
+            <div style="flex: 1; height: 44px; display: flex; align-items: center; justify-content: center; border-bottom: 2.5px solid #FF6B5B; margin-bottom: -1px; cursor: pointer;">
+              <span style="font-size: 15px; font-weight: 600; color: #2D2A26; white-space: nowrap;">แชท</span>
+            </div>
+            <div style="flex: 1; height: 44px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+              <span style="font-size: 15px; font-weight: 500; color: #8A8580; white-space: nowrap;">นัดเล่น</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chat list -->
+        <div style="flex: 1;">
+
+          <!-- Row 1 — UNREAD -->
+          <div style="display: flex; align-items: center; gap: 12px; padding: 14px 20px; border-bottom: 1px solid #F5F3F0; cursor: pointer; background: rgba(255,107,91,0.03);">
+            <div style="width: 52px; height: 52px; border-radius: 50%; background: #E0DDD8; flex-shrink: 0; display: flex; align-items: center; justify-content: center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="3" r="1.5"></circle><circle cx="15" cy="3" r="1.5"></circle><circle cx="4" cy="9" r="1.5"></circle><circle cx="20" cy="9" r="1.5"></circle><path d="M12 10c-3 3-6 3.5-6 7a6 6 0 0 0 12 0c0-3.5-3-4-6-7z"></path></svg></div>
+            <div style="flex: 1; min-width: 0;">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                <span style="font-size: 15px; font-weight: 700; color: #2D2A26;">มะพร้าว</span>
+                <span style="font-size: 12px; color: #B5B0AA; white-space: nowrap; flex-shrink: 0; margin-left: 8px;">2 น.</span>
+              </div>
+              <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+                <span style="font-size: 13px; color: #2D2A26; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;">สวัสดีค่ะ ยินดีที่ได้รู้จักนะคะ!</span>
+                <div style="width: 9px; height: 9px; border-radius: 50%; background: #FF6B5B; flex-shrink: 0;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Row 2 — read -->
+          <div style="display: flex; align-items: center; gap: 12px; padding: 14px 20px; border-bottom: 1px solid #F5F3F0; cursor: pointer;">
+            <div style="width: 52px; height: 52px; border-radius: 50%; background: #E0DDD8; flex-shrink: 0;"></div>
+            <div style="flex: 1; min-width: 0;">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                <span style="font-size: 15px; font-weight: 600; color: #2D2A26;">บัดดี้</span>
+                <span style="font-size: 12px; color: #B5B0AA; white-space: nowrap; flex-shrink: 0; margin-left: 8px;">1 ชม.</span>
+              </div>
+              <span style="font-size: 13px; color: #8A8580; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block;">นัดพบกันได้เลยครับ ช่วงสุดสัปดาห์</span>
+            </div>
+          </div>
+
+          <!-- Row 3 — UNREAD -->
+          <div style="display: flex; align-items: center; gap: 12px; padding: 14px 20px; border-bottom: 1px solid #F5F3F0; cursor: pointer; background: rgba(255,107,91,0.03);">
+            <div style="width: 52px; height: 52px; border-radius: 50%; background: #E0DDD8; flex-shrink: 0;"></div>
+            <div style="flex: 1; min-width: 0;">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                <span style="font-size: 15px; font-weight: 700; color: #2D2A26;">ลูนา</span>
+                <span style="font-size: 12px; color: #B5B0AA; white-space: nowrap; flex-shrink: 0; margin-left: 8px;">เมื่อวาน</span>
+              </div>
+              <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+                <span style="font-size: 13px; color: #2D2A26; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;">น้องสุขภาพดีไหมคะ ช่วงนี้อากาศแปรปรวน</span>
+                <div style="width: 9px; height: 9px; border-radius: 50%; background: #FF6B5B; flex-shrink: 0;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Row 4 — read -->
+          <div style="display: flex; align-items: center; gap: 12px; padding: 14px 20px; border-bottom: 1px solid #F5F3F0; cursor: pointer;">
+            <div style="width: 52px; height: 52px; border-radius: 50%; background: #E0DDD8; flex-shrink: 0;"></div>
+            <div style="flex: 1; min-width: 0;">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                <span style="font-size: 15px; font-weight: 600; color: #2D2A26;">โทฟุ</span>
+                <span style="font-size: 12px; color: #B5B0AA; white-space: nowrap; flex-shrink: 0; margin-left: 8px;">3 วัน</span>
+              </div>
+              <span style="font-size: 13px; color: #8A8580; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block;">ขอบคุณมากเลยครับที่แชร์ข้อมูลนั้น</span>
+            </div>
+          </div>
+
+          <!-- Row 5 — read -->
+          <div style="display: flex; align-items: center; gap: 12px; padding: 14px 20px; border-bottom: 1px solid #F5F3F0; cursor: pointer;">
+            <div style="width: 52px; height: 52px; border-radius: 50%; background: #E0DDD8; flex-shrink: 0;"></div>
+            <div style="flex: 1; min-width: 0;">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                <span style="font-size: 15px; font-weight: 600; color: #2D2A26;">โมจิ</span>
+                <span style="font-size: 12px; color: #B5B0AA; white-space: nowrap; flex-shrink: 0; margin-left: 8px;">1 สป.</span>
+              </div>
+              <span style="font-size: 13px; color: #8A8580; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block;">เห็นด้วยเลย เดี๋ยวโทรหานะคะ</span>
+            </div>
+          </div>
+
+          <!-- Unread count annotation -->
+          <div style="padding: 12px 20px;">
+            <span style="font-size: 11px; color: #C5C0BB; font-family: monospace;">2 unread · shaded rows = unread</span>
+          </div>
+        </div>
+
+        <!-- Bottom nav -->
+        <div style="height: 60px; border-top: 1px solid #EDEAE6; display: grid; grid-template-columns: repeat(5, 1fr); background: #FDFCFB; flex-shrink: 0;">
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg><span style="font-size: 10px; color: #B5B0AA; white-space: nowrap;">หน้าแรก</span></div>
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"></path><path d="M2 17l10 5 10-5"></path><path d="M2 12l10 5 10-5"></path></svg><span style="font-size: 10px; color: #B5B0AA; white-space: nowrap;">ปัดการ์ด</span></div>
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; position: relative;">
+            <div style="position: relative;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FF6B5B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+              <div style="position: absolute; top: -4px; right: -6px; width: 14px; height: 14px; border-radius: 50%; background: #FF6B5B; display: flex; align-items: center; justify-content: center; border: 2px solid #FDFCFB;"><span style="font-size: 8px; font-weight: 700; color: white;">2</span></div>
+            </div>
+            <span style="font-size: 10px; font-weight: 600; color: #FF6B5B; white-space: nowrap;">แมตช์</span>
+          </div>
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg><span style="font-size: 10px; color: #B5B0AA; white-space: nowrap;">แดชบอร์ด</span></div>
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg><span style="font-size: 10px; color: #B5B0AA; white-space: nowrap;">โปรไฟล์</span></div>
+        </div>
+      </div>
+      <!-- /frame 1 -->
+
+      <!-- ════ FRAME 2 · นัดเล่น TAB ════ -->
+      <div style="width: 390px; background: #FDFCFB; border-radius: 24px; overflow: hidden; box-shadow: 0 16px 56px rgba(0,0,0,0.22); display: flex; flex-direction: column;">
+
+        <!-- Header -->
+        <div style="height: 56px; background: #FDFCFB; border-bottom: 1px solid #EDEAE6; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; flex-shrink: 0;">
+          <div style="display: flex; align-items: center; gap: 7px;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2D2A26" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="3" r="1.5"></circle><circle cx="15" cy="3" r="1.5"></circle><circle cx="4" cy="9" r="1.5"></circle><circle cx="20" cy="9" r="1.5"></circle><path d="M12 10c-3 3-6 3.5-6 7a6 6 0 0 0 12 0c0-3.5-3-4-6-7z"></path></svg>
+            <span style="font-size: 17px; font-weight: 700; color: #2D2A26; white-space: nowrap;">PawMate</span>
+          </div>
+          <div style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2D2A26" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg></div>
+        </div>
+
+        <!-- Title + tabs (นัดเล่น active) -->
+        <div style="padding: 20px 20px 0; flex-shrink: 0;">
+          <h2 style="font-size: 22px; font-weight: 700; color: #2D2A26; margin-bottom: 16px;">แมตช์ของคุณ</h2>
+          <div style="display: flex; border-bottom: 1px solid #EDEAE6;">
+            <div style="flex: 1; height: 44px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+              <span style="font-size: 15px; font-weight: 500; color: #8A8580; white-space: nowrap;">แชท</span>
+            </div>
+            <div style="flex: 1; height: 44px; display: flex; align-items: center; justify-content: center; border-bottom: 2.5px solid #2EC4B6; margin-bottom: -1px; cursor: pointer;">
+              <span style="font-size: 15px; font-weight: 600; color: #2D2A26; white-space: nowrap;">นัดเล่น</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Playdate list -->
+        <div style="flex: 1;">
+
+          <!-- Row 1 — ยืนยันแล้ว (teal) -->
+          <div style="display: flex; align-items: center; gap: 12px; padding: 14px 20px; border-bottom: 1px solid #F5F3F0; cursor: pointer;">
+            <div style="width: 52px; height: 52px; border-radius: 50%; background: #E0DDD8; flex-shrink: 0;"></div>
+            <div style="flex: 1; min-width: 0;">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; gap: 8px;">
+                <span style="font-size: 15px; font-weight: 600; color: #2D2A26;">บัดดี้</span>
+                <span style="background: rgba(46,196,182,0.10); border: 1px solid rgba(46,196,182,0.3); color: #26A89C; border-radius: 20px; padding: 3px 10px; font-size: 11px; font-weight: 600; white-space: nowrap; flex-shrink: 0;">ยืนยันแล้ว</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 5px;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                <span style="font-size: 13px; color: #8A8580; white-space: nowrap;">สวนลุมพินี · 20 มิ.ย. 10:00</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Row 2 — รอตอบรับ (amber) -->
+          <div style="display: flex; align-items: center; gap: 12px; padding: 14px 20px; border-bottom: 1px solid #F5F3F0; cursor: pointer;">
+            <div style="width: 52px; height: 52px; border-radius: 50%; background: #E0DDD8; flex-shrink: 0;"></div>
+            <div style="flex: 1; min-width: 0;">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; gap: 8px;">
+                <span style="font-size: 15px; font-weight: 600; color: #2D2A26;">มะพร้าว</span>
+                <span style="background: rgba(255,184,76,0.10); border: 1px solid rgba(255,184,76,0.35); color: #b08000; border-radius: 20px; padding: 3px 10px; font-size: 11px; font-weight: 600; white-space: nowrap; flex-shrink: 0;">รอตอบรับ</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 5px;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                <span style="font-size: 13px; color: #8A8580; white-space: nowrap;">สวนเบญจกิติ · 22 มิ.ย. 14:00</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Row 3 — ยืนยันแล้ว -->
+          <div style="display: flex; align-items: center; gap: 12px; padding: 14px 20px; border-bottom: 1px solid #F5F3F0; cursor: pointer;">
+            <div style="width: 52px; height: 52px; border-radius: 50%; background: #E0DDD8; flex-shrink: 0;"></div>
+            <div style="flex: 1; min-width: 0;">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; gap: 8px;">
+                <span style="font-size: 15px; font-weight: 600; color: #2D2A26;">โทฟุ</span>
+                <span style="background: rgba(46,196,182,0.10); border: 1px solid rgba(46,196,182,0.3); color: #26A89C; border-radius: 20px; padding: 3px 10px; font-size: 11px; font-weight: 600; white-space: nowrap; flex-shrink: 0;">ยืนยันแล้ว</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 5px;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                <span style="font-size: 13px; color: #8A8580; white-space: nowrap;">สวนวชิรเบญจทัศน์ · 25 มิ.ย. 09:00</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Row 4 — เสร็จสิ้น (gray) -->
+          <div style="display: flex; align-items: center; gap: 12px; padding: 14px 20px; border-bottom: 1px solid #F5F3F0; cursor: pointer; opacity: 0.65;">
+            <div style="width: 52px; height: 52px; border-radius: 50%; background: #E0DDD8; flex-shrink: 0;"></div>
+            <div style="flex: 1; min-width: 0;">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; gap: 8px;">
+                <span style="font-size: 15px; font-weight: 600; color: #2D2A26;">ลูนา</span>
+                <span style="background: #F0EEEB; color: #8A8580; border-radius: 20px; padding: 3px 10px; font-size: 11px; font-weight: 600; white-space: nowrap; flex-shrink: 0;">เสร็จสิ้น</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 5px;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#C5C0BB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                <span style="font-size: 13px; color: #B5B0AA; white-space: nowrap;">สวนจตุจักร · 10 มิ.ย. 09:00</span>
+              </div>
+            </div>
+          </div>
+
+          <div style="padding: 12px 20px;">
+            <span style="font-size: 11px; color: #C5C0BB; font-family: monospace;">status chips: teal=confirmed · amber=pending · gray=past</span>
+          </div>
+        </div>
+
+        <!-- Bottom nav -->
+        <div style="height: 60px; border-top: 1px solid #EDEAE6; display: grid; grid-template-columns: repeat(5, 1fr); background: #FDFCFB; flex-shrink: 0;">
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg><span style="font-size: 10px; color: #B5B0AA; white-space: nowrap;">หน้าแรก</span></div>
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"></path><path d="M2 17l10 5 10-5"></path><path d="M2 12l10 5 10-5"></path></svg><span style="font-size: 10px; color: #B5B0AA; white-space: nowrap;">ปัดการ์ด</span></div>
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FF6B5B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg><span style="font-size: 10px; font-weight: 600; color: #FF6B5B; white-space: nowrap;">แมตช์</span></div>
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg><span style="font-size: 10px; color: #B5B0AA; white-space: nowrap;">แดชบอร์ด</span></div>
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg><span style="font-size: 10px; color: #B5B0AA; white-space: nowrap;">โปรไฟล์</span></div>
+        </div>
+      </div>
+      <!-- /frame 2 -->
+
+      <!-- ════ FRAME 3 · LOADING ════ -->
+      <div style="width: 390px; background: #FDFCFB; border-radius: 24px; overflow: hidden; box-shadow: 0 16px 56px rgba(0,0,0,0.22); display: flex; flex-direction: column;">
+        <div style="height: 56px; background: #FDFCFB; border-bottom: 1px solid #EDEAE6; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; flex-shrink: 0;">
+          <div style="display: flex; align-items: center; gap: 7px;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2D2A26" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="3" r="1.5"></circle><circle cx="15" cy="3" r="1.5"></circle><circle cx="4" cy="9" r="1.5"></circle><circle cx="20" cy="9" r="1.5"></circle><path d="M12 10c-3 3-6 3.5-6 7a6 6 0 0 0 12 0c0-3.5-3-4-6-7z"></path></svg><span style="font-size: 17px; font-weight: 700; color: #2D2A26; white-space: nowrap;">PawMate</span></div>
+          <div style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2D2A26" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg></div>
+        </div>
+        <div style="padding: 20px 20px 0; flex-shrink: 0;">
+          <h2 style="font-size: 22px; font-weight: 700; color: #2D2A26; margin-bottom: 16px;">แมตช์ของคุณ</h2>
+          <div style="display: flex; border-bottom: 1px solid #EDEAE6;">
+            <div style="flex: 1; height: 44px; background: #EDEAE6; border-radius: 8px 8px 0 0; margin: 0 4px; opacity: 0.5;"></div>
+            <div style="flex: 1; height: 44px; background: #EDEAE6; border-radius: 8px 8px 0 0; margin: 0 4px; opacity: 0.3;"></div>
+          </div>
+        </div>
+        <!-- Skeleton rows -->
+        <div style="flex: 1; padding-top: 4px;">
+          <!-- 5 skeleton rows -->
+          <div style="display: flex; align-items: center; gap: 12px; padding: 14px 20px; border-bottom: 1px solid #F5F3F0;"><div style="width: 52px; height: 52px; border-radius: 50%; background: #E5E2DE; flex-shrink: 0;"></div><div style="flex: 1; display: flex; flex-direction: column; gap: 8px;"><div style="display: flex; justify-content: space-between;"><div style="height: 14px; width: 100px; background: #E5E2DE; border-radius: 4px;"></div><div style="height: 12px; width: 36px; background: #EDEAE6; border-radius: 4px;"></div></div><div style="height: 12px; width: 220px; background: #EDEAE6; border-radius: 4px;"></div></div></div>
+          <div style="display: flex; align-items: center; gap: 12px; padding: 14px 20px; border-bottom: 1px solid #F5F3F0;"><div style="width: 52px; height: 52px; border-radius: 50%; background: #E5E2DE; flex-shrink: 0;"></div><div style="flex: 1; display: flex; flex-direction: column; gap: 8px;"><div style="display: flex; justify-content: space-between;"><div style="height: 14px; width: 80px; background: #E5E2DE; border-radius: 4px;"></div><div style="height: 12px; width: 42px; background: #EDEAE6; border-radius: 4px;"></div></div><div style="height: 12px; width: 180px; background: #EDEAE6; border-radius: 4px;"></div></div></div>
+          <div style="display: flex; align-items: center; gap: 12px; padding: 14px 20px; border-bottom: 1px solid #F5F3F0;"><div style="width: 52px; height: 52px; border-radius: 50%; background: #E5E2DE; flex-shrink: 0;"></div><div style="flex: 1; display: flex; flex-direction: column; gap: 8px;"><div style="display: flex; justify-content: space-between;"><div style="height: 14px; width: 120px; background: #E5E2DE; border-radius: 4px;"></div><div style="height: 12px; width: 52px; background: #EDEAE6; border-radius: 4px;"></div></div><div style="height: 12px; width: 200px; background: #EDEAE6; border-radius: 4px;"></div></div></div>
+          <div style="display: flex; align-items: center; gap: 12px; padding: 14px 20px; border-bottom: 1px solid #F5F3F0;"><div style="width: 52px; height: 52px; border-radius: 50%; background: #E5E2DE; flex-shrink: 0;"></div><div style="flex: 1; display: flex; flex-direction: column; gap: 8px;"><div style="display: flex; justify-content: space-between;"><div style="height: 14px; width: 90px; background: #E5E2DE; border-radius: 4px;"></div><div style="height: 12px; width: 36px; background: #EDEAE6; border-radius: 4px;"></div></div><div style="height: 12px; width: 160px; background: #EDEAE6; border-radius: 4px;"></div></div></div>
+          <div style="display: flex; align-items: center; gap: 12px; padding: 14px 20px; border-bottom: 1px solid #F5F3F0; opacity: 0.5;"><div style="width: 52px; height: 52px; border-radius: 50%; background: #E5E2DE; flex-shrink: 0;"></div><div style="flex: 1; display: flex; flex-direction: column; gap: 8px;"><div style="height: 14px; width: 110px; background: #E5E2DE; border-radius: 4px;"></div><div style="height: 12px; width: 190px; background: #EDEAE6; border-radius: 4px;"></div></div></div>
+        </div>
+        <div style="height: 60px; border-top: 1px solid #EDEAE6; display: grid; grid-template-columns: repeat(5, 1fr); background: #FDFCFB; flex-shrink: 0;">
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg><span style="font-size: 10px; color: #B5B0AA; white-space: nowrap;">หน้าแรก</span></div>
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"></path><path d="M2 17l10 5 10-5"></path><path d="M2 12l10 5 10-5"></path></svg><span style="font-size: 10px; color: #B5B0AA; white-space: nowrap;">ปัดการ์ด</span></div>
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FF6B5B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg><span style="font-size: 10px; font-weight: 600; color: #FF6B5B; white-space: nowrap;">แมตช์</span></div>
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg><span style="font-size: 10px; color: #B5B0AA; white-space: nowrap;">แดชบอร์ด</span></div>
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg><span style="font-size: 10px; color: #B5B0AA; white-space: nowrap;">โปรไฟล์</span></div>
+        </div>
+      </div>
+      <!-- /frame 3 -->
+
+      <!-- ════ FRAME 4 · EMPTY ════ -->
+      <div style="width: 390px; background: #FDFCFB; border-radius: 24px; overflow: hidden; box-shadow: 0 16px 56px rgba(0,0,0,0.22); display: flex; flex-direction: column; min-height: 560px;">
+        <div style="height: 56px; background: #FDFCFB; border-bottom: 1px solid #EDEAE6; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; flex-shrink: 0;">
+          <div style="display: flex; align-items: center; gap: 7px;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2D2A26" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="3" r="1.5"></circle><circle cx="15" cy="3" r="1.5"></circle><circle cx="4" cy="9" r="1.5"></circle><circle cx="20" cy="9" r="1.5"></circle><path d="M12 10c-3 3-6 3.5-6 7a6 6 0 0 0 12 0c0-3.5-3-4-6-7z"></path></svg><span style="font-size: 17px; font-weight: 700; color: #2D2A26; white-space: nowrap;">PawMate</span></div>
+          <div style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2D2A26" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg></div>
+        </div>
+        <div style="padding: 20px 20px 0; flex-shrink: 0;">
+          <h2 style="font-size: 22px; font-weight: 700; color: #2D2A26; margin-bottom: 16px;">แมตช์ของคุณ</h2>
+          <div style="display: flex; border-bottom: 1px solid #EDEAE6;">
+            <div style="flex: 1; height: 44px; display: flex; align-items: center; justify-content: center; border-bottom: 2.5px solid #FF6B5B; margin-bottom: -1px;"><span style="font-size: 15px; font-weight: 600; color: #2D2A26; white-space: nowrap;">แชท</span></div>
+            <div style="flex: 1; height: 44px; display: flex; align-items: center; justify-content: center;"><span style="font-size: 15px; font-weight: 500; color: #8A8580; white-space: nowrap;">นัดเล่น</span></div>
+          </div>
+        </div>
+        <!-- Empty state -->
+        <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px 24px; text-align: center;">
+          <div style="width: 72px; height: 72px; border-radius: 50%; background: #F0EEEB; display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+          </div>
+          <h3 style="font-size: 20px; font-weight: 700; color: #2D2A26; margin-bottom: 8px;">ยังไม่มีแมตช์</h3>
+          <p style="font-size: 14px; color: #8A8580; line-height: 1.6; margin-bottom: 28px;">เริ่มต้นปัดการ์ดเพื่อหาเพื่อนให้น้อง<br>แมตช์จะปรากฏที่นี่เมื่อต่างฝ่ายถูกใจกัน</p>
+          <div style="height: 52px; background: #FF6B5B; border-radius: 16px; display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 0 28px;">
+            <span style="font-size: 16px; font-weight: 600; color: #fff; white-space: nowrap;">ไปปัดการ์ด</span>
+          </div>
+        </div>
+        <div style="height: 60px; border-top: 1px solid #EDEAE6; display: grid; grid-template-columns: repeat(5, 1fr); background: #FDFCFB; flex-shrink: 0;">
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg><span style="font-size: 10px; color: #B5B0AA; white-space: nowrap;">หน้าแรก</span></div>
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"></path><path d="M2 17l10 5 10-5"></path><path d="M2 12l10 5 10-5"></path></svg><span style="font-size: 10px; color: #B5B0AA; white-space: nowrap;">ปัดการ์ด</span></div>
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FF6B5B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg><span style="font-size: 10px; font-weight: 600; color: #FF6B5B; white-space: nowrap;">แมตช์</span></div>
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg><span style="font-size: 10px; color: #B5B0AA; white-space: nowrap;">แดชบอร์ด</span></div>
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg><span style="font-size: 10px; color: #B5B0AA; white-space: nowrap;">โปรไฟล์</span></div>
+        </div>
+      </div>
+      <!-- /frame 4 -->
+
+    </div>
+
+    <!-- Annotation key -->
+    <div style="width: 1632px; border-radius: 12px; background: rgba(0,0,0,0.07); padding: 14px 16px; display: flex; flex-direction: column; gap: 4px;">
+      <span style="font-size: 10px; font-weight: 700; letter-spacing: 0.08em; color: #6A6560; text-transform: uppercase; font-family: monospace; display: block; margin-bottom: 4px;">Annotations</span>
+      <span style="font-size: 11px; color: #8A8580; font-family: monospace; line-height: 1.8;">
+        · Top logo header + bell · แมตช์ tab active (coral) + unread badge "2" in frames ① ③<br>
+        · แชท tab: shaded rows = unread · bold name + dark preview text = unread · coral dot right of preview<br>
+        · นัดเล่น tab: <span style="color: #26A89C;">teal</span> = ยืนยันแล้ว · <span style="color: #b08000;">amber</span> = รอตอบรับ · gray + dimmed = เสร็จสิ้น (past event) · map pin + place + datetime<br>
+        · Tab switch underline: coral for แชท, teal for นัดเล่น (matches mode semantics) · tapping a chat row → /app/chat/[matchId]<br>
+        · Frame ③: skeleton mirrors exact row height (52px avatar + 2 text bars) · tab bar also skeleton<br>
+        · Frame ④: empty heart icon · "ไปปัดการ์ด" coral button → /app/swipe · both tabs show same empty state
+      </span>
+    </div>
+
+  </div>
+
+</div>
+</x-dc>
+</body>
+</html>

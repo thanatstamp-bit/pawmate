@@ -104,25 +104,31 @@ export default function OnboardingPage() {
 
       const birthMonth = `${data.birthYear}-${String(data.birthMonthNum).padStart(2, "0")}-01`;
 
-      const { error: insertError } = await supabase.from("pets").insert({
-        owner_id: user.id,
-        name: data.name.trim(),
-        species: data.species,
-        breed: data.breed,
-        sex: data.sex,
-        birth_month: birthMonth,
-        photos: data.photos,
-        personality_tags: data.personalityTags,
-        province: data.province,
-        district: data.district || null,
-        modes: data.modes,
-        vaccinated: data.vaccinated,
-        neutered: data.neutered,
-        bio: data.bio || null,
-      });
+      const { data: newPet, error: insertError } = await supabase
+        .from("pets")
+        .insert({
+          owner_id: user.id,
+          name: data.name.trim(),
+          species: data.species,
+          breed: data.breed,
+          sex: data.sex,
+          birth_month: birthMonth,
+          photos: data.photos,
+          personality_tags: data.personalityTags,
+          province: data.province,
+          district: data.district || null,
+          modes: data.modes,
+          vaccinated: data.vaccinated,
+          neutered: data.neutered,
+          bio: data.bio || null,
+        })
+        .select("id")
+        .single();
 
       if (insertError) throw insertError;
-      router.push("/app/swipe");
+      // Set the new pet as active so the swipe/profile pages pick it up
+      if (newPet?.id) localStorage.setItem("pawmate_active_pet_id", newPet.id);
+      router.push("/app/profile");
       router.refresh();
     } catch {
       setError("บันทึกข้อมูลไม่สำเร็จ ลองใหม่อีกครั้งนะ");
@@ -134,15 +140,20 @@ export default function OnboardingPage() {
     <main className="mx-auto flex min-h-screen w-full max-w-[480px] flex-col bg-cream">
       {/* Header */}
       <div className="flex items-center gap-3 px-6 pb-2 pt-6">
-        {step > 1 && (
-          <button
-            type="button"
-            onClick={() => { setStep(step - 1); setError(null); }}
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-white shadow-card"
-          >
-            <ChevronLeft size={20} />
-          </button>
-        )}
+        <button
+          type="button"
+          onClick={() => {
+            if (step > 1) {
+              setStep(step - 1);
+              setError(null);
+            } else {
+              router.back();
+            }
+          }}
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white shadow-card"
+        >
+          <ChevronLeft size={20} />
+        </button>
         <div className="flex-1">
           <p className="text-xs text-brown-muted">ขั้นตอน {step}/{TOTAL}</p>
           <h1 className="text-lg font-bold text-brown">{STEP_TITLES[step - 1]}</h1>

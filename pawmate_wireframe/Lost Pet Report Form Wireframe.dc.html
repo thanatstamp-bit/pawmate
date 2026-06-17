@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #D6D2CD; font-family: 'Prompt', sans-serif; }
+    @keyframes shimmer {
+      0%   { background-position: -600px 0; }
+      100% { background-position:  600px 0; }
+    }
+  </style>
+</helmet>
+
+<div style="min-height:100vh; padding:32px 24px 64px; display:flex; flex-direction:column; align-items:center; gap:16px;">
+
+  <span style="font-size:10px; font-weight:600; letter-spacing:0.1em; color:#8A8580; text-transform:uppercase; font-family:monospace; white-space:nowrap;">PawMate · /app/care/lost/new · 390 px · Mid-fi wireframe</span>
+
+  <div style="display:flex; flex-direction:column; gap:8px;">
+
+    <!-- ══════════════════ ROW LABELS ══════════════════ -->
+    <div style="display:flex; gap:24px;">
+      <div style="width:390px; text-align:center; font-size:10px; font-weight:600; letter-spacing:0.08em; color:#8A8580; font-family:monospace; text-transform:uppercase;">① Form · Empty / start</div>
+      <div style="width:390px; text-align:center; font-size:10px; font-weight:600; letter-spacing:0.08em; color:#8A8580; font-family:monospace; text-transform:uppercase;">② Form · Filled · ready to submit</div>
+      <div style="width:390px; text-align:center; font-size:10px; font-weight:600; letter-spacing:0.08em; color:#8A8580; font-family:monospace; text-transform:uppercase;">③ Success · Submitted</div>
+    </div>
+
+    <div style="display:flex; gap:24px; align-items:flex-start;">
+
+      <!-- ════ FRAME 1 · EMPTY FORM ════ -->
+      <div data-screen-label="① Form Empty" style="width:390px; background:#FDFCFB; border-radius:24px; overflow:hidden; box-shadow:0 16px 56px rgba(0,0,0,0.22); display:flex; flex-direction:column;">
+
+        <!-- Header -->
+        <div style="height:56px; background:#FDFCFB; border-bottom:1px solid #EDEAE6; display:flex; align-items:center; padding:0 12px 0 4px; gap:4px; flex-shrink:0;">
+          <div style="width:44px; height:44px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2D2A26" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"></path></svg>
+          </div>
+          <span style="font-size:17px; font-weight:700; color:#2D2A26; flex:1;">แจ้งสัตว์หาย</span>
+        </div>
+
+        <!-- Form body -->
+        <div style="padding:20px 20px 32px; display:flex; flex-direction:column; gap:20px;">
+
+          <!-- Photo upload -->
+          <div style="border:2px dashed #D5D1CC; border-radius:18px; height:156px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; background:#FAF9F7; cursor:pointer;">
+            <div style="width:44px; height:44px; background:#EDEAE6; border-radius:14px; display:flex; align-items:center; justify-content:center;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8A8580" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+            </div>
+            <span style="font-size:13px; color:#8A8580; font-weight:500;">เพิ่มรูปน้อง</span>
+            <span style="font-size:11px; color:#B5B0AA;">อัปโหลดได้สูงสุด 4 รูป</span>
+          </div>
+
+          <!-- Pet name -->
+          <div style="display:flex; flex-direction:column; gap:6px;">
+            <span style="font-size:13px; font-weight:600; color:#2D2A26;">ชื่อน้อง <span style="color:#A82040;">*</span></span>
+            <div style="height:48px; border:1.5px solid #EDEAE6; border-radius:13px; padding:0 14px; display:flex; align-items:center; background:#FDFCFB;">
+              <span style="font-size:14px; color:#C5C0BB;">เช่น บัตเตอร์สก็อตช์</span>
+            </div>
+          </div>
+
+          <!-- Species chips -->
+          <div style="display:flex; flex-direction:column; gap:8px;">
+            <span style="font-size:13px; font-weight:600; color:#2D2A26;">ชนิดสัตว์ <span style="color:#A82040;">*</span></span>
+            <div style="display:flex; gap:8px;">
+              <div style="flex:1; height:44px; border:1.5px solid #EDEAE6; border-radius:13px; display:flex; align-items:center; justify-content:center; background:#FDFCFB; cursor:pointer;">
+                <span style="font-size:14px; color:#B5B0AA;">สุนัข</span>
+              </div>
+              <div style="flex:1; height:44px; border:1.5px solid #EDEAE6; border-radius:13px; display:flex; align-items:center; justify-content:center; background:#FDFCFB; cursor:pointer;">
+                <span style="font-size:14px; color:#B5B0AA;">แมว</span>
+              </div>
+              <div style="flex:1; height:44px; border:1.5px solid #EDEAE6; border-radius:13px; display:flex; align-items:center; justify-content:center; background:#FDFCFB; cursor:pointer;">
+                <span style="font-size:14px; color:#B5B0AA;">อื่นๆ</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Breed -->
+          <div style="display:flex; flex-direction:column; gap:6px;">
+            <span style="font-size:13px; font-weight:600; color:#2D2A26;">สายพันธุ์ <span style="font-size:11px; font-weight:400; color:#B5B0AA;">(ถ้าทราบ)</span></span>
+            <div style="height:48px; border:1.5px solid #EDEAE6; border-radius:13px; padding:0 14px; display:flex; align-items:center; background:#FDFCFB;">
+              <span style="font-size:14px; color:#C5C0BB;">เช่น โกลเด้น รีทรีฟเวอร์</span>
+            </div>
+          </div>
+
+          <!-- Location row -->
+          <div style="display:flex; flex-direction:column; gap:8px;">
+            <span style="font-size:13px; font-weight:600; color:#2D2A26;">หายแถวไหน <span style="color:#A82040;">*</span></span>
+            <div style="display:flex; gap:10px;">
+              <div style="flex:1; height:48px; border:1.5px solid #EDEAE6; border-radius:13px; padding:0 12px; display:flex; align-items:center; justify-content:space-between; background:#FDFCFB; cursor:pointer; min-width:0;">
+                <span style="font-size:13px; color:#C5C0BB; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">อำเภอ</span>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M6 9l6 6 6-6"></path></svg>
+              </div>
+              <div style="flex:1; height:48px; border:1.5px solid #EDEAE6; border-radius:13px; padding:0 12px; display:flex; align-items:center; justify-content:space-between; background:#FDFCFB; cursor:pointer; min-width:0;">
+                <span style="font-size:13px; color:#C5C0BB; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">จังหวัด</span>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M6 9l6 6 6-6"></path></svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- Date lost -->
+          <div style="display:flex; flex-direction:column; gap:6px;">
+            <span style="font-size:13px; font-weight:600; color:#2D2A26;">วันที่หาย <span style="color:#A82040;">*</span></span>
+            <div style="height:48px; border:1.5px solid #EDEAE6; border-radius:13px; padding:0 14px; display:flex; align-items:center; justify-content:space-between; background:#FDFCFB; cursor:pointer;">
+              <span style="font-size:14px; color:#C5C0BB;">เลือกวันที่</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div style="display:flex; flex-direction:column; gap:6px;">
+            <span style="font-size:13px; font-weight:600; color:#2D2A26;">รายละเอียดเพิ่มเติม</span>
+            <div style="height:90px; border:1.5px solid #EDEAE6; border-radius:13px; padding:12px 14px; background:#FDFCFB;">
+              <span style="font-size:13px; color:#C5C0BB; line-height:1.6;">เช่น ลักษณะพิเศษ สี ขนาด ปลอกคอ</span>
+            </div>
+          </div>
+
+          <!-- Contact -->
+          <div style="display:flex; flex-direction:column; gap:6px;">
+            <span style="font-size:13px; font-weight:600; color:#2D2A26;">เบอร์ติดต่อ <span style="color:#A82040;">*</span></span>
+            <div style="height:48px; border:1.5px solid #EDEAE6; border-radius:13px; padding:0 14px; display:flex; align-items:center; background:#FDFCFB;">
+              <span style="font-size:14px; color:#C5C0BB;">08x-xxx-xxxx</span>
+            </div>
+            <span style="font-size:11px; color:#B5B0AA; padding-left:2px;">แสดงเฉพาะผู้ที่คุณอนุญาต</span>
+          </div>
+
+          <!-- Submit button (disabled) -->
+          <div style="height:54px; background:#EDEAE6; border-radius:16px; display:flex; align-items:center; justify-content:center; margin-top:4px;">
+            <span style="font-size:15px; font-weight:700; color:#B5B0AA;">โพสต์ประกาศ</span>
+          </div>
+
+        </div>
+      </div>
+      <!-- /Frame 1 -->
+
+      <!-- ════ FRAME 2 · FILLED FORM ════ -->
+      <div data-screen-label="② Form Filled" style="width:390px; background:#FDFCFB; border-radius:24px; overflow:hidden; box-shadow:0 16px 56px rgba(0,0,0,0.22); display:flex; flex-direction:column;">
+
+        <!-- Header -->
+        <div style="height:56px; background:#FDFCFB; border-bottom:1px solid #EDEAE6; display:flex; align-items:center; padding:0 12px 0 4px; gap:4px; flex-shrink:0;">
+          <div style="width:44px; height:44px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2D2A26" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"></path></svg>
+          </div>
+          <span style="font-size:17px; font-weight:700; color:#2D2A26; flex:1;">แจ้งสัตว์หาย</span>
+        </div>
+
+        <!-- Form body: filled -->
+        <div style="padding:20px 20px 32px; display:flex; flex-direction:column; gap:20px;">
+
+          <!-- Photo upload: 1 filled + 3 empty slots -->
+          <div style="display:flex; gap:8px;">
+            <!-- Filled slot 1 -->
+            <div style="width:88px; height:88px; border-radius:14px; overflow:hidden; position:relative; flex-shrink:0;">
+              <div style="width:100%; height:100%; background:repeating-linear-gradient(135deg,#EDEAE6 0px,#EDEAE6 4px,#F5F3F0 4px,#F5F3F0 12px); display:flex; align-items:center; justify-content:center;">
+                <span style="font-size:9px; color:#B5B0AA; font-family:monospace;">photo</span>
+              </div>
+              <div style="position:absolute; top:4px; right:4px; width:20px; height:20px; background:rgba(45,42,38,0.55); border-radius:50%; display:flex; align-items:center; justify-content:center;">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              </div>
+            </div>
+            <!-- Empty slots -->
+            <div style="width:88px; height:88px; border:2px dashed #D5D1CC; border-radius:14px; display:flex; align-items:center; justify-content:center; background:#FAF9F7; cursor:pointer; flex-shrink:0;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C5C0BB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            </div>
+            <div style="width:88px; height:88px; border:2px dashed #D5D1CC; border-radius:14px; display:flex; align-items:center; justify-content:center; background:#FAF9F7; cursor:pointer; flex-shrink:0;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C5C0BB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            </div>
+            <div style="width:88px; height:88px; border:2px dashed #D5D1CC; border-radius:14px; display:flex; align-items:center; justify-content:center; background:#FAF9F7; cursor:pointer; flex-shrink:0;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C5C0BB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            </div>
+          </div>
+
+          <!-- Pet name: filled -->
+          <div style="display:flex; flex-direction:column; gap:6px;">
+            <span style="font-size:13px; font-weight:600; color:#2D2A26;">ชื่อน้อง <span style="color:#A82040;">*</span></span>
+            <div style="height:48px; border:1.5px solid #D5D1CC; border-radius:13px; padding:0 14px; display:flex; align-items:center; background:#FDFCFB;">
+              <span style="font-size:14px; color:#2D2A26;">ถั่ว</span>
+            </div>
+          </div>
+
+          <!-- Species: สุนัข selected -->
+          <div style="display:flex; flex-direction:column; gap:8px;">
+            <span style="font-size:13px; font-weight:600; color:#2D2A26;">ชนิดสัตว์ <span style="color:#A82040;">*</span></span>
+            <div style="display:flex; gap:8px;">
+              <div style="flex:1; height:44px; border:1.5px solid #FF6B5B; border-radius:13px; display:flex; align-items:center; justify-content:center; background:rgba(255,107,91,0.07); cursor:pointer;">
+                <span style="font-size:14px; color:#FF6B5B; font-weight:600;">สุนัข</span>
+              </div>
+              <div style="flex:1; height:44px; border:1.5px solid #EDEAE6; border-radius:13px; display:flex; align-items:center; justify-content:center; background:#FDFCFB; cursor:pointer;">
+                <span style="font-size:14px; color:#B5B0AA;">แมว</span>
+              </div>
+              <div style="flex:1; height:44px; border:1.5px solid #EDEAE6; border-radius:13px; display:flex; align-items:center; justify-content:center; background:#FDFCFB; cursor:pointer;">
+                <span style="font-size:14px; color:#B5B0AA;">อื่นๆ</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Breed: filled -->
+          <div style="display:flex; flex-direction:column; gap:6px;">
+            <span style="font-size:13px; font-weight:600; color:#2D2A26;">สายพันธุ์ <span style="font-size:11px; font-weight:400; color:#B5B0AA;">(ถ้าทราบ)</span></span>
+            <div style="height:48px; border:1.5px solid #D5D1CC; border-radius:13px; padding:0 14px; display:flex; align-items:center; background:#FDFCFB;">
+              <span style="font-size:14px; color:#2D2A26;">ชิวาวา</span>
+            </div>
+          </div>
+
+          <!-- Location: filled -->
+          <div style="display:flex; flex-direction:column; gap:8px;">
+            <span style="font-size:13px; font-weight:600; color:#2D2A26;">หายแถวไหน <span style="color:#A82040;">*</span></span>
+            <div style="display:flex; gap:10px;">
+              <div style="flex:1; height:48px; border:1.5px solid #D5D1CC; border-radius:13px; padding:0 12px; display:flex; align-items:center; justify-content:space-between; background:#FDFCFB; cursor:pointer; min-width:0;">
+                <span style="font-size:13px; color:#2D2A26; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">เมืองเชียงใหม่</span>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M6 9l6 6 6-6"></path></svg>
+              </div>
+              <div style="flex:1; height:48px; border:1.5px solid #D5D1CC; border-radius:13px; padding:0 12px; display:flex; align-items:center; justify-content:space-between; background:#FDFCFB; cursor:pointer; min-width:0;">
+                <span style="font-size:13px; color:#2D2A26; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">เชียงใหม่</span>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M6 9l6 6 6-6"></path></svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- Date: filled -->
+          <div style="display:flex; flex-direction:column; gap:6px;">
+            <span style="font-size:13px; font-weight:600; color:#2D2A26;">วันที่หาย <span style="color:#A82040;">*</span></span>
+            <div style="height:48px; border:1.5px solid #D5D1CC; border-radius:13px; padding:0 14px; display:flex; align-items:center; justify-content:space-between; background:#FDFCFB; cursor:pointer;">
+              <span style="font-size:14px; color:#2D2A26;">15 มิถุนายน 2569</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B5B0AA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+            </div>
+          </div>
+
+          <!-- Description: filled -->
+          <div style="display:flex; flex-direction:column; gap:6px;">
+            <span style="font-size:13px; font-weight:600; color:#2D2A26;">รายละเอียดเพิ่มเติม</span>
+            <div style="height:90px; border:1.5px solid #D5D1CC; border-radius:13px; padding:12px 14px; background:#FDFCFB;">
+              <span style="font-size:13px; color:#2D2A26; line-height:1.6;">ตัวเล็ก ขนสั้น สีน้ำตาลอ่อน ใส่ปลอกคอสีแดง ชอบวิ่งหนี</span>
+            </div>
+          </div>
+
+          <!-- Contact: pre-filled from profile -->
+          <div style="display:flex; flex-direction:column; gap:6px;">
+            <span style="font-size:13px; font-weight:600; color:#2D2A26;">เบอร์ติดต่อ <span style="color:#A82040;">*</span></span>
+            <div style="height:48px; border:1.5px solid #D5D1CC; border-radius:13px; padding:0 14px; display:flex; align-items:center; justify-content:space-between; background:#F5F3F0;">
+              <span style="font-size:14px; color:#2D2A26;">081-234-5678</span>
+              <span style="font-size:10px; color:#B5B0AA; font-family:monospace; white-space:nowrap;">จากโปรไฟล์</span>
+            </div>
+            <span style="font-size:11px; color:#B5B0AA; padding-left:2px;">แสดงเฉพาะผู้ที่คุณอนุญาต</span>
+          </div>
+
+          <!-- Submit button: active -->
+          <div style="height:54px; background:#FF6B5B; border-radius:16px; display:flex; align-items:center; justify-content:center; margin-top:4px; box-shadow:0 4px 16px rgba(255,107,91,0.28); cursor:pointer;">
+            <span style="font-size:15px; font-weight:700; color:white;">โพสต์ประกาศ</span>
+          </div>
+
+        </div>
+      </div>
+      <!-- /Frame 2 -->
+
+      <!-- ════ FRAME 3 · SUCCESS ════ -->
+      <div data-screen-label="③ Success" style="width:390px; background:#FDFCFB; border-radius:24px; overflow:hidden; box-shadow:0 16px 56px rgba(0,0,0,0.22); display:flex; flex-direction:column;">
+
+        <!-- Header: no back (modal-ish context) -->
+        <div style="height:56px; background:#FDFCFB; border-bottom:1px solid #EDEAE6; display:flex; align-items:center; padding:0 20px; flex-shrink:0;">
+          <span style="font-size:17px; font-weight:700; color:#2D2A26; flex:1;">แจ้งสัตว์หาย</span>
+        </div>
+
+        <!-- Success body -->
+        <div style="flex:1; padding:36px 24px 48px; display:flex; flex-direction:column; align-items:center; gap:0;">
+
+          <!-- Check ring -->
+          <div style="width:72px; height:72px; border-radius:50%; background:rgba(21,122,110,0.1); display:flex; align-items:center; justify-content:center; margin-bottom:16px;">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#157A6E" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          </div>
+
+          <p style="font-size:19px; font-weight:700; color:#2D2A26; text-align:center; line-height:1.3; margin-bottom:8px;">ส่งประกาศแล้ว!</p>
+          <p style="font-size:13px; color:#8A8580; text-align:center; line-height:1.6; margin-bottom:28px; text-wrap:pretty;">ประกาศของถั่วถูกเผยแพร่แล้ว<br>ขอให้เจอน้องเร็วๆ นะ 🧡</p>
+
+          <!-- Card preview of what was posted -->
+          <div style="width:100%; background:#FDFCFB; border:1px solid #EDEAE6; border-radius:16px; overflow:hidden; margin-bottom:24px;">
+            <div style="height:120px; background:repeating-linear-gradient(135deg,#EDEAE6 0px,#EDEAE6 4px,#F5F3F0 4px,#F5F3F0 12px); position:relative; display:flex; align-items:center; justify-content:center;">
+              <span style="font-size:10px; color:#B5B0AA; font-family:monospace; background:rgba(253,252,251,0.75); padding:3px 8px; border-radius:4px;">pet photo</span>
+              <div style="position:absolute; top:10px; right:10px; background:#A82040; border-radius:8px; padding:4px 10px;">
+                <span style="font-size:11px; font-weight:700; color:white; white-space:nowrap;">ยังตามหา</span>
+              </div>
+            </div>
+            <div style="padding:12px 14px 14px; display:flex; flex-direction:column; gap:5px;">
+              <div style="display:flex; align-items:baseline; justify-content:space-between;">
+                <span style="font-size:15px; font-weight:700; color:#2D2A26;">ถั่ว</span>
+                <span style="font-size:11px; color:#B5B0AA; white-space:nowrap;">หายมาแล้ว 1 วัน</span>
+              </div>
+              <span style="font-size:13px; color:#8A8580;">สุนัข · ชิวาวา</span>
+              <div style="display:flex; align-items:center; gap:4px;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#C5C0BB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                <span style="font-size:12px; color:#8A8580;">หายแถว เมืองเชียงใหม่, เชียงใหม่</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div style="width:100%; display:flex; flex-direction:column; gap:10px;">
+            <div style="height:52px; background:#FF6B5B; border-radius:16px; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 4px 16px rgba(255,107,91,0.24);">
+              <span style="font-size:15px; font-weight:700; color:white;">ดูประกาศของฉัน</span>
+            </div>
+            <div style="height:52px; background:#F5F3F0; border-radius:16px; display:flex; align-items:center; justify-content:center; cursor:pointer;">
+              <span style="font-size:15px; font-weight:600; color:#5A5650;">กลับหน้าประกาศ</span>
+            </div>
+          </div>
+
+          <!-- Share nudge -->
+          <div style="margin-top:20px; width:100%; background:#FFF8F0; border:1px solid #FDDEC8; border-radius:14px; padding:12px 14px; display:flex; align-items:center; gap:10px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E8863A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+            <div style="flex:1; min-width:0;">
+              <p style="font-size:12px; font-weight:600; color:#2D2A26; line-height:1.3;">แชร์ให้เพื่อนช่วยตาม</p>
+              <p style="font-size:11px; color:#8A8580; line-height:1.4; text-wrap:pretty;">ยิ่งมีคนรู้ ยิ่งมีโอกาสเจอน้องเร็วขึ้น</p>
+            </div>
+            <div style="height:32px; background:#E8863A; border-radius:9px; padding:0 12px; display:flex; align-items:center; flex-shrink:0; cursor:pointer;">
+              <span style="font-size:12px; font-weight:700; color:white; white-space:nowrap;">แชร์</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+      <!-- /Frame 3 -->
+
+    </div><!-- /Row 1 -->
+
+    <!-- ══════════════════ ANNOTATION KEY ══════════════════ -->
+    <div style="width:1222px; border-radius:12px; background:rgba(0,0,0,0.07); padding:14px 16px; display:flex; flex-direction:column; gap:4px; margin-top:8px;">
+      <span style="font-size:10px; font-weight:700; letter-spacing:0.08em; color:#6A6560; text-transform:uppercase; font-family:monospace; display:block; margin-bottom:4px;">Annotations</span>
+      <span style="font-size:11px; color:#8A8580; font-family:monospace; line-height:1.9;">
+        · Entry: reached from FAB "แจ้งสัตว์หาย" on /app/care/lost feed · no bottom nav (full-screen form flow) · ← back dismisses with confirmation if dirty<br>
+        · ① Empty form: submit CTA disabled (#EDEAE6) until all required fields * are filled · photo upload full-width single tap target<br>
+        · ② Filled: 1 of 4 photo slots used (thumbnail + remove ×) · remaining slots show + add affordance · species chip active = coral border + tint<br>
+        · Contact field pre-filled from user profile, bg tinted #F5F3F0 to signal read-only-ish · editable inline if user taps<br>
+        · ③ Success: no back arrow intentionally — promotes "ดูประกาศของฉัน" as primary exit · post card mirrors feed card exactly (content audit)<br>
+        · Share nudge: warm amber tone, non-blocking, optional action — reinforces hopeful tone without pressure<br>
+        · "พบแล้ว" toggle (mark as found): lives on the individual post detail screen, not on this form<br>
+        · Photo upload: max 4, first photo = main card image on feed · minimum 1 required (enforced at submit)
+      </span>
+    </div>
+
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {}
+</script>
+</body>
+</html>
