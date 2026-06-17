@@ -73,7 +73,6 @@ function calcAge(birthMonth: string): string {
 export default function HomePage() {
   const supabase = createClient();
 
-  const [ownerName, setOwnerName] = useState("");
   const [pets, setPets] = useState<Pet[]>([]);
   const [activePetId, setActivePetId] = useState<string | null>(null);
   const [stats, setStats] = useState<Stats>({ likesReceived: 0, matches: 0, avgRating: null });
@@ -84,13 +83,6 @@ export default function HomePage() {
     async function load() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
-
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("display_name")
-        .eq("id", user.id)
-        .maybeSingle();
-      setOwnerName(profile?.display_name ?? "");
 
       const { data: petsData } = await supabase
         .from("pets")
@@ -159,7 +151,7 @@ export default function HomePage() {
       <div>
         <p className="text-sm text-brown-muted/70">วันนี้</p>
         <h1 className="text-xl font-bold text-brown">
-          สวัสดี{ownerName ? `, ${ownerName}` : ""}
+          สวัสดี{activePet?.name ? `, ${activePet.name}` : ""}
         </h1>
       </div>
 
