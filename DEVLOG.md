@@ -1,7 +1,7 @@
 # PawMate — Developer Log & Handoff Notes
 
 > บันทึกสิ่งที่ทำไปในแต่ละ session เพื่อ reference สำหรับครั้งถัดไป
-> อัปเดตล่าสุด: 2026-06-17 (session 15)
+> อัปเดตล่าสุด: 2026-06-17 (session 16)
 
 ## โปรเจกต์คืออะไร
 
@@ -36,6 +36,8 @@ Portfolio project ที่ใช้งานได้จริง — เป้
 - [ ] **รัน migration `013_lost_pets.sql` ใน Supabase SQL Editor** — ยังไม่ได้รัน เป็น blocker ของ Phase 8 ทั้งหมด (`/app/care/lost` และ `/lost/[id]` จะ error)
 - [ ] **ยังไม่ได้ทดสอบ UI จริงในเบราว์เซอร์/มือถือ** สำหรับงานทั้งหมดใน Session 9–12 (ไม่มี browser tool ในเซสชันที่ทำ) — โดยเฉพาะ: หน้า swipe (layout+scroll), หน้า profile (หลังยุบ dashboard), Trust Layer 6 frame ใหม่ (rating card, review modal+ลบรีวิว, report sheet, toast, block dialog), detail sheet ของการ์ด swipe (z-index fix)
 - [x] ~~tile "แดชบอร์ด" dead link ใน `/app/home`~~ — แก้แล้วใน Session 15 (ลบ tile + import ออก)
+- [x] ~~mode toggle หายไปบนหน้า swipe เมื่อ pet มีแค่ 1 mode~~ — แก้แล้ว Session 15 (แสดง toggle เสมอ โหมดที่ไม่ available จะ disabled + dimmed แทนซ่อน)
+- [x] ~~greeting "สวัสดี, X" บน `/app/home` ไม่เปลี่ยนตาม active pet~~ — แก้แล้ว Session 16 (เปลี่ยนจาก `profile.display_name` เป็น `activePet.name`)
 
 ---
 
@@ -435,6 +437,8 @@ npx ts-node --project scripts/tsconfig.json scripts/seed-spots.ts  # playdate sp
 | breeding mode มีการ์ดแค่ใบเดียว | seed รันก่อน demo pet มี breeding mode → ไม่ได้สร้าง compatible pets + swipe feed ไม่ exclude likes จาก session เก่า | แก้ `fetchCards` ให้ query `likes` table ก่อนแสดงการ์ด + รัน seed ใหม่ (ดู Session 3) |
 | GitHub Push Protection บล็อก push | DEVLOG.md มี `SUPABASE_SERVICE_ROLE_KEY` จริง | แก้ DEVLOG เป็น placeholder แล้ว `git commit --amend --no-edit` (safe เพราะยังไม่ได้ push) |
 | Vercel deploy ล้มเหลว | Vercel ไม่ detect Next.js framework อัตโนมัติ → หา output dir `public` แทน `.next` | ไปที่ Vercel → Project Settings → General → Framework Preset → เลือก "Next.js" → Save → Redeploy ✅ |
+| swipe mode toggle หายเมื่อ pet มีแค่ 1 mode | เงื่อนไข `availableModes.length > 1` ซ่อน toggle ทั้งก้อน | เปลี่ยนให้ render เสมอ โหมดที่ไม่ available ได้รับ `disabled` + `cursor-not-allowed text-brown-muted/30` + tooltip (Session 15) |
+| greeting "สวัสดี, X" บน `/app/home` ไม่เปลี่ยนตาม active pet | ใช้ `ownerName` = `profile.display_name` (ค่า static ของ user ไม่ใช่ per-pet) | เปลี่ยนเป็น `activePet?.name` ซึ่งอัปเดตทุกครั้งที่สลับน้อง ลบ `ownerName` state + profile query ออกด้วย (Session 16) |
 
 ---
 
@@ -1093,6 +1097,143 @@ useEffect(() => {
 **ยังค้างทำ (ต้องทำเอง):**
 - รัน `012_hospitals.sql` ใน Supabase SQL Editor
 - รัน `seed-hospitals.ts` หลังจาก migration ผ่าน
+
+---
+
+## Session 15 — 2026-06-17 (Phase 8: Lost Pet Board + Swipe Mode Toggle Fix)
+
+### 1. Phase 8 — ประกาศสัตว์หาย (Lost Pet Board)
+
+#### Migration ใหม่ — `013_lost_pets.sql`
+
+2 ตาราง + RLS:
+
+| ตาราง | คอลัมน์สำคัญ | RLS |
+|---|---|---|
+| `lost_pets` | reporter_id, pet_name, species, breed, photos[], last_seen_province, last_seen_district, lost_date, distinguishing_marks, contact, reward, status ('lost'\|'found') | **SELECT USING(true) ไม่มี TO authenticated** — anon role ต้องเห็นได้สำหรับ `/lost/[id]` public page |
+| `lost_pet_sightings` | lost_pet_id FK, reporter_id FK, detail, seen_at_location | SELECT เหมือน lost_pets (anon), INSERT = authenticated + reporter_id = auth.uid() ไม่มี UPDATE/DELETE (immutable community tips) |
+
+> ⚠️ ยังไม่ได้รันใน Supabase จริง ดูหัวข้อ "ค้างทำ" ด้านบน
+
+#### ไฟล์ที่สร้างใหม่
+
+**`components/lost/LostPetCard.tsx`**
+- Feed card สำหรับ `/app/care/lost` — photo (`h-[152px]` object-cover) + status badge top-right + info strip ด้านล่าง
+- Status badge: `bg-[#A82040]` ยังตามหา / `bg-teal` พบแล้ว; found cards ได้ `opacity-[0.78]`
+- Days lost: `Math.floor((Date.now() - new Date(date + "T00:00:00").getTime()) / 86_400_000)` — ใช้ `"T00:00:00"` suffix เพื่อไม่ให้ timezone offset ทำให้ today = -1
+
+**`components/lost/SightingModal.tsx`**
+- Bottom sheet `z-[70]` สำหรับแจ้งเบาะแส, props: `{ lostPetId, petName, onClose, onSubmitted }`
+- 2 fields: seen_at_location (required) + detail textarea (required)
+- Insert ลง `lost_pet_sightings` แล้วเรียก `onSubmitted` + `onClose`
+
+**`app/app/care/lost/page.tsx`** — Feed (ไม่ต้องใช้ active pet — community feed)
+- Header: back → `/app/care` (pattern เดียวกับ hospitals page)
+- Fetch: `lost_pets` order by `created_at DESC`
+- 3 filter pills (client-side): province (MapPin icon), species, status
+- Single-column list + loading skeleton (3 animated cards)
+- FAB extended pill: `fixed right-4 bottom-[76px] z-[60]` — coral pill กว้าง (Plus icon + "แจ้งสัตว์หาย") link → `/app/care/lost/new`
+
+**`app/app/care/lost/new/page.tsx`** — Create Form
+- Photo upload: Supabase Storage `pet-photos` bucket, path `{userId}/{timestamp}-{random}.{ext}`, สูงสุด 4 รูป
+- Fields: photos*, ชื่อน้อง*, ชนิด* (3 chip), สายพันธุ์ (optional), อำเภอ* + จังหวัด*, วันที่หาย*, รายละเอียด (optional), เบอร์ติดต่อ*
+- Submit: `INSERT` ลง `lost_pets`
+- In-page success screen (แทน redirect): teal check ring + ชื่อน้อง + preview card + coral "ดูประกาศของฉัน" + gray "กลับหน้าประกาศ" + amber share nudge (Web Share API / clipboard fallback)
+
+**`app/app/care/lost/[id]/page.tsx`** — Protected Detail
+- Parallel fetch: `lost_pets` + `lost_pet_sightings(profiles(display_name))` + `auth.getUser()`
+- Photo carousel: `translateX(-${idx*100}%)` บน flex container ไม่ใช้ library
+- Status badge top-LEFT: `bg-[#E0445A]` lost / `bg-teal` found
+- Facts card: แถวข้อมูล MapPin/Calendar/Clock/Eye/DollarSign แยก border-b
+- Owner row: "คุณเอง" badge (เจ้าของ) หรือ ปุ่ม "ติดต่อ" copy-to-clipboard (คนอื่น)
+- Action buttons: non-owner+lost → แจ้งเบาะแส (bg-[#E8724A]) + แชร์; owner+lost → แชร์ + แก้ไข
+- Celebration banner เมื่อ found: `bg-[#EDF7F6]` ระหว่างรูปกับเนื้อหา
+- Sightings timeline: vertical connector + avatar + display_name + timeAgo + location chip
+- Owner-only footer: teal outline "ทำเครื่องหมายว่าพบแล้ว" → center confirm dialog `z-[70]`
+- Share: `window.location.origin + "/lost/" + id` ผ่าน Web Share API / clipboard
+- Toast integration ผ่าน `components/trust/Toast.tsx`
+- TS gotcha: Supabase FK join (`profiles(display_name)`) return type เป็น array → ต้อง cast `as unknown as Sighting[]`
+
+**`app/lost/[id]/page.tsx`** — Public Share Page (Server Component)
+- `generateMetadata` export: OG title/description/image สำหรับ LINE/Facebook preview
+- Sticky amber login banner top: `"เข้าสู่ระบบเพื่อแจ้งเบาะแส"` link → `/login?redirect=/lost/${id}`
+- Photo เดียว (ไม่มี carousel), facts card, sightings timeline read-only
+- ไม่มี BottomNav/AppHeader (อยู่ใน root layout เท่านั้น)
+- `notFound()` ถ้าไม่มี post
+
+#### ไฟล์ที่แก้ไข
+
+| ไฟล์ | สิ่งที่แก้ |
+|---|---|
+| `app/app/care/page.tsx` | ประกาศสัตว์หาย: `href:"#"` → `/app/care/lost`, `comingSoon:true` → `false` |
+| `app/app/home/page.tsx` | CARE_MENU: แก้ href + comingSoon; ลบ MAIN_MENU tile "แดชบอร์ด" + `LayoutDashboard` import |
+| `components/AuthForm.tsx` | เพิ่ม `useSearchParams()` อ่าน `?redirect=` param → redirect หลัง login แทน hardcode `/app/swipe` |
+| `app/login/page.tsx` | wrap `<AuthForm>` ใน `<Suspense>` (required สำหรับ `useSearchParams` ใน Next.js 14 server page) |
+| `CLAUDE.md` | เพิ่ม 4 routes, migration 013, "next migration → 014", Phase 8 ว่า built |
+| `LINK_PATH.md` | สร้างใหม่ — รายการ route ทั้งหมด 14 เส้นทาง แบ่ง Public/Onboarding/App |
+
+#### GitHub Push (3 commits)
+
+```
+feat: Phase 8 lost pet board — feed, create form, detail, public share page
+fix: mode toggle always visible (disabled styles for unavailable modes)
+chore: update CLAUDE.md, DEVLOG.md, CLAUDE-EXPANSION.md for Phase 8
+```
+
+---
+
+### 2. Fix: Swipe Mode Toggle หายเมื่อ Pet มีแค่ 1 Mode
+
+**ปัญหา:** condition `availableModes.length > 1` ใน `app/app/swipe/page.tsx` ซ่อน segmented control ทั้งก้อน → user เห็นแค่ว่างเปล่า ไม่รู้ว่าสลับ mode ได้
+
+**วิธีแก้:**
+- ลบเงื่อนไข `length > 1` ออก — render toggle เสมอ 2 ปุ่ม
+- ปุ่มที่ไม่ available: `disabled` + `cursor-not-allowed text-brown-muted/30` + `title="เปิดโหมดนี้ได้ที่หน้าโปรไฟล์"`
+- `onClick` ป้องกันด้วย `availableModes.includes(mode) && setMode(mode)`
+
+---
+
+## Session 16 — 2026-06-17 (Bug Fix: Home Greeting + Favicon)
+
+### 1. Fix: Greeting บน `/app/home` ไม่เปลี่ยนตาม Active Pet
+
+**ปัญหา:** greeting "สวัสดี, {ownerName}" ใช้ `profile.display_name` ซึ่งเป็นชื่อ account ของ user (static ไม่เปลี่ยน) → เมื่อสลับ pet ที่ Profile page แล้วกลับมา home page ชื่อในการทักทายยังคงเดิม แม้ pet card ด้านล่างจะอัปเดตแล้ว
+
+**วิธีแก้ (`app/app/home/page.tsx`):**
+- ลบ state `ownerName` + query `profile.display_name` ออกทั้งหมด (ไม่ได้ใช้ที่อื่นในไฟล์)
+- เปลี่ยน greeting JSX จาก `สวัสดี, {ownerName}` → `สวัสดี, {activePet?.name}`
+- `activePet` compute จาก `pets.find(p => p.id === activePetId)` ซึ่งอัปเดตทันทีที่ `handleSwitchPet` เรียกหรือตอน mount อ่าน localStorage ค่าใหม่
+- ผล: สลับไปน้อง "เทาบิ๊ก" → greeting แสดง "สวัสดี, เทาบิ๊ก"; สลับไปน้อง "ถุงเงิน" → "สวัสดี, ถุงเงิน"
+- Bonus: ลด 1 DB query ต่อ page load (ไม่ต้อง fetch profiles อีกต่อไป)
+
+### 2. Feat: SVG Favicon
+
+**ไฟล์ใหม่:** `app/icon.svg`
+
+```svg
+<!-- Coral rounded-square background (#FF6B5B) + white paw print -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <rect width="100" height="100" rx="22" fill="#FF6B5B"/>
+  <ellipse cx="50" cy="70" rx="17" ry="14" fill="white"/>  <!-- main pad -->
+  <ellipse cx="23" cy="54" rx="8" ry="9" fill="white"/>
+  <ellipse cx="38" cy="42" rx="8.5" ry="9.5" fill="white"/>
+  <ellipse cx="62" cy="42" rx="8.5" ry="9.5" fill="white"/>
+  <ellipse cx="77" cy="54" rx="8" ry="9" fill="white"/>
+</svg>
+```
+
+Next.js 14 App Router auto-injects `<link rel="icon" type="image/svg+xml" href="/icon.svg">` เมื่อพบไฟล์ `app/icon.svg` — ไม่ต้องแก้ `layout.tsx`
+
+รองรับ: Chrome, Firefox, Safari 14+, Edge (ไม่รองรับ IE แต่ไม่จำเป็นแล้ว)
+
+### Git & Push
+
+```
+fix: home page greeting now shows active pet name instead of static owner display_name
+feat: add SVG favicon (paw print on coral background)
+```
+
+Push ไป `main` — Vercel auto-deploy ทั้ง 2 commits
 
 ---
 
