@@ -288,30 +288,38 @@ export default function SwipePage() {
     <div className="flex h-[calc(100dvh-5rem)] flex-col overflow-hidden bg-cream">
       {/* Mode toggle + filter — segmented control, no logo header on this screen */}
       <div className="mx-5 mb-3 mt-3 flex shrink-0 items-center gap-3">
-        {availableModes.length > 1 ? (
-          <div className="grid h-10 flex-1 grid-cols-2 gap-0.5 rounded-xl bg-[#EDEAE6] p-[3px]">
-            <button
-              type="button"
-              onClick={() => setMode("playdate")}
-              className={`flex items-center justify-center rounded-[10px] text-sm font-semibold transition-all ${
-                mode === "playdate" ? "bg-teal text-white" : "text-brown-muted"
-              }`}
-            >
-              หาเพื่อนเล่น
-            </button>
-            <button
-              type="button"
-              onClick={() => setMode("breeding")}
-              className={`flex items-center justify-center rounded-[10px] text-sm font-semibold transition-all ${
-                mode === "breeding" ? "bg-amber text-white" : "text-brown-muted"
-              }`}
-            >
-              หาคู่
-            </button>
-          </div>
-        ) : (
-          <div className="flex-1" />
-        )}
+        <div className="grid h-10 flex-1 grid-cols-2 gap-0.5 rounded-xl bg-[#EDEAE6] p-[3px]">
+          <button
+            type="button"
+            onClick={() => availableModes.includes("playdate") && setMode("playdate")}
+            disabled={!availableModes.includes("playdate")}
+            title={!availableModes.includes("playdate") ? "เปิดโหมดนี้ได้ที่หน้าโปรไฟล์" : undefined}
+            className={`flex items-center justify-center rounded-[10px] text-sm font-semibold transition-all ${
+              mode === "playdate"
+                ? "bg-teal text-white"
+                : availableModes.includes("playdate")
+                ? "text-brown-muted"
+                : "cursor-not-allowed text-brown-muted/30"
+            }`}
+          >
+            หาเพื่อนเล่น
+          </button>
+          <button
+            type="button"
+            onClick={() => availableModes.includes("breeding") && setMode("breeding")}
+            disabled={!availableModes.includes("breeding")}
+            title={!availableModes.includes("breeding") ? "เปิดโหมดนี้ได้ที่หน้าโปรไฟล์" : undefined}
+            className={`flex items-center justify-center rounded-[10px] text-sm font-semibold transition-all ${
+              mode === "breeding"
+                ? "bg-amber text-white"
+                : availableModes.includes("breeding")
+                ? "text-brown-muted"
+                : "cursor-not-allowed text-brown-muted/30"
+            }`}
+          >
+            หาคู่
+          </button>
+        </div>
         <button
           type="button"
           onClick={() => setFilterOpen(true)}
