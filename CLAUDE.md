@@ -40,6 +40,10 @@ No test suite exists — `npx tsc --noEmit` is the primary correctness check.
 | `/app/profile` | Pet profile preview + edit, multi-pet management, stats, account actions |
 | `/app/care` | Care Hub — ดูแล tab in bottom nav; 2×2 grid of care features |
 | `/app/care/hospitals` | Vet hospital finder — list/map toggle, filters, geolocation distance sort |
+| `/app/care/lost` | Lost pet feed — province/species/status filters, extended pill FAB |
+| `/app/care/lost/new` | Create lost pet post — photo upload, in-page success screen |
+| `/app/care/lost/[id]` | Lost pet detail — photo carousel, sightings timeline, owner actions |
+| `/lost/[id]` | Public share page — server component, OG meta tags, no auth required |
 
 The `/app/*` layout (`app/app/layout.tsx`) wraps all authenticated pages with a persistent `ConditionalAppHeader` (logo → /app/home) and `BottomNav` (5 tabs: หน้าแรก, ปัดการ์ด, แมตช์, ดูแล, โปรไฟล์). The chat page suppresses the global header because it has its own navigation header; the swipe page suppresses it too, to give the card deck maximum vertical space; `/app/care/*` suppresses it too — Care Hub and its sub-pages build their own back-arrow header (back → `/app/home` from the hub, back → `/app/care` from hospitals).
 
@@ -98,8 +102,9 @@ Migrations live in `supabase/migrations/` and must be run manually in the Supaba
 | `010_trust.sql` | reviews, reports, blocks tables + RLS |
 | `011_reviews_delete.sql` | RLS DELETE policy so a reviewer can delete their own review |
 | `012_hospitals.sql` | `hospitals` table (Care Hub → Hospital Finder), public read-only RLS |
+| `013_lost_pets.sql` | `lost_pets` + `lost_pet_sightings` tables + RLS — anon SELECT for public `/lost/[id]` |
 
-Numbers are non-sequential (no `003`–`007`) — they reflect actual build order, not the phase numbering suggested in `CLAUDE-EXPANSION.md`. The next new migration should be `013_*.sql`.
+Numbers are non-sequential (no `003`–`007`) — they reflect actual build order, not the phase numbering suggested in `CLAUDE-EXPANSION.md`. The next new migration should be `014_*.sql`.
 
 **RLS pattern**: `owns_pet(pet_id)` is a SECURITY DEFINER helper that checks `pets.owner_id = auth.uid()`. Use it in policies instead of inlining the join. `is_in_match(match_id)` checks that the caller's pet is a participant.
 
@@ -127,7 +132,7 @@ Bottom sheets and modals above the swipe deck use `z-[60]`; match popup uses `z-
 
 ## Future phases (not yet built)
 
-`CLAUDE-EXPANSION.md` is a prompt-kit roadmap for Phases 6–11: Trust Layer, Care Hub, vet hospital finder, lost-pet board, blood donation center, health book, and an optional tele-triage demo. Phase 6 (Trust Layer, `010_trust.sql`/`011_reviews_delete.sql`, `components/trust/*`) and Phase 7 (Care Hub + Vet Hospital Finder, `012_hospitals.sql`, `app/app/care/*`, `components/care/*`) are built. Phases 8–11 (lost-pet board, blood donation, health book, tele-triage) are not. If asked to build any of them, read `CLAUDE-EXPANSION.md` first — it has the DB schema, RLS rules, and per-phase build steps. Note its illustrative migration numbers (`003_hospitals.sql`, etc.) don't match what actually shipped — check the migration table above for the real numbers.
+`CLAUDE-EXPANSION.md` is a prompt-kit roadmap for Phases 6–11: Trust Layer, Care Hub, vet hospital finder, lost-pet board, blood donation center, health book, and an optional tele-triage demo. Phases 6–8 are built: Phase 6 (Trust Layer, `010_trust.sql`/`011_reviews_delete.sql`, `components/trust/*`), Phase 7 (Care Hub + Vet Hospital Finder, `012_hospitals.sql`, `app/app/care/*`, `components/care/*`), Phase 8 (Lost Pet Board, `013_lost_pets.sql`, `app/app/care/lost/*`, `app/lost/[id]`, `components/lost/*`). Phases 9–11 (blood donation, health book, tele-triage) are not yet built. If asked to build any of them, read `CLAUDE-EXPANSION.md` first — it has the DB schema, RLS rules, and per-phase build steps. Note its illustrative migration numbers (`003_hospitals.sql`, etc.) don't match what actually shipped — check the migration table above for the real numbers.
 
 ## Environment variables
 

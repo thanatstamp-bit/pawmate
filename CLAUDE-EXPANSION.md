@@ -9,7 +9,7 @@
 **ลำดับที่แนะนำ:** Phase 6 (Trust) → 7 (Care Hub + รพ.สัตว์) → 8 (สัตว์หาย) → 9 (บริจาคเลือด) → 10 (สมุดสุขภาพ) → 11 (Tele-vet demo — ทำหรือไม่ทำก็ได้)
 **เหตุผล:** Trust layer ต้องมาก่อนเพราะเฟสอื่นใช้ badge ต่อ, ส่วน Care Hub (Phase 7) เป็น "บ้าน" ของฟีเจอร์ที่เหลือทั้งหมด
 
-> ⚠️ **สถานะ (อัปเดต 2026-06-16):** **Phase 6 ทำเสร็จแล้ว** — แต่ใช้ migration เลข `010_trust.sql` จริง ไม่ใช่ `002_trust.sql` ที่ระบุในแผนเดิม (เลขจริงเรียงตามลำดับที่สร้างขึ้นจริงในโปรเจกต์ ไม่ใช่ตามแผนนี้) รายละเอียดที่ทำไปดูได้ใน `DEVLOG.md` (Session 7 + Session 12 ที่ปรับ UI ให้ตรง wireframe) **เริ่มงานต่อที่ Phase 7 ได้เลย** และ migration ใหม่ของ Phase 7 เป็นต้นไปต้องเริ่มที่ `012_*.sql` (ไม่ใช่ `003_*.sql` ตามที่เขียนไว้ด้านล่าง — เลขในไฟล์นี้ทั้งหมดเป็นแค่ลำดับอ้างอิงตอนเขียนแผน ไม่ใช่เลขที่ต้องใช้จริง)
+> ⚠️ **สถานะ (อัปเดต 2026-06-17):** **Phase 6, 7 และ 8 ทำเสร็จแล้ว** — Phase 6 ใช้ migration `010_trust.sql` + `011_reviews_delete.sql`, Phase 7 ใช้ `012_hospitals.sql`, Phase 8 ใช้ `013_lost_pets.sql` (เลขจริงต่างจากในแผนนี้ — ดูรายละเอียดใน `CLAUDE.md` migration table) รายละเอียดที่ทำไปดูได้ใน `DEVLOG.md` **เริ่มงานต่อที่ Phase 9 ได้เลย** — migration ใหม่ต้องเริ่มที่ `014_blood.sql`
 
 ---
 
@@ -182,6 +182,8 @@ Explain the block-filter helper with a clear comment. All copy in Thai.
 
 ## 🗺 PHASE 7 — Care Hub + Vet Hospital Finder (รพ.สัตว์ใกล้ฉัน)
 
+> ✅ **DONE** (Session 13–14) — shipped as `012_hospitals.sql`. Prompt kept for reference only; see `DEVLOG.md`.
+
 ```
 Using the MVP Master Context and the Expansion Context above:
 
@@ -222,6 +224,8 @@ Install react-leaflet and leaflet. Handle the Next.js SSR issue with Leaflet
 ---
 
 ## 📣 PHASE 8 — Lost Pet Board (ประกาศสัตว์หาย)
+
+> ✅ **DONE** (Session 15) — shipped as `013_lost_pets.sql`. Prompt kept for reference only; see `DEVLOG.md`.
 
 ```
 Using the MVP Master Context and the Expansion Context above:

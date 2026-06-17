@@ -1,7 +1,7 @@
 # PawMate — Developer Log & Handoff Notes
 
 > บันทึกสิ่งที่ทำไปในแต่ละ session เพื่อ reference สำหรับครั้งถัดไป
-> อัปเดตล่าสุด: 2026-06-17 (session 14)
+> อัปเดตล่าสุด: 2026-06-17 (session 15)
 
 ## โปรเจกต์คืออะไร
 
@@ -25,15 +25,17 @@ Portfolio project ที่ใช้งานได้จริง — เป้
 ✅ Deploy ไป Vercel — ผ่านสมบูรณ์ (2026-06-12)
 ✅ Phase 7 — Care Hub + Vet Hospital Finder (Session 13) — UI ตรงตาม `Care Hub Wireframe.dc.html` + `Hospital Finder Wireframe.dc.html` ทุก frame
 ✅ Phase 7 recheck (Session 14) — เพิ่ม ดูแล tab ใน BottomNav (5 tabs), แก้ HospitalMap re-centering, อัปเดต CLAUDE.md
-🔲 Phase 8–11 — สัตว์หาย / บริจาคเลือด / สมุดสุขภาพ / tele-vet demo — ยังไม่เริ่ม
+✅ Phase 8 — Lost Pet Board / ประกาศสัตว์หาย (Session 15) — feed + create form + detail + public share page พร้อม OG meta
+🔲 Phase 9–11 — บริจาคเลือด / สมุดสุขภาพ / tele-vet demo — ยังไม่เริ่ม
 
-### ⚠️ ค้างทำก่อนใช้งานจริง (จาก Session 9–14)
+### ⚠️ ค้างทำก่อนใช้งานจริง (อัปเดต Session 15)
 
 - [ ] **รัน migration `011_reviews_delete.sql` ใน Supabase SQL Editor** — ยังไม่ได้รัน ถ้าไม่รัน ปุ่ม "ลบรีวิวนี้" ใน `ReviewModal` จะกดไม่ได้ (RLS ปฏิเสธ)
 - [ ] **รัน migration `012_hospitals.sql` ใน Supabase SQL Editor** — ยังไม่ได้รัน เป็น blocker ของ Phase 7 ทั้งหมด
-- [ ] **หลังรัน 012 แล้ว ให้รัน `npx ts-node --project scripts/tsconfig.json scripts/seed-hospitals.ts`** เพื่อ seed 30 โรงพยาบาล แล้วค่อยทดสอบ list/map/filter/geolocation/bottom sheet ของ `/app/care/hospitals` ด้วยข้อมูลจริง
+- [ ] **หลังรัน 012 แล้ว ให้รัน `npx ts-node --project scripts/tsconfig.json scripts/seed-hospitals.ts`** เพื่อ seed 30 โรงพยาบาล
+- [ ] **รัน migration `013_lost_pets.sql` ใน Supabase SQL Editor** — ยังไม่ได้รัน เป็น blocker ของ Phase 8 ทั้งหมด (`/app/care/lost` และ `/lost/[id]` จะ error)
 - [ ] **ยังไม่ได้ทดสอบ UI จริงในเบราว์เซอร์/มือถือ** สำหรับงานทั้งหมดใน Session 9–12 (ไม่มี browser tool ในเซสชันที่ทำ) — โดยเฉพาะ: หน้า swipe (layout+scroll), หน้า profile (หลังยุบ dashboard), Trust Layer 6 frame ใหม่ (rating card, review modal+ลบรีวิว, report sheet, toast, block dialog), detail sheet ของการ์ด swipe (z-index fix)
-- [ ] **หมายเหตุพบระหว่าง Session 13:** เมนู "เมนูหลัก" ในหน้า `/app/home` ยังมี tile "แดชบอร์ด" ลิงก์ไป `/app/dashboard` ซึ่งถูกลบไปแล้วตั้งแต่ Session 10 (ยุบเข้า `/app/profile`) — เป็น dead link ควรลบ tile นี้ทิ้ง
+- [x] ~~tile "แดชบอร์ด" dead link ใน `/app/home`~~ — แก้แล้วใน Session 15 (ลบ tile + import ออก)
 
 ---
 
@@ -183,8 +185,9 @@ blocks
 - `009_demo_match.sql` — `create_demo_match()` SECURITY DEFINER RPC (ใช้ตอน demo swipe เพื่อการันตี match)
 - `010_trust.sql` — reviews + reports + blocks (Phase 6)
 - `011_reviews_delete.sql` — เพิ่ม RLS DELETE policy ให้ลบรีวิวตัวเองได้ (Session 12) — **migration นี้ยังไม่ได้รันใน Supabase จริง ดูหัวข้อ "ค้างทำ" ด้านบน**
-- `012_hospitals.sql` — ตาราง `hospitals` (Phase 7) public read-only RLS (Session 13) — **ยังไม่ได้รันใน Supabase จริงเช่นกัน ดูหัวข้อ "ค้างทำ" ด้านบน**
-- migration ใหม่ถัดไปควรเป็น `013_*.sql`
+- `012_hospitals.sql` — ตาราง `hospitals` (Phase 7) public read-only RLS (Session 13) — **ยังไม่ได้รันใน Supabase จริง ดูหัวข้อ "ค้างทำ" ด้านบน**
+- `013_lost_pets.sql` — ตาราง `lost_pets` + `lost_pet_sightings` (Phase 8) — anon SELECT เพื่อให้ `/lost/[id]` เข้าได้โดยไม่ login — **ยังไม่ได้รันใน Supabase จริง ดูหัวข้อ "ค้างทำ" ด้านบน**
+- migration ใหม่ถัดไปควรเป็น `014_*.sql`
 
 ### RLS Rules
 - ทุก table เปิด RLS
@@ -230,12 +233,23 @@ app/
     chat/[matchId]/page.tsx      — Realtime chat + scheduling + trust actions
     profile/page.tsx             — Active-pet hero + multi-pet switcher + stats + account
                                     (รวม dashboard เดิมเข้ามาแล้ว — app/app/dashboard ไม่มีแล้ว ลบไปตั้งแต่ Session 10)
+    care/
+      page.tsx                   — Care Hub 2×2 grid (Phase 7)
+      hospitals/page.tsx         — Hospital finder: list/map toggle, geolocation sort
+      lost/
+        page.tsx                 — Lost pet feed + 3 filters + extended pill FAB (Phase 8)
+        new/page.tsx             — Create form: photo upload, in-page success screen
+        [id]/page.tsx            — Detail: carousel, sightings timeline, mark-as-found
+
+app/ (public — ไม่ต้อง login)
+  lost/
+    [id]/page.tsx                — Public share page (server component, OG meta, anon RLS)
 
 components/
   AuthForm.tsx                   — Login/signup tabs + Demo button
   AppHeader.tsx                  — Logo header (โชว์ทุกหน้ายกเว้น /app/chat/* และ /app/swipe)
   ConditionalAppHeader.tsx       — เลือกว่าจะโชว์ AppHeader หรือไม่ตาม path
-  BottomNav.tsx                  — Bottom navigation (4 tabs: หน้าแรก/ปัดการ์ด/แมตช์/โปรไฟล์)
+  BottomNav.tsx                  — Bottom navigation (5 tabs: หน้าแรก/ปัดการ์ด/แมตช์/ดูแล/โปรไฟล์)
   LogoutButton.tsx                — Logout button (client component)
   onboarding/
     Step1Photos.tsx              — Photo upload (Supabase Storage)
@@ -257,6 +271,13 @@ components/
     BlockConfirm.tsx               — ยืนยันบล็อก
     RatingSummary.tsx              — คะแนนเฉลี่ย + รีวิวล่าสุด (compact card)
     Toast.tsx                      — toast แจ้งเตือนทั่วไป (title/subtitle/icon)
+  care/
+    HospitalCard.tsx              — Hospital list card
+    HospitalDetailSheet.tsx       — Hospital detail bottom sheet (stops at bottom-[60px])
+    HospitalMap.tsx               — Leaflet map, custom divIcon, dynamic import ssr:false
+  lost/
+    LostPetCard.tsx               — Feed card: photo + status badge + days-lost
+    SightingModal.tsx             — Bottom sheet แจ้งเบาะแส
 
 lib/
   supabase/
@@ -272,9 +293,13 @@ lib/
 
 middleware.ts                    — Route protection: /app/*, /onboarding/*, /login
 
+lib/
+  geo.ts                         — haversineKm() great-circle distance (Phase 7)
+
 scripts/
   seed.ts                        — Seed script (45 dogs + 40 cats + breeding-compatible ต่อ pet จริง + pre-likes)
   seed-spots.ts                  — Seed 24 pet-friendly playdate spots
+  seed-hospitals.ts              — Seed ~30 vet hospitals (รัน หลัง 012_hospitals.sql)
   tsconfig.json                  — Separate tsconfig for scripts (commonjs)
 
 supabase/
@@ -285,6 +310,8 @@ supabase/
     009_demo_match.sql
     010_trust.sql
     011_reviews_delete.sql
+    012_hospitals.sql            — hospitals table (Phase 7) — ยังไม่ได้รันใน Supabase
+    013_lost_pets.sql            — lost_pets + lost_pet_sightings (Phase 8) — ยังไม่ได้รันใน Supabase
 
 tsconfig.json                    — "scripts" อยู่ใน exclude เพื่อไม่ให้ Next.js compile seed
 ```
