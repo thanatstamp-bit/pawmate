@@ -9,7 +9,7 @@
 **ลำดับที่แนะนำ:** Phase 6 (Trust) → 7 (Care Hub + รพ.สัตว์) → 8 (สัตว์หาย) → 9 (บริจาคเลือด) → 10 (สมุดสุขภาพ) → 11 (Tele-vet demo — ทำหรือไม่ทำก็ได้)
 **เหตุผล:** Trust layer ต้องมาก่อนเพราะเฟสอื่นใช้ badge ต่อ, ส่วน Care Hub (Phase 7) เป็น "บ้าน" ของฟีเจอร์ที่เหลือทั้งหมด
 
-> ⚠️ **สถานะ (อัปเดต 2026-06-17, Session 17):** **Phase 6, 7, 8 และ 9 ทำเสร็จแล้ว** — Phase 6 ใช้ `010_trust.sql` + `011_reviews_delete.sql`, Phase 7 ใช้ `012_hospitals.sql`, Phase 8 ใช้ `013_lost_pets.sql`, Phase 9 ใช้ `014_blood.sql` (เลขจริงต่างจากในแผนนี้ — ดูรายละเอียดใน `CLAUDE.md` migration table) รายละเอียดที่ทำไปดูได้ใน `DEVLOG.md` **เริ่มงานต่อที่ Phase 10 ได้เลย** — migration ใหม่ต้องเริ่มที่ `015_health.sql`
+> ⚠️ **สถานะ (อัปเดต 2026-06-17, Session 18):** **Phase 6, 7, 8 และ 9 ทำเสร็จแล้ว** — Phase 6 ใช้ `010_trust.sql` + `011_reviews_delete.sql`, Phase 7 ใช้ `012_hospitals.sql`, Phase 8 ใช้ `013_lost_pets.sql` (Session 18 ยกระดับ `/lost/[id]` public share page ให้ตรง wireframe: logo bar, CTA banner, phone button, share button, social proof strip), Phase 9 ใช้ `014_blood.sql` (เลขจริงต่างจากในแผนนี้ — ดูรายละเอียดใน `CLAUDE.md` migration table) รายละเอียดที่ทำไปดูได้ใน `DEVLOG.md` **เริ่มงานต่อที่ Phase 10 ได้เลย** — migration ใหม่ต้องเริ่มที่ `015_health.sql`
 
 ---
 

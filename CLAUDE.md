@@ -45,7 +45,7 @@ No test suite exists — `npx tsc --noEmit` is the primary correctness check.
 | `/app/care/lost/[id]` | Lost pet detail — photo carousel, sightings timeline, owner actions |
 | `/app/care/blood` | Blood donation center — feed of open requests + donor registration tab |
 | `/app/care/blood/[id]` | Blood request detail — matched donors (exact + crossmatch), respond as donor, owner sees responses |
-| `/lost/[id]` | Public share page — server component, OG meta tags, no auth required |
+| `/lost/[id]` | Public share page — server component, OG meta tags, no auth required; logo bar + CTA banner + phone button + share button (client island `PublicShareButton`) |
 
 The `/app/*` layout (`app/app/layout.tsx`) wraps all authenticated pages with a persistent `ConditionalAppHeader` (logo → /app/home) and `BottomNav` (5 tabs: หน้าแรก, ปัดการ์ด, แมตช์, ดูแล, โปรไฟล์). The chat page suppresses the global header because it has its own navigation header; the swipe page suppresses it too, to give the card deck maximum vertical space; `/app/care/*` suppresses it too — Care Hub and its sub-pages build their own back-arrow header (back → `/app/home` from the hub, back → `/app/care` from hospitals).
 
@@ -136,7 +136,7 @@ Bottom sheets and modals above the swipe deck use `z-[60]`; match popup uses `z-
 
 ## Future phases (not yet built)
 
-`CLAUDE-EXPANSION.md` is a prompt-kit roadmap for Phases 6–11: Trust Layer, Care Hub, vet hospital finder, lost-pet board, blood donation center, health book, and an optional tele-triage demo. Phases 6–9 are built: Phase 6 (Trust Layer, `010_trust.sql`/`011_reviews_delete.sql`, `components/trust/*`), Phase 7 (Care Hub + Vet Hospital Finder, `012_hospitals.sql`, `app/app/care/*`, `components/care/*`), Phase 8 (Lost Pet Board, `013_lost_pets.sql`, `app/app/care/lost/*`, `app/lost/[id]`, `components/lost/*`), Phase 9 (Blood Donation Center, `014_blood.sql`, `lib/blood-matching.ts`, `app/app/care/blood/*`). Phases 10–11 (health book, tele-triage) are not yet built. If asked to build any of them, read `CLAUDE-EXPANSION.md` first — it has the DB schema, RLS rules, and per-phase build steps. Note its illustrative migration numbers (`003_hospitals.sql`, etc.) don't match what actually shipped — check the migration table above for the real numbers.
+`CLAUDE-EXPANSION.md` is a prompt-kit roadmap for Phases 6–11: Trust Layer, Care Hub, vet hospital finder, lost-pet board, blood donation center, health book, and an optional tele-triage demo. Phases 6–9 are built: Phase 6 (Trust Layer, `010_trust.sql`/`011_reviews_delete.sql`, `components/trust/*`), Phase 7 (Care Hub + Vet Hospital Finder, `012_hospitals.sql`, `app/app/care/*`, `components/care/*`), Phase 8 (Lost Pet Board, `013_lost_pets.sql`, `app/app/care/lost/*`, `app/lost/[id]`, `components/lost/*` including `PublicShareButton.tsx` client island for the public share page), Phase 9 (Blood Donation Center, `014_blood.sql`, `lib/blood-matching.ts`, `app/app/care/blood/*`). Phases 10–11 (health book, tele-triage) are not yet built. If asked to build any of them, read `CLAUDE-EXPANSION.md` first — it has the DB schema, RLS rules, and per-phase build steps. Note its illustrative migration numbers (`003_hospitals.sql`, etc.) don't match what actually shipped — check the migration table above for the real numbers.
 
 ## Environment variables
 
