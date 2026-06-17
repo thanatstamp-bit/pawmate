@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Coral rounded-square background -->
+  <rect width="100" height="100" rx="22" fill="#FF6B5B"/>
+
+  <!-- Paw print — white -->
+  <!-- Main pad -->
+  <ellipse cx="50" cy="70" rx="17" ry="14" fill="white"/>
+  <!-- Toe pads (left → right) -->
+  <ellipse cx="23" cy="54" rx="8" ry="9" fill="white"/>
+  <ellipse cx="38" cy="42" rx="8.5" ry="9.5" fill="white"/>
+  <ellipse cx="62" cy="42" rx="8.5" ry="9.5" fill="white"/>
+  <ellipse cx="77" cy="54" rx="8" ry="9" fill="white"/>
+</svg>
