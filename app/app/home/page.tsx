@@ -57,7 +57,7 @@ const CARE_MENU: MenuTile[] = [
   { label: "โรงพยาบาลสัตว์ใกล้ฉัน", href: "/app/care/hospitals", icon: Hospital },
   { label: "ประกาศสัตว์หาย", href: "/app/care/lost", icon: Megaphone, comingSoon: false },
   { label: "สมุดสุขภาพ", href: "/app/care/health-book", icon: BookOpenText, comingSoon: true },
-  { label: "ศูนย์บริจาคเลือด", href: "#", icon: Droplet, comingSoon: true },
+  { label: "ศูนย์บริจาคเลือด", href: "/app/care/blood", icon: Droplet, comingSoon: false },
 ];
 
 function calcAge(birthMonth: string): string {

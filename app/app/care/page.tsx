@@ -19,9 +19,9 @@ const CARE_CARDS = [
   {
     label: "ศูนย์บริจาคเลือด",
     subtitle: "หาผู้บริจาคเลือดสัตว์",
-    href: "#",
+    href: "/app/care/blood",
     icon: Droplet,
-    comingSoon: true,
+    comingSoon: false,
   },
   {
     label: "สมุดสุขภาพ",
