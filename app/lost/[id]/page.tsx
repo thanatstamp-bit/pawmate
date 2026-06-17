@@ -1,7 +1,19 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { MapPin, Calendar, Eye, DollarSign, User } from "lucide-react";
+import {
+  MapPin,
+  Calendar,
+  Eye,
+  DollarSign,
+  User,
+  Clock,
+  CheckCircle,
+  Phone,
+  LogIn,
+  Share2,
+} from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { PublicShareButton } from "@/components/lost/PublicShareButton";
 
 type Props = { params: { id: string } };
 
@@ -41,17 +53,31 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const supabase = createClient();
   const { data: post } = await supabase
     .from("lost_pets")
-    .select("pet_name, last_seen_district, last_seen_province, photos, breed, species")
+    .select(
+      "pet_name, last_seen_district, last_seen_province, photos, breed, species, distinguishing_marks, reward, lost_date, status"
+    )
     .eq("id", params.id)
     .single();
 
   if (!post) return { title: "ประกาศสัตว์หาย — PawMate" };
 
+  const days = Math.floor(
+    (Date.now() - new Date(post.lost_date + "T00:00:00").getTime()) / 86_400_000
+  );
+  const desc = [
+    `${SPECIES_LABEL[post.species] ?? post.species}${post.breed ? ` · ${post.breed}` : ""}`,
+    post.distinguishing_marks ?? null,
+    post.status === "lost" ? `หายมา ${days} วัน` : "พบแล้ว",
+    post.reward ? `มีของรางวัล ${post.reward}` : null,
+  ]
+    .filter(Boolean)
+    .join(" · ");
+
   return {
     title: `ตามหา${post.pet_name} หายแถว${post.last_seen_district} — PawMate`,
     openGraph: {
       title: `ตามหา${post.pet_name} หายแถว${post.last_seen_district}`,
-      description: `ช่วยตามหา ${post.pet_name} (${post.breed || SPECIES_LABEL[post.species] || post.species}) หายแถว${post.last_seen_district} ${post.last_seen_province}`,
+      description: desc,
       images: post.photos[0] ? [{ url: post.photos[0] }] : [],
       type: "website",
     },
@@ -107,27 +133,24 @@ export default async function PublicLostPetPage({ params }: Props) {
 
   if (!postRes.data || postRes.error) notFound();
 
-  const post = postRes.data as LostPetFull & { profiles: { display_name: string } | null };
+  const post = postRes.data as LostPetFull & {
+    profiles: { display_name: string } | null;
+  };
   const sightings = (sightingsRes.data as unknown as Sighting[]) ?? [];
   const days = daysLost(post.lost_date);
 
   return (
     <div className="mx-auto min-h-screen w-full max-w-[480px] bg-[#F8F7F5]">
-      {/* Login banner */}
-      <div className="sticky top-0 z-10 bg-amber px-4 py-3 text-center shadow-sm">
-        <span className="text-[13px] text-white">
-          พบเห็นน้องตัวนี้?{" "}
-          <a
-            href={`/login?redirect=/lost/${params.id}`}
-            className="font-bold underline underline-offset-2"
-          >
-            เข้าสู่ระบบเพื่อแจ้งเบาะแส
-          </a>
+      {/* Logo bar */}
+      <div className="flex h-[52px] items-center border-b border-[#ECEAE7] bg-white px-5">
+        <span className="text-[18px] font-bold tracking-tight">
+          <span style={{ color: "#E8724A" }}>Paw</span>
+          <span className="text-brown">Mate</span>
         </span>
       </div>
 
-      {/* Photo (first only, static) */}
-      <div className="relative h-[220px] overflow-hidden bg-[#CCCAC7]">
+      {/* Photo */}
+      <div className="relative h-[240px] overflow-hidden bg-[#CCCAC7]">
         {post.photos[0] ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -140,19 +163,38 @@ export default async function PublicLostPetPage({ params }: Props) {
             <span className="text-sm text-[#AAA]">ไม่มีรูปภาพ</span>
           </div>
         )}
+        {/* Status badge */}
         <span
           className="absolute left-3 top-3 rounded-full px-3 py-1 text-[12px] font-semibold text-white"
           style={{ background: post.status === "found" ? "#2A9D8F" : "#E0445A" }}
         >
           {post.status === "found" ? "พบแล้ว" : "ยังตามหา"}
         </span>
+        {/* Dot indicators for multiple photos */}
+        {post.photos.length > 1 && (
+          <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-1.5">
+            {post.photos.map((_, i) => (
+              <div
+                key={i}
+                className={`h-1.5 rounded-full ${
+                  i === 0 ? "w-4 bg-white" : "w-1.5 bg-white/50"
+                }`}
+              />
+            ))}
+          </div>
+        )}
       </div>
 
-      {/* Found banner */}
+      {/* Found celebration strip */}
       {post.status === "found" && (
-        <div className="flex flex-col items-center gap-1 border-b border-[#BEE6E2] bg-[#EDF7F6] py-4">
-          <p className="text-[17px] font-bold text-teal">น้องกลับบ้านแล้ว!</p>
-          <p className="text-[13px] text-teal/80">ขอบคุณทุกเบาะแสจากเพื่อนๆ</p>
+        <div className="flex items-center gap-3 border-b border-[#BEE6E2] bg-[#EDF7F6] px-4 py-3.5">
+          <CheckCircle size={18} className="shrink-0 text-teal" strokeWidth={2.5} />
+          <div>
+            <p className="text-[15px] font-bold text-teal">น้องกลับบ้านแล้ว!</p>
+            <p className="mt-0.5 text-[12px] font-medium text-teal/70">
+              ขอบคุณทุกเบาะแสจากชุมชน PawMate
+            </p>
+          </div>
         </div>
       )}
 
@@ -183,14 +225,27 @@ export default async function PublicLostPetPage({ params }: Props) {
               <p className={factLabelClass}>วันที่หาย</p>
               <p className="mt-0.5 text-[14px] font-medium text-brown">
                 {thaiDate(post.lost_date)}
-                {post.status === "lost" && days > 0 && (
-                  <span className="ml-2 text-[12px] font-normal text-[#E0445A]">
-                    ({days} วันที่ผ่านมา)
-                  </span>
-                )}
               </p>
             </div>
           </div>
+          {post.status === "lost" && (
+            <div className={factRowClass}>
+              <Clock size={16} className="mt-0.5 shrink-0 text-[#E0445A]" />
+              <div>
+                <p className={factLabelClass}>หายมาแล้ว</p>
+                <p className="mt-0.5 text-[14px] font-bold text-[#E0445A]">{days} วัน</p>
+              </div>
+            </div>
+          )}
+          {post.status === "found" && (
+            <div className={factRowClass}>
+              <CheckCircle size={16} className="mt-0.5 shrink-0 text-teal" />
+              <div>
+                <p className={factLabelClass}>สถานะ</p>
+                <p className="mt-0.5 text-[14px] font-bold text-teal">กลับบ้านแล้ว</p>
+              </div>
+            </div>
+          )}
           {post.distinguishing_marks && (
             <div className={factRowClass}>
               <Eye size={16} className="mt-0.5 shrink-0 text-[#888]" />
@@ -213,32 +268,82 @@ export default async function PublicLostPetPage({ params }: Props) {
           )}
         </div>
 
-        {/* Reporter */}
+        {/* Owner row */}
         <div className="mb-4 flex items-center gap-3 rounded-[14px] border border-[#E4E3DF] bg-white px-3.5 py-3">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#D8D7D3]">
             <User size={17} className="text-[#AAA]" />
           </div>
-          <div>
+          <div className="flex-1">
             <p className="text-[11px] font-medium text-[#AAA]">เจ้าของ</p>
             <p className="text-[15px] font-semibold text-brown">
               {post.profiles?.display_name ?? "ผู้ใช้งาน"}
             </p>
           </div>
+          {post.status === "lost" && (
+            <a
+              href={`tel:${post.contact}`}
+              className="flex h-9 items-center gap-1.5 rounded-full border border-[#CCCCC8] px-3.5"
+            >
+              <Phone size={13} className="text-[#555]" />
+              <span className="text-[13px] font-semibold text-[#555]">โทร</span>
+            </a>
+          )}
         </div>
 
-        {/* CTA to login */}
+        {/* Social proof strip */}
         {post.status === "lost" && (
-          <a
-            href={`/login?redirect=/lost/${params.id}`}
-            className="mb-5 flex h-[52px] w-full items-center justify-center gap-2 rounded-2xl font-bold text-white"
-            style={{ background: "#E8724A" }}
-          >
-            <MapPin size={16} />
-            แจ้งเบาะแส (เข้าสู่ระบบ)
-          </a>
+          <div className="mb-4 flex items-center justify-center gap-4 border-y border-[#F0EFEC] py-2.5">
+            <div className="flex items-center gap-1.5">
+              <MapPin size={13} className="text-[#AAA]" />
+              <span className="text-[12px] font-medium text-[#AAA]">
+                {sightings.length} เบาะแสแล้ว
+              </span>
+            </div>
+            <div className="h-3.5 w-px bg-[#E0DFDC]" />
+            <div className="flex items-center gap-1.5">
+              <Share2 size={13} className="text-[#AAA]" />
+              <span className="text-[12px] font-medium text-[#AAA]">ช่วยกันแชร์</span>
+            </div>
+          </div>
         )}
 
-        {/* Sightings */}
+        {/* CTA Banner (lost only) */}
+        {post.status === "lost" && (
+          <div className="mb-4 rounded-2xl border-[1.5px] border-[#F2BFA8] bg-[#FFF3F0] p-4">
+            <div className="mb-4 flex items-start gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-[#FDDDD4]">
+                <MapPin size={20} className="text-[#E8724A]" />
+              </div>
+              <div>
+                <p className="text-[15px] font-bold text-brown">พบเห็นน้องตัวนี้?</p>
+                <p className="mt-1 text-[13px] leading-[1.55] text-[#888]">
+                  เข้าสู่ระบบเพื่อแจ้งเบาะแสและช่วยน้องกลับบ้าน
+                </p>
+              </div>
+            </div>
+            <a
+              href={`/login?redirect=/lost/${params.id}`}
+              className="flex h-[50px] items-center justify-center gap-2 rounded-[12px] bg-[#E8724A] font-bold text-white"
+            >
+              <LogIn size={16} />
+              เข้าสู่ระบบเพื่อแจ้งเบาะแส
+            </a>
+            <p className="mt-2.5 text-center text-[12px] text-[#BBB]">
+              ยังไม่มีบัญชี?{" "}
+              <a href="/login" className="font-semibold text-[#E8724A]">
+                สมัครสมาชิกฟรี
+              </a>
+            </p>
+          </div>
+        )}
+
+        {/* Share button */}
+        <PublicShareButton
+          petName={post.pet_name}
+          variant={post.status === "found" ? "found" : "lost"}
+        />
+
+        {/* Sightings timeline */}
         <div className="mb-6">
           <div className="mb-3 flex items-baseline gap-2">
             <h2 className="text-[15px] font-bold text-brown">
@@ -263,7 +368,10 @@ export default async function PublicLostPetPage({ params }: Props) {
                       <User size={15} className="text-[#AAA]" />
                     </div>
                     {i < sightings.length - 1 && (
-                      <div className="mt-1 w-px flex-1 bg-[#E4E3DF]" style={{ minHeight: 24 }} />
+                      <div
+                        className="mt-1 w-px flex-1 bg-[#E4E3DF]"
+                        style={{ minHeight: 24 }}
+                      />
                     )}
                   </div>
                   <div className="flex-1 pb-4">
@@ -285,20 +393,17 @@ export default async function PublicLostPetPage({ params }: Props) {
           )}
         </div>
 
-        {/* PawMate footer */}
-        <div className="mb-8 flex flex-col items-center gap-1.5 rounded-2xl border border-[#E4E3DF] bg-white px-5 py-5 text-center">
-          <p className="text-[13px] font-bold text-brown">PawMate</p>
-          <p className="text-[12px] leading-relaxed text-[#AAA]">
-            แอปหาเพื่อนและคู่ให้เจ้าตัวน้อย
-            <br />
-            ช่วยกันตามหาน้องด้วยนะ
+        {/* Footer */}
+        <div className="mb-8 border-t border-[#ECEAE7] py-5 text-center">
+          <p className="text-[14px] font-bold">
+            <span style={{ color: "#E8724A" }}>Paw</span>
+            <span className="text-brown">Mate</span>
           </p>
-          <a
-            href="/login"
-            className="mt-2 flex h-9 items-center rounded-full bg-coral px-5 text-[13px] font-bold text-white"
-          >
-            สมัครฟรี
-          </a>
+          <p className="mt-1 text-[11px] leading-[1.6] text-[#CCC]">
+            แอปตามหาสัตว์เลี้ยงในชุมชนไทย
+            <br />
+            สมัครฟรี · ช่วยน้องกลับบ้านด้วยกัน
+          </p>
         </div>
       </div>
     </div>
