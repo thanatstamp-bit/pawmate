@@ -1,7 +1,7 @@
 # PawMate — Developer Log & Handoff Notes
 
 > บันทึกสิ่งที่ทำไปในแต่ละ session เพื่อ reference สำหรับครั้งถัดไป
-> อัปเดตล่าสุด: 2026-06-17 (session 16)
+> อัปเดตล่าสุด: 2026-06-17 (session 17)
 
 ## โปรเจกต์คืออะไร
 
@@ -26,15 +26,15 @@ Portfolio project ที่ใช้งานได้จริง — เป้
 ✅ Phase 7 — Care Hub + Vet Hospital Finder (Session 13) — UI ตรงตาม `Care Hub Wireframe.dc.html` + `Hospital Finder Wireframe.dc.html` ทุก frame
 ✅ Phase 7 recheck (Session 14) — เพิ่ม ดูแล tab ใน BottomNav (5 tabs), แก้ HospitalMap re-centering, อัปเดต CLAUDE.md
 ✅ Phase 8 — Lost Pet Board / ประกาศสัตว์หาย (Session 15) — feed + create form + detail + public share page พร้อม OG meta
-🔲 Phase 9–11 — บริจาคเลือด / สมุดสุขภาพ / tele-vet demo — ยังไม่เริ่ม
+✅ Phase 9 — Blood Donation Center / ศูนย์บริจาคเลือด (Session 17) — feed + donor registration + request detail + donor matching
+🔲 Phase 10–11 — สมุดสุขภาพ / tele-vet demo — ยังไม่เริ่ม
 
-### ⚠️ ค้างทำก่อนใช้งานจริง (อัปเดต Session 15)
+### ⚠️ ค้างทำก่อนใช้งานจริง (อัปเดต Session 17)
 
-- [ ] **รัน migration `011_reviews_delete.sql` ใน Supabase SQL Editor** — ยังไม่ได้รัน ถ้าไม่รัน ปุ่ม "ลบรีวิวนี้" ใน `ReviewModal` จะกดไม่ได้ (RLS ปฏิเสธ)
-- [ ] **รัน migration `012_hospitals.sql` ใน Supabase SQL Editor** — ยังไม่ได้รัน เป็น blocker ของ Phase 7 ทั้งหมด
-- [ ] **หลังรัน 012 แล้ว ให้รัน `npx ts-node --project scripts/tsconfig.json scripts/seed-hospitals.ts`** เพื่อ seed 30 โรงพยาบาล
-- [ ] **รัน migration `013_lost_pets.sql` ใน Supabase SQL Editor** — ยังไม่ได้รัน เป็น blocker ของ Phase 8 ทั้งหมด (`/app/care/lost` และ `/lost/[id]` จะ error)
+- [ ] **รัน migration `014_blood.sql` ใน Supabase SQL Editor** — ยังไม่ได้รัน เป็น blocker ของ Phase 9 ทั้งหมด (`/app/care/blood` และ `/app/care/blood/[id]` จะ error)
 - [ ] **ยังไม่ได้ทดสอบ UI จริงในเบราว์เซอร์/มือถือ** สำหรับงานทั้งหมดใน Session 9–12 (ไม่มี browser tool ในเซสชันที่ทำ) — โดยเฉพาะ: หน้า swipe (layout+scroll), หน้า profile (หลังยุบ dashboard), Trust Layer 6 frame ใหม่ (rating card, review modal+ลบรีวิว, report sheet, toast, block dialog), detail sheet ของการ์ด swipe (z-index fix)
+- [x] ~~รัน migration 011/012/013 ใน Supabase SQL Editor~~ — รันแล้วใน Session 17 ✅
+- [x] ~~รัน seed-hospitals.ts~~ — รันแล้ว Session 17 (✅ Done! Inserted 30 hospitals.)
 - [x] ~~tile "แดชบอร์ด" dead link ใน `/app/home`~~ — แก้แล้วใน Session 15 (ลบ tile + import ออก)
 - [x] ~~mode toggle หายไปบนหน้า swipe เมื่อ pet มีแค่ 1 mode~~ — แก้แล้ว Session 15 (แสดง toggle เสมอ โหมดที่ไม่ available จะ disabled + dimmed แทนซ่อน)
 - [x] ~~greeting "สวัสดี, X" บน `/app/home` ไม่เปลี่ยนตาม active pet~~ — แก้แล้ว Session 16 (เปลี่ยนจาก `profile.display_name` เป็น `activePet.name`)
@@ -186,10 +186,11 @@ blocks
 - `008_playdates.sql` — playdate_spots + playdate_proposals
 - `009_demo_match.sql` — `create_demo_match()` SECURITY DEFINER RPC (ใช้ตอน demo swipe เพื่อการันตี match)
 - `010_trust.sql` — reviews + reports + blocks (Phase 6)
-- `011_reviews_delete.sql` — เพิ่ม RLS DELETE policy ให้ลบรีวิวตัวเองได้ (Session 12) — **migration นี้ยังไม่ได้รันใน Supabase จริง ดูหัวข้อ "ค้างทำ" ด้านบน**
-- `012_hospitals.sql` — ตาราง `hospitals` (Phase 7) public read-only RLS (Session 13) — **ยังไม่ได้รันใน Supabase จริง ดูหัวข้อ "ค้างทำ" ด้านบน**
-- `013_lost_pets.sql` — ตาราง `lost_pets` + `lost_pet_sightings` (Phase 8) — anon SELECT เพื่อให้ `/lost/[id]` เข้าได้โดยไม่ login — **ยังไม่ได้รันใน Supabase จริง ดูหัวข้อ "ค้างทำ" ด้านบน**
-- migration ใหม่ถัดไปควรเป็น `014_*.sql`
+- `011_reviews_delete.sql` — เพิ่ม RLS DELETE policy ให้ลบรีวิวตัวเองได้ (Session 12) — ✅ รันแล้ว Session 17
+- `012_hospitals.sql` — ตาราง `hospitals` (Phase 7) public read-only RLS (Session 13) — ✅ รันแล้ว Session 17
+- `013_lost_pets.sql` — ตาราง `lost_pets` + `lost_pet_sightings` (Phase 8) — anon SELECT เพื่อให้ `/lost/[id]` เข้าได้โดยไม่ login — ✅ รันแล้ว Session 17
+- `014_blood.sql` — ตาราง `blood_donors` + `blood_requests` + `blood_responses` (Phase 9) + RLS — **ยังไม่ได้รันใน Supabase จริง ดูหัวข้อ "ค้างทำ" ด้านบน**
+- migration ใหม่ถัดไปควรเป็น `015_*.sql`
 
 ### RLS Rules
 - ทุก table เปิด RLS
@@ -242,6 +243,9 @@ app/
         page.tsx                 — Lost pet feed + 3 filters + extended pill FAB (Phase 8)
         new/page.tsx             — Create form: photo upload, in-page success screen
         [id]/page.tsx            — Detail: carousel, sightings timeline, mark-as-found
+      blood/
+        page.tsx                 — Blood donation center: 2 tabs (ประกาศขอรับบริจาค feed + เป็นผู้บริจาค) + overlay request form (Phase 9)
+        [id]/page.tsx            — Blood request detail: matched donors (exact+crossmatch groups), responses list (Phase 9)
 
 app/ (public — ไม่ต้อง login)
   lost/
@@ -288,6 +292,7 @@ lib/
     middleware.ts                 — updateSession
   match.ts                       — checkAndCreateMatch() helper
   blocks.ts                      — getBlockedPetIds() — กรอง pet ที่ถูกบล็อกออกจาก feed/matches/chat
+  blood-matching.ts              — matchDonors() donor ranking + evaluateEligibility() checklist + monthsSinceLastDonation() spacing check (Phase 9)
   data/
     breeds.ts                    — DOG_BREEDS, CAT_BREEDS, BREED_SIZE_MAP
     provinces.ts                 — Thai provinces array (77 จังหวัด)
@@ -312,8 +317,9 @@ supabase/
     009_demo_match.sql
     010_trust.sql
     011_reviews_delete.sql
-    012_hospitals.sql            — hospitals table (Phase 7) — ยังไม่ได้รันใน Supabase
-    013_lost_pets.sql            — lost_pets + lost_pet_sightings (Phase 8) — ยังไม่ได้รันใน Supabase
+    012_hospitals.sql            — hospitals table (Phase 7) — ✅ รันแล้ว Session 17
+    013_lost_pets.sql            — lost_pets + lost_pet_sightings (Phase 8) — ✅ รันแล้ว Session 17
+    014_blood.sql                — blood_donors + blood_requests + blood_responses (Phase 9) — ยังไม่ได้รันใน Supabase
 
 tsconfig.json                    — "scripts" อยู่ใน exclude เพื่อไม่ให้ Next.js compile seed
 ```
@@ -1234,6 +1240,71 @@ feat: add SVG favicon (paw print on coral background)
 ```
 
 Push ไป `main` — Vercel auto-deploy ทั้ง 2 commits
+
+---
+
+## Session 17 — 2026-06-17 (Phase 9: Blood Donation Center)
+
+### Phase 9 — ศูนย์บริจาคเลือดสัตว์ (Blood Donation Center)
+
+เริ่มต้น Session นี้ด้วยการ verify Phase 6/7/8 (migration 011/012/013 รันครบ + seed hospitals สำเร็จ) แล้วลุยต่อ Phase 9
+
+#### Migration ใหม่ — `014_blood.sql`
+
+3 ตาราง + RLS:
+
+| ตาราง | คอลัมน์สำคัญ | RLS |
+|---|---|---|
+| `blood_donors` | pet_id (UNIQUE FK), blood_type, weight_kg, eligible (bool), available (bool), last_donation_date | SELECT = ทุก authenticated, INSERT/UPDATE/DELETE = owns_pet(pet_id) |
+| `blood_requests` | requester_id FK, species ('dog'/'cat'), blood_type_needed, urgency ('urgent'/'normal'), hospital_name, province, details, contact, status ('open'/'fulfilled') | SELECT = ทุก authenticated, INSERT/UPDATE = requester_id = auth.uid() |
+| `blood_responses` | request_id FK, donor_pet_id FK · UNIQUE(request_id, donor_pet_id) | **SELECT เฉพาะ donor owner หรือ request owner** (contact info ต้องไม่เปิดเผยต่อสาธารณะ), INSERT = owns_pet(donor_pet_id) |
+
+> ⚠️ ยังไม่ได้รันใน Supabase จริง — ดูหัวข้อ "ค้างทำ" ด้านบน
+
+#### Library helper ใหม่ — `lib/blood-matching.ts`
+
+Pure functions สำหรับ matching logic (ไม่มี Supabase dependency):
+
+| Function | หน้าที่ |
+|---|---|
+| `matchDonors(donors, province, bloodTypeNeeded)` | filter eligible+available → แยก exact/crossmatch → sort same-province first |
+| `evaluateEligibility(species, weightKg, birthMonth, vaccinated, indoorOnly)` | ประเมิน criteria array → `{ criteria[{label, pass}], allPass }` |
+| `monthsSinceLastDonation(lastDate)` | คำนวณเดือนนับจากบริจาคล่าสุด (null = ไม่เคย), ≥3 เดือน = available |
+
+เกณฑ์ eligibility:
+- สุนัข: น้ำหนัก ≥20 กก. + อายุ 1-7 ปี + vaccinated = true
+- แมว: น้ำหนัก ≥4 กก. + อายุ 1-7 ปี + vaccinated = true + indoor-only
+
+#### ไฟล์ที่สร้างใหม่
+
+**`app/app/care/blood/page.tsx`** — Main Page
+- Header: back → `/app/care`
+- Disclaimer: "PawMate เป็นสื่อกลางช่วยหาผู้บริจาคเท่านั้น การบริจาคจริงต้องผ่านการตรวจและดูแลโดยสัตวแพทย์"
+- **Tab ประกาศขอรับบริจาค**: feed + province/species filters; request cards (species icon + blood type ใหญ่ + urgency badge + hospital + timeAgo); FAB pill "ขอรับบริจาค"
+- **Tab เป็นผู้บริจาค**: active pet resolver (localStorage pattern) → donor form (blood type, weight, indoor-only checkbox สำหรับแมว, last donation date) + live eligibility checklist (`evaluateEligibility()`) + status card ถ้า registered แล้ว + toggle available
+- Overlay request form (ไม่ใช่ route แยก เป็น state ใน page เดียวกัน): species, blood type, urgency, hospital, province, details, contact → INSERT blood_requests
+
+**`app/app/care/blood/[id]/page.tsx`** — Request Detail Page
+- Full request info (species, blood type, urgency, hospital, province, details) + ปุ่มโทร `tel:`
+- **Non-owner + open**: matching donors via `matchDonors()` แบ่ง 2 กลุ่ม (กรุ๊ปตรง / ต้องตรวจ crossmatch); donor card มีปุ่ม "แจ้งความสนใจ" + textarea → INSERT blood_responses (UNIQUE constraint ป้องกันซ้ำ)
+- **Owner**: list blood_responses (RLS เปิดให้เห็นเฉพาะเจ้าของ request) + ปุ่ม "ทำเครื่องหมายว่าหาได้แล้ว" → UPDATE status='fulfilled'
+
+#### ไฟล์ที่แก้ไข
+
+| ไฟล์ | สิ่งที่แก้ |
+|---|---|
+| `app/app/care/page.tsx` | ศูนย์บริจาคเลือด: `href:"#"` → `/app/care/blood`, `comingSoon:true` → `false` |
+| `app/app/home/page.tsx` | CARE_MENU: ศูนย์บริจาคเลือด `href` + `comingSoon` เหมือนกัน |
+
+#### Git & Push
+
+```
+feat: Phase 9 — ศูนย์บริจาคเลือดสัตว์ (Blood Donation Center)
+# commit: 0cccc50
+# 6 files changed, 1399 insertions(+), 3 deletions(-)
+```
+
+Push ไป `main` — Vercel auto-deploy
 
 ---
 
