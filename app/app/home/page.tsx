@@ -56,7 +56,7 @@ const MAIN_MENU: MenuTile[] = [
 const CARE_MENU: MenuTile[] = [
   { label: "โรงพยาบาลสัตว์ใกล้ฉัน", href: "/app/care/hospitals", icon: Hospital },
   { label: "ประกาศสัตว์หาย", href: "/app/care/lost", icon: Megaphone, comingSoon: false },
-  { label: "สมุดสุขภาพ", href: "/app/care/health-book", icon: BookOpenText, comingSoon: true },
+  { label: "สมุดสุขภาพ", href: "/app/care/health", icon: BookOpenText, comingSoon: false },
   { label: "ศูนย์บริจาคเลือด", href: "/app/care/blood", icon: Droplet, comingSoon: false },
 ];
 

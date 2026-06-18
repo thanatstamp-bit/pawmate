@@ -3,12 +3,13 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Home, PawPrint, Heart, HeartPulse, User } from "lucide-react";
+import CareDueBadge from "@/components/care/CareDueBadge";
 
 const tabs = [
   { href: "/app/home", label: "หน้าแรก", icon: Home },
   { href: "/app/swipe", label: "ปัดการ์ด", icon: PawPrint },
   { href: "/app/matches", label: "แมตช์", icon: Heart },
-  { href: "/app/care", label: "ดูแล", icon: HeartPulse },
+  { href: "/app/care", label: "ดูแล", icon: HeartPulse, badge: true },
   { href: "/app/profile", label: "โปรไฟล์", icon: User },
 ];
 
@@ -20,7 +21,7 @@ export default function BottomNav() {
   return (
     <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-black/5 bg-white">
       <div className="mx-auto flex max-w-[480px] items-stretch justify-around pb-[env(safe-area-inset-bottom)]">
-        {tabs.map(({ href, label, icon: Icon }) => {
+        {tabs.map(({ href, label, icon: Icon, badge }) => {
           const active = pathname.startsWith(href);
           return (
             <Link
@@ -30,7 +31,10 @@ export default function BottomNav() {
                 active ? "text-coral" : "text-brown-muted hover:text-brown"
               }`}
             >
-              <Icon size={24} strokeWidth={active ? 2.5 : 2} />
+              <div className="relative">
+                <Icon size={24} strokeWidth={active ? 2.5 : 2} />
+                {badge && <CareDueBadge />}
+              </div>
               {label}
             </Link>
           );
