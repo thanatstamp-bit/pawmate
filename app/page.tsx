@@ -5,6 +5,33 @@ import { PawPrint, Users, Heart, ArrowRight, CheckCircle2 } from "lucide-react";
 export default function LandingPage() {
   return (
     <main className="min-h-screen bg-cream">
+
+      {/* ── NAVBAR ── */}
+      <nav className="sticky top-0 z-50 border-b border-black/5 bg-cream/90 backdrop-blur-sm">
+        <div className="mx-auto flex h-14 max-w-2xl items-center justify-between px-5">
+          {/* Logo */}
+          <Link href="/" className="flex items-center gap-2">
+            <Image src="/logo.png" alt="PawMate" width={36} height={36} className="drop-shadow-sm" />
+            <span className="text-base font-bold text-brown">PawMate</span>
+          </Link>
+          {/* Auth buttons */}
+          <div className="flex items-center gap-2">
+            <Link
+              href="/login"
+              className="rounded-full border border-brown/20 bg-white px-4 py-1.5 text-sm font-bold text-brown transition-colors hover:border-coral/40"
+            >
+              เข้าสู่ระบบ
+            </Link>
+            <Link
+              href="/login"
+              className="rounded-full bg-coral px-4 py-1.5 text-sm font-bold text-white transition-colors hover:bg-coral-dark"
+            >
+              สมัครฟรี
+            </Link>
+          </div>
+        </div>
+      </nav>
+
       {/* ── HERO ── */}
       <section className="relative overflow-hidden px-6 pb-16 pt-14 text-center">
         <div className="pointer-events-none absolute -left-20 -top-20 h-72 w-72 rounded-full bg-coral/10 blur-3xl" />
