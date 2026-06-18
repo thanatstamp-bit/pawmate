@@ -1,7 +1,7 @@
 # PawMate — Developer Log & Handoff Notes (รวมศูนย์)
 
 > บันทึกสิ่งที่ทำไปในแต่ละ session + roadmap + แผนเฟสถัดไป รวมไว้ในไฟล์เดียว
-> อัปเดตล่าสุด: 2026-06-18 (Session 19 — Phase 10 Health Book เสร็จสมบูรณ์)
+> อัปเดตล่าสุด: 2026-06-19 (Session 20 — Landing page navbar)
 >
 > **โครงไฟล์เอกสารโปรเจกต์ตอนนี้มี 2 ไฟล์:**
 > - `CLAUDE.md` — instructions ที่ Claude Code โหลดอัตโนมัติทุก session (architecture, rules, design system) — **แก้ที่นั่นเมื่อ architecture เปลี่ยน**
@@ -453,6 +453,9 @@ Greeting ใช้ `activePet?.name` แทน `profile.display_name` (ลบ ow
 
 **Session 19 (06-18) — Phase 10 Health Book + Wireframe Rework**
 `015_health.sql` (health_records + RLS ผ่าน `owns_pet()`). `lib/health.ts` (`syncVaccinatedBadge()` — recompute `pets.vaccinated` จากวัคซีนพิษสุนัขบ้าภายใน 12 เดือน). `components/care/HealthRecordForm.tsx` (bottom sheet add/edit: type tabs, quick suggestions, "วันนัดครั้งต่อไป" collapsible, trash icon → inline rose confirm banner). `app/app/care/health/page.tsx` (vertical timeline + dots สีตาม type, ใกล้ถึงกำหนด section, pet switcher, empty CTA — ตรง wireframe ทุก frame). `components/care/CareDueBadge.tsx` (amber count badge). `BottomNav.tsx` เพิ่ม badge บน ดูแล tab. `care/page.tsx` → client component + reminder banner + unlock health card. `home/page.tsx` unlock สมุดสุขภาพ → `/app/care/health`. TypeScript ผ่าน 0 error. commit `e4fdbfc`.
+
+**Session 20 (06-19) — Landing Page Navbar**
+เพิ่ม sticky navbar บน landing page (`app/page.tsx`): logo + "PawMate" ซ้าย, ปุ่ม "เข้าสู่ระบบ" (outline) + "สมัครฟรี" (coral fill) ขวา — `sticky top-0 z-50 backdrop-blur`. commit `82b623a`.
 
 ---
 
