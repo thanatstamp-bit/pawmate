@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ChevronLeft, Star, AlertOctagon, ChevronRight, UserPlus } from "lucide-react";
+import { ChevronLeft, Star, AlertOctagon, ChevronRight, UserPlus, CalendarDays } from "lucide-react";
 import {
   MOCK_VETS,
   getNextAvailableSlots,
@@ -58,7 +58,12 @@ export default function VetOnlinePage() {
         <span className="flex-1 text-center text-base font-bold text-brown">
           สัตวแพทย์ออนไลน์
         </span>
-        <div className="w-11" />
+        <Link
+          href="/app/care/vet-online/bookings"
+          className="flex h-11 w-11 shrink-0 items-center justify-center text-brown"
+        >
+          <CalendarDays size={20} />
+        </Link>
       </div>
 
       <div className="flex flex-col gap-3 px-5 pb-8 pt-3">
@@ -82,6 +87,25 @@ export default function VetOnlinePage() {
             </span>
           </p>
         </div>
+
+        {/* My bookings shortcut */}
+        <Link
+          href="/app/care/vet-online/bookings"
+          className="flex items-center gap-3 rounded-[14px] border-[1.5px] bg-white px-3.5 py-3"
+          style={{ borderColor: "#EDEAE6" }}
+        >
+          <div
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[11px]"
+            style={{ background: "rgba(46,196,182,0.12)" }}
+          >
+            <CalendarDays size={17} style={{ color: "#2EC4B6" }} />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-[13px] font-bold text-brown">การจองของฉัน</p>
+            <p className="text-[11px]" style={{ color: "#8A8580" }}>ดูนัดหมายและห้องรอ</p>
+          </div>
+          <ChevronRight size={16} style={{ color: "#C5C1BC" }} />
+        </Link>
 
         {/* Emergency disclaimer */}
         <div
