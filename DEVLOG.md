@@ -1,7 +1,7 @@
 # PawMate — Developer Log & Handoff Notes (รวมศูนย์)
 
 > บันทึกสิ่งที่ทำไปในแต่ละ session + roadmap + แผนเฟสถัดไป รวมไว้ในไฟล์เดียว
-> อัปเดตล่าสุด: 2026-06-19 (Session 26 — Facebook OAuth login)
+> อัปเดตล่าสุด: 2026-06-19 (Session 27 — Privacy Policy page)
 >
 > **โครงไฟล์เอกสารโปรเจกต์ตอนนี้มี 2 ไฟล์:**
 > - `CLAUDE.md` — instructions ที่ Claude Code โหลดอัตโนมัติทุก session (architecture, rules, design system) — **แก้ที่นั่นเมื่อ architecture เปลี่ยน**
@@ -463,6 +463,12 @@ Greeting ใช้ `activePet?.name` แทน `profile.display_name` (ลบ ow
 
 **Session 22 (06-19) — Vet-Online Bookings Shortcut**
 เพิ่มทางเข้า "การจองของฉัน" จากหน้ารายชื่อหมอโดยตรง (ก่อนหน้านี้เข้าได้เฉพาะหลังจองสำเร็จ): (1) CalendarDays icon มุมขวา header → `/app/care/vet-online/bookings`; (2) shortcut card (teal icon + "ดูนัดหมายและห้องรอ" + ChevronRight) ใต้ intro card. รัน `016_vet_bookings.sql` ใน Supabase SQL Editor แล้ว. Push ขึ้น GitHub. commit `056b35f`.
+
+**Session 27 (06-19) — Privacy Policy page**
+เพิ่มหน้า `/privacy` (public server component, ไม่ต้องล็อกอิน) — จำเป็นสำหรับ publish OAuth app (Google publish แล้ว Session 26.5; Facebook ต้องมีก่อน publish). เนื้อหาไทย: ข้อมูลที่เก็บ, การล็อกอินผ่าน Google/Facebook (รับแค่ email/ชื่อ/รูป ไม่โพสต์/ไม่เก็บรหัสโซเชียล), การใช้ข้อมูล, ประกาศสัตว์หาย = public, Supabase + RLS, สิทธิ์ลบบัญชี, ติดต่อ. สไตล์ตรง landing (navbar logo + กลับหน้าแรก, `Section` helper). เพิ่มลิงก์ใน landing footer. ติดต่อ = `thanat.stamp@gmail.com` (เปลี่ยนได้). **ต้องทำต่อ:** เอา URL `https://pawmate-mu.vercel.app/privacy` ไปใส่ใน Meta app (App settings → Basic → Privacy Policy URL) + Google consent screen. commit หลัง deploy. TypeScript 0 errors, `/privacy` + `/` = 200.
+
+**Session 26.5 (06-19) — Google OAuth published to production**
+กด Publish app ใน Google Auth Platform → Audience (Testing → In production). เพราะใช้แค่ non-sensitive scopes (`email`+`profile`) จึงไม่ต้องผ่าน Google verification — ใครมี Gmail ก็ล็อกอินได้ (user cap 100 ไม่มีผลกับ non-sensitive scopes). Facebook ยังเป็น Development (เฉพาะ admin/tester).
 
 **Session 26 (06-19) — Facebook OAuth login**
 เพิ่มปุ่ม "เข้าสู่ระบบด้วย Facebook" — โครงโค้ดพร้อมอยู่แล้วจาก Session 25 (callback route + `handleOAuth(provider)` รับ provider เป็น parameter อยู่แล้ว) จึงแก้แค่ `components/AuthForm.tsx` (import `FacebookLogo` + เพิ่มปุ่มที่เรียก `handleOAuth("facebook")`). ไม่แตะ callback route (รองรับทุก provider แบบ generic — Facebook ส่งชื่อมาใน `user_metadata.name` ซึ่ง fallback ไว้แล้ว). TypeScript 0 errors. เทส flow จริงบน localhost ผ่าน (Facebook → consent → /onboarding).

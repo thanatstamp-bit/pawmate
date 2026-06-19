@@ -51,6 +51,7 @@ No test suite exists — `npx tsc --noEmit` is the primary correctness check.
 | `/app/care/vet-online/book/[vetId]` | Booking wizard — 3-step (เลือกเวลา → อาการ → ยืนยัน), server wrapper + `VetBookingWizard` client component |
 | `/app/care/vet-online/bookings` | My bookings + waiting room — list with upcoming/past sections, cancel, countdown timer, disabled video frame |
 | `/lost/[id]` | Public share page — server component, OG meta tags, no auth required; logo bar + CTA banner + phone button + share button (client island `PublicShareButton`) |
+| `/privacy` | Public privacy policy — server component, no auth; linked from landing footer + set as the OAuth Privacy Policy URL in the Meta/Google dashboards |
 
 The `/app/*` layout (`app/app/layout.tsx`) wraps all authenticated pages with a persistent `ConditionalAppHeader` (logo → /app/home) and `BottomNav` (5 tabs: หน้าแรก, ปัดการ์ด, แมตช์, ดูแล, โปรไฟล์). BottomNav แสดง amber count badge บน tab ดูแล เมื่อมี health record ใกล้ถึงกำหนด (ผ่าน `CareDueBadge` component). The chat page suppresses the global header because it has its own navigation header; the swipe page suppresses it too, to give the card deck maximum vertical space; `/app/care/*` suppresses it too — Care Hub and its sub-pages build their own back-arrow header (back → `/app/home` from the hub, back → `/app/care` from sub-pages).
 

@@ -167,6 +167,9 @@ export default function LandingPage() {
           <span className="font-bold text-white">Thanat Tam Kongchasingha</span>
         </p>
         <p className="mt-1 text-xs">Built with Next.js · Supabase · Tailwind CSS</p>
+        <Link href="/privacy" className="mt-3 inline-block text-xs text-white/70 underline hover:text-white">
+          นโยบายความเป็นส่วนตัว
+        </Link>
       </footer>
     </main>
   );
