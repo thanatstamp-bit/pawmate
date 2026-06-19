@@ -22,6 +22,8 @@ npx ts-node --project scripts/tsconfig.json scripts/seed-hospitals.ts
 
 No test suite exists — `npx tsc --noEmit` is the primary correctness check.
 
+`docs/` holds reference material that is not loaded automatically: `figma-screen-inventory.md` (every screen/state/overlay) and `figma-design-tokens.md` (color/type/component spec) — written to support a Figma visual-refresh redesign.
+
 ## Architecture
 
 **Next.js 14 App Router + Supabase + Tailwind.** All user-facing text is in Thai; code/comments are in English.

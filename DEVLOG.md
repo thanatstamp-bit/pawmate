@@ -1,7 +1,7 @@
 # PawMate — Developer Log & Handoff Notes (รวมศูนย์)
 
 > บันทึกสิ่งที่ทำไปในแต่ละ session + roadmap + แผนเฟสถัดไป รวมไว้ในไฟล์เดียว
-> อัปเดตล่าสุด: 2026-06-19 (Session 27 — Privacy Policy page)
+> อัปเดตล่าสุด: 2026-06-20 (Session 28 — Figma redesign reference docs)
 >
 > **โครงไฟล์เอกสารโปรเจกต์ตอนนี้มี 2 ไฟล์:**
 > - `CLAUDE.md` — instructions ที่ Claude Code โหลดอัตโนมัติทุก session (architecture, rules, design system) — **แก้ที่นั่นเมื่อ architecture เปลี่ยน**
@@ -463,6 +463,9 @@ Greeting ใช้ `activePet?.name` แทน `profile.display_name` (ลบ ow
 
 **Session 22 (06-19) — Vet-Online Bookings Shortcut**
 เพิ่มทางเข้า "การจองของฉัน" จากหน้ารายชื่อหมอโดยตรง (ก่อนหน้านี้เข้าได้เฉพาะหลังจองสำเร็จ): (1) CalendarDays icon มุมขวา header → `/app/care/vet-online/bookings`; (2) shortcut card (teal icon + "ดูนัดหมายและห้องรอ" + ChevronRight) ใต้ intro card. รัน `016_vet_bookings.sql` ใน Supabase SQL Editor แล้ว. Push ขึ้น GitHub. commit `056b35f`.
+
+**Session 28 (06-20) — Figma redesign reference docs**
+ผู้ใช้จะ redesign (visual refresh) ใน Figma เอง — ขอเอกสารอ้างอิง 2 ชุด (ไม่แตะโค้ดแอป). สร้างโฟลเดอร์ `docs/`: (1) `docs/figma-screen-inventory.md` — เช็กลิสต์ ~21 หน้า + ~20 overlay + ทุก state จัดเป็นโครง 4 Figma Pages (Public/Onboarding/Main/Care) + workflow + วิธี import (plugin free-tier + Chrome DevTools full-page screenshot 390px); (2) `docs/figma-design-tokens.md` — color (10 brand + gray ramp 8 + semantic 3 ที่ตอนนี้ซ่อนเป็น hex ดิบในโค้ด), typography (Prompt, ~10 text style), radius/shadow, component spec พร้อม className จริง, icon list. Cross-check ครบ: 21 page.tsx + 1 route handler + 32 components ตรงกับ inventory. ไม่มีการแก้โค้ดแอป.
 
 **Session 27 (06-19) — Privacy Policy page**
 เพิ่มหน้า `/privacy` (public server component, ไม่ต้องล็อกอิน) — จำเป็นสำหรับ publish OAuth app (Google publish แล้ว Session 26.5; Facebook ต้องมีก่อน publish). เนื้อหาไทย: ข้อมูลที่เก็บ, การล็อกอินผ่าน Google/Facebook (รับแค่ email/ชื่อ/รูป ไม่โพสต์/ไม่เก็บรหัสโซเชียล), การใช้ข้อมูล, ประกาศสัตว์หาย = public, Supabase + RLS, สิทธิ์ลบบัญชี, ติดต่อ. สไตล์ตรง landing (navbar logo + กลับหน้าแรก, `Section` helper). เพิ่มลิงก์ใน landing footer. ติดต่อ = `thanat.stamp@gmail.com` (เปลี่ยนได้). **ต้องทำต่อ:** เอา URL `https://pawmate-mu.vercel.app/privacy` ไปใส่ใน Meta app (App settings → Basic → Privacy Policy URL) + Google consent screen. commit หลัง deploy. TypeScript 0 errors, `/privacy` + `/` = 200.
