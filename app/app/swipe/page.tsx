@@ -44,6 +44,8 @@ export default function SwipePage() {
   const [filterOpen, setFilterOpen] = useState(false);
   const [filters, setFilters] = useState<SwipeFilters>(DEFAULT_FILTERS);
   const [match, setMatch] = useState<MatchResult | null>(null);
+  // Set by the action buttons to drive the top card's fly-off animation.
+  const [buttonSwipe, setButtonSwipe] = useState<"like" | "skip" | null>(null);
 
   // Track skips/likes in session memory so cards don't repeat
   const skippedIds     = useRef<Set<string>>(new Set());
@@ -248,6 +250,15 @@ export default function SwipePage() {
     tickSwipe();
   }
 
+  // Single exit path shared by drag gestures and the action buttons. The card
+  // animates itself out, then calls this; we resolve the like/skip + clear the
+  // button trigger so the next card (fresh, via key=id) starts clean.
+  function onSwipe(dir: "like" | "skip") {
+    if (dir === "like") handleLike();
+    else handleSkip();
+    setButtonSwipe(null);
+  }
+
   // After blocking, the block row is already inserted; just drop the card.
   function handleBlock() {
     if (cards.length === 0) return;
@@ -379,6 +390,7 @@ export default function SwipePage() {
             <div className="relative min-h-0 flex-1 pb-3 pt-2">
               {cards[1] && (
                 <PetCard
+                  key={cards[1].id}
                   pet={cards[1]}
                   mode={mode}
                   myPetId={myPet?.id ?? ""}
@@ -387,11 +399,14 @@ export default function SwipePage() {
                 />
               )}
               <PetCard
+                key={cards[0].id}
                 pet={cards[0]}
                 mode={mode}
                 myPetId={myPet?.id ?? ""}
                 onBlock={handleBlock}
                 isTop={true}
+                onSwipe={onSwipe}
+                triggerSwipe={buttonSwipe}
               />
             </div>
 
@@ -399,15 +414,17 @@ export default function SwipePage() {
             <div className="flex shrink-0 items-center justify-center gap-6 py-3">
               <button
                 type="button"
-                onClick={handleSkip}
-                className="flex h-16 w-16 items-center justify-center rounded-full border-2 border-black/10 bg-white shadow-card transition-transform active:scale-95"
+                onClick={() => setButtonSwipe("skip")}
+                disabled={buttonSwipe !== null}
+                className="flex h-16 w-16 items-center justify-center rounded-full border-2 border-black/10 bg-white shadow-card transition-transform active:scale-95 disabled:opacity-60"
               >
                 <X size={28} className="text-brown-muted" />
               </button>
               <button
                 type="button"
-                onClick={handleLike}
-                className="flex h-16 w-16 items-center justify-center rounded-full bg-coral shadow-card transition-transform active:scale-95"
+                onClick={() => setButtonSwipe("like")}
+                disabled={buttonSwipe !== null}
+                className="flex h-16 w-16 items-center justify-center rounded-full bg-coral shadow-card transition-transform active:scale-95 disabled:opacity-60"
               >
                 <svg viewBox="0 0 24 24" fill="currentColor" className="h-7 w-7 text-white">
                   <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />

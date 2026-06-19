@@ -89,6 +89,8 @@ const storedId = localStorage.getItem("pawmate_active_pet_id");
 
 The deck fetch always loads `prevLikedIds` from the DB (regardless of recycle mode) so liked cards never reappear. `skippedIds` (session `useRef`) are cleared on recycle so skipped cards cycle back. `likedIds` are never cleared — they mirror the DB. A demo counter (`swipeCount` + `forceNext` refs) triggers `create_demo_match` RPC after 3–7 swipes without a natural match.
 
+**Drag-to-swipe (`components/swipe/PetCard.tsx`)**: native Pointer Events (no framer-motion — kept deps lean). Drag the top card left/right; past `SWIPE_THRESHOLD` (110px) it flies off and calls `onSwipe(dir)`, otherwise it snaps back. The transform is applied to the card *face* only — never an ancestor of the detail sheet, because a `transform` on an ancestor reparents `position: fixed` children to that element instead of the viewport, breaking the full-screen sheet. A post-drag tap is suppressed (`onClickCapture` + `didDrag` ref) so it doesn't open the detail sheet; `touch-none` stops the browser hijacking the horizontal swipe as a back-gesture. The ✕/♥ action buttons drive the same fly-off via the `triggerSwipe` prop, and each card carries `key={pet.id}` so its drag state resets cleanly per card.
+
 ### Realtime chat
 
 `/app/chat/[matchId]` subscribes to Supabase Realtime on `messages` filtered by `match_id`. Messages sent by the local user are optimistically appended and de-duplicated by ID when the realtime event arrives.

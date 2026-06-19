@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { MapPin, Info, X, ShieldCheck, Scissors, AlertTriangle, Megaphone, Ban, Check, ZoomIn, ChevronLeft, ChevronRight } from "lucide-react";
 import RatingSummary from "@/components/trust/RatingSummary";
 import ReportSheet from "@/components/trust/ReportSheet";
@@ -41,9 +41,18 @@ interface Props {
   myPetId: string;
   onBlock: () => void;
   isTop: boolean;
+  /** Called when the top card is swiped away (by gesture or by the action
+      buttons). Only the top card supplies this. */
+  onSwipe?: (dir: "like" | "skip") => void;
+  /** Programmatic swipe trigger from the action buttons below the deck — when
+      set, the top card runs the same fly-off animation before calling onSwipe. */
+  triggerSwipe?: "like" | "skip" | null;
 }
 
-export default function PetCard({ pet, mode, myPetId, onBlock, isTop }: Props) {
+// Horizontal drag past this many px commits the swipe; below it snaps back.
+const SWIPE_THRESHOLD = 110;
+
+export default function PetCard({ pet, mode, myPetId, onBlock, isTop, onSwipe, triggerSwipe }: Props) {
   const [detailOpen, setDetailOpen] = useState(false);
   const [photoIdx, setPhotoIdx] = useState(0);
   const [reportOpen, setReportOpen] = useState(false);
@@ -53,6 +62,85 @@ export default function PetCard({ pet, mode, myPetId, onBlock, isTop }: Props) {
   const [dragY, setDragY] = useState(0);
   const dragStartY = useRef(0);
   const dragging = useRef(false);
+
+  // --- Horizontal swipe gesture (top card only) ---
+  const [pos, setPos] = useState({ x: 0, y: 0 });
+  const [phase, setPhase] = useState<"idle" | "drag" | "exit">("idle");
+  const exitDir = useRef<1 | -1>(1);
+  const posRef = useRef({ x: 0, y: 0 });
+  const cardStart = useRef({ x: 0, y: 0 });
+  const cardDragging = useRef(false);
+  const didDrag = useRef(false);
+
+  function runExit(dir: 1 | -1) {
+    exitDir.current = dir;
+    setPhase("exit");
+    window.setTimeout(() => onSwipe?.(dir === 1 ? "like" : "skip"), 280);
+  }
+
+  // Action-button presses route through the same fly-off animation.
+  useEffect(() => {
+    if (isTop && onSwipe && triggerSwipe && phase !== "exit") {
+      runExit(triggerSwipe === "like" ? 1 : -1);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [triggerSwipe]);
+
+  function onCardPointerDown(e: React.PointerEvent) {
+    if (!isTop || !onSwipe || phase === "exit") return;
+    cardDragging.current = true;
+    didDrag.current = false;
+    cardStart.current = { x: e.clientX, y: e.clientY };
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    setPhase("drag");
+  }
+  function onCardPointerMove(e: React.PointerEvent) {
+    if (!cardDragging.current) return;
+    const x = e.clientX - cardStart.current.x;
+    const y = e.clientY - cardStart.current.y;
+    if (Math.abs(x) > 6 || Math.abs(y) > 6) didDrag.current = true;
+    posRef.current = { x, y };
+    setPos({ x, y });
+  }
+  function onCardPointerUp() {
+    if (!cardDragging.current) return;
+    cardDragging.current = false;
+    if (Math.abs(posRef.current.x) > SWIPE_THRESHOLD) {
+      runExit(posRef.current.x > 0 ? 1 : -1);
+    } else {
+      setPhase("idle");
+      posRef.current = { x: 0, y: 0 };
+      setPos({ x: 0, y: 0 });
+    }
+  }
+  // Suppress the photo/info tap that would open the detail sheet after a drag.
+  function onCardClickCapture(e: React.MouseEvent) {
+    if (didDrag.current) {
+      e.stopPropagation();
+      e.preventDefault();
+      didDrag.current = false;
+    }
+  }
+
+  const faceStyle: React.CSSProperties =
+    phase === "drag"
+      ? {
+          transform: `translate(${pos.x}px, ${pos.y}px) rotate(${pos.x * 0.04}deg)`,
+          transition: "none",
+        }
+      : phase === "exit"
+      ? {
+          transform: `translate(${exitDir.current * 1000}px, ${pos.y}px) rotate(${exitDir.current * 22}deg)`,
+          transition: "transform 0.3s ease-out",
+          opacity: 0,
+        }
+      : {
+          transform: "translate(0px, 0px) rotate(0deg)",
+          transition: "transform 0.25s cubic-bezier(0.22,0.61,0.36,1)",
+        };
+
+  const likeOpacity = Math.max(0, Math.min(pos.x / SWIPE_THRESHOLD, 1));
+  const nopeOpacity = Math.max(0, Math.min(-pos.x / SWIPE_THRESHOLD, 1));
 
   const onHandleTouchStart = (e: React.TouchEvent) => {
     dragStartY.current = e.touches[0].clientY;
@@ -96,7 +184,34 @@ export default function PetCard({ pet, mode, myPetId, onBlock, isTop }: Props) {
           itself bounded by the page's fixed viewport height). The photo
           (flex-1 below) absorbs whatever space is left after the info strip,
           so it's as large as possible while the page still can't scroll. */}
-      <div className="relative mx-auto flex h-full max-w-[420px] flex-col overflow-hidden rounded-card bg-white shadow-card">
+      <div
+        className={`relative mx-auto flex h-full max-w-[420px] flex-col overflow-hidden rounded-card bg-white shadow-card ${
+          isTop && onSwipe ? "touch-none select-none will-change-transform" : ""
+        }`}
+        style={isTop && onSwipe ? faceStyle : undefined}
+        onPointerDown={onCardPointerDown}
+        onPointerMove={onCardPointerMove}
+        onPointerUp={onCardPointerUp}
+        onPointerCancel={onCardPointerUp}
+        onClickCapture={onCardClickCapture}
+      >
+        {/* Swipe direction labels — fade in with the drag distance */}
+        {isTop && onSwipe && (
+          <>
+            <div
+              className="pointer-events-none absolute left-5 top-6 z-10 -rotate-12 rounded-xl border-[3px] border-coral px-3 py-0.5 text-2xl font-extrabold uppercase text-coral"
+              style={{ opacity: likeOpacity }}
+            >
+              ถูกใจ
+            </div>
+            <div
+              className="pointer-events-none absolute right-5 top-6 z-10 rotate-12 rounded-xl border-[3px] border-brown-muted px-3 py-0.5 text-2xl font-extrabold uppercase text-brown-muted"
+              style={{ opacity: nopeOpacity }}
+            >
+              ผ่าน
+            </div>
+          </>
+        )}
         {/* Photo */}
         <div
           className="relative min-h-0 flex-1 cursor-pointer bg-cream"
