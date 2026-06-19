@@ -1,7 +1,7 @@
 # PawMate — Developer Log & Handoff Notes (รวมศูนย์)
 
 > บันทึกสิ่งที่ทำไปในแต่ละ session + roadmap + แผนเฟสถัดไป รวมไว้ในไฟล์เดียว
-> อัปเดตล่าสุด: 2026-06-19 (Session 21 — Phase 11 Tele-vet Demo)
+> อัปเดตล่าสุด: 2026-06-19 (Session 22 — Vet-Online Bookings Shortcut)
 >
 > **โครงไฟล์เอกสารโปรเจกต์ตอนนี้มี 2 ไฟล์:**
 > - `CLAUDE.md` — instructions ที่ Claude Code โหลดอัตโนมัติทุก session (architecture, rules, design system) — **แก้ที่นั่นเมื่อ architecture เปลี่ยน**
@@ -56,6 +56,7 @@ Portfolio project ที่ใช้งานได้จริง — เป้
 - [ ] **ยังไม่ได้ทดสอบ UI จริงในเบราว์เซอร์/มือถือ** สำหรับงานหลาย session — โดยเฉพาะ: Trust Layer 6 frame, Phase 9 blood ทั้งหมด, Phase 10 health book
 - [x] ~~รัน migration `014_blood.sql`~~ — รันแล้ว (Session 19) ✅
 - [x] ~~รัน migration `015_health.sql`~~ — รันแล้ว (Session 19) ✅
+- [x] ~~รัน migration `016_vet_bookings.sql`~~ — รันแล้ว (Session 22) ✅
 - [x] ~~รัน migration 011/012/013~~ — รันแล้ว Session 17 ✅
 - [x] ~~รัน seed-hospitals.ts~~ — รันแล้ว Session 17 (30 hospitals) ✅
 - [x] ~~tile "แดชบอร์ด" dead link ใน `/app/home`~~ — แก้แล้ว Session 15
@@ -458,7 +459,10 @@ Greeting ใช้ `activePet?.name` แทน `profile.display_name` (ลบ ow
 เพิ่ม sticky navbar บน landing page (`app/page.tsx`): logo + "PawMate" ซ้าย, ปุ่ม "เข้าสู่ระบบ" (outline) + "สมัครฟรี" (coral fill) ขวา — `sticky top-0 z-50 backdrop-blur`. commit `82b623a`.
 
 **Session 21 (06-19) — Phase 11 Tele-vet Demo**
-`016_vet_bookings.sql` (vet_bookings table + owner-only RLS). `lib/data/mock-vets.ts` (5 vets hardcoded + `getSlotsForDay` + `getNextAvailableSlots` + Thai date helpers). `app/app/care/vet-online/page.tsx` (server component — vet list, amber badge, emergency disclaimer → /app/care/hospitals, slot chips per card, "นัดหมาย" button). `app/app/care/vet-online/book/[vetId]/page.tsx` (server wrapper reads dynamic param → `VetBookingWizard`). `components/care/VetBookingWizard.tsx` (client — 3-step wizard: day tabs + 4-col slot grid → textarea + suggestion prompts → success + booking ref #DEMO-XXXX). `app/app/care/vet-online/bookings/page.tsx` (client — my bookings list + waiting room state: countdown MM:SS + disabled video frame + hatch bg). `app/app/care/page.tsx` เพิ่ม tile ที่ 5 "ปรึกษาสัตวแพทย์" (Stethoscope icon). TypeScript 0 errors. รัน `016_vet_bookings.sql` ใน Supabase SQL Editor ก่อนใช้งาน.
+`016_vet_bookings.sql` (vet_bookings table + owner-only RLS). `lib/data/mock-vets.ts` (5 vets hardcoded + `getSlotsForDay` + `getNextAvailableSlots` + Thai date helpers). `app/app/care/vet-online/page.tsx` (server component — vet list, amber badge, emergency disclaimer → /app/care/hospitals, slot chips per card, "นัดหมาย" button). `app/app/care/vet-online/book/[vetId]/page.tsx` (server wrapper reads dynamic param → `VetBookingWizard`). `components/care/VetBookingWizard.tsx` (client — 3-step wizard: day tabs + 4-col slot grid → textarea + suggestion prompts → success + booking ref #DEMO-XXXX). `app/app/care/vet-online/bookings/page.tsx` (client — my bookings list + waiting room state: countdown MM:SS + disabled video frame + hatch bg). `app/app/care/page.tsx` เพิ่ม tile ที่ 5 "ปรึกษาสัตวแพทย์" (Stethoscope icon). TypeScript 0 errors. commit `b8c1dae`.
+
+**Session 22 (06-19) — Vet-Online Bookings Shortcut**
+เพิ่มทางเข้า "การจองของฉัน" จากหน้ารายชื่อหมอโดยตรง (ก่อนหน้านี้เข้าได้เฉพาะหลังจองสำเร็จ): (1) CalendarDays icon มุมขวา header → `/app/care/vet-online/bookings`; (2) shortcut card (teal icon + "ดูนัดหมายและห้องรอ" + ChevronRight) ใต้ intro card. รัน `016_vet_bookings.sql` ใน Supabase SQL Editor แล้ว. Push ขึ้น GitHub. commit `056b35f`.
 
 ---
 

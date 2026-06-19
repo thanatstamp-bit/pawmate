@@ -46,7 +46,7 @@ No test suite exists — `npx tsc --noEmit` is the primary correctness check.
 | `/app/care/blood` | Blood donation center — feed of open requests + donor registration tab |
 | `/app/care/blood/[id]` | Blood request detail — matched donors (exact + crossmatch), respond as donor, owner sees responses |
 | `/app/care/health` | Health Book — vertical timeline, ใกล้ถึงกำหนด section, pet switcher, add/edit/delete records |
-| `/app/care/vet-online` | Tele-vet Demo — vet list (static mock), amber "ระบบสาธิต" badge, emergency disclaimer → hospitals |
+| `/app/care/vet-online` | Tele-vet Demo — vet list (static mock), amber "ระบบสาธิต" badge, emergency disclaimer → hospitals; calendar icon (top-right) + shortcut card → bookings |
 | `/app/care/vet-online/book/[vetId]` | Booking wizard — 3-step (เลือกเวลา → อาการ → ยืนยัน), server wrapper + `VetBookingWizard` client component |
 | `/app/care/vet-online/bookings` | My bookings + waiting room — list with upcoming/past sections, cancel, countdown timer, disabled video frame |
 | `/lost/[id]` | Public share page — server component, OG meta tags, no auth required; logo bar + CTA banner + phone button + share button (client island `PublicShareButton`) |
