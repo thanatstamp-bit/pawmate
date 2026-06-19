@@ -14,6 +14,11 @@
 
 # debug
 npm-debug.log*
+*.log
+
+# local wireframe reference files (design docs, not source code)
+pawmate_wireframe/
+pawmate_wireframe_full/
 
 # env files — never commit Supabase keys
 .env*.local
