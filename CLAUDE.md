@@ -46,6 +46,9 @@ No test suite exists — `npx tsc --noEmit` is the primary correctness check.
 | `/app/care/blood` | Blood donation center — feed of open requests + donor registration tab |
 | `/app/care/blood/[id]` | Blood request detail — matched donors (exact + crossmatch), respond as donor, owner sees responses |
 | `/app/care/health` | Health Book — vertical timeline, ใกล้ถึงกำหนด section, pet switcher, add/edit/delete records |
+| `/app/care/vet-online` | Tele-vet Demo — vet list (static mock), amber "ระบบสาธิต" badge, emergency disclaimer → hospitals |
+| `/app/care/vet-online/book/[vetId]` | Booking wizard — 3-step (เลือกเวลา → อาการ → ยืนยัน), server wrapper + `VetBookingWizard` client component |
+| `/app/care/vet-online/bookings` | My bookings + waiting room — list with upcoming/past sections, cancel, countdown timer, disabled video frame |
 | `/lost/[id]` | Public share page — server component, OG meta tags, no auth required; logo bar + CTA banner + phone button + share button (client island `PublicShareButton`) |
 
 The `/app/*` layout (`app/app/layout.tsx`) wraps all authenticated pages with a persistent `ConditionalAppHeader` (logo → /app/home) and `BottomNav` (5 tabs: หน้าแรก, ปัดการ์ด, แมตช์, ดูแล, โปรไฟล์). BottomNav แสดง amber count badge บน tab ดูแล เมื่อมี health record ใกล้ถึงกำหนด (ผ่าน `CareDueBadge` component). The chat page suppresses the global header because it has its own navigation header; the swipe page suppresses it too, to give the card deck maximum vertical space; `/app/care/*` suppresses it too — Care Hub and its sub-pages build their own back-arrow header (back → `/app/home` from the hub, back → `/app/care` from sub-pages).
@@ -110,8 +113,9 @@ Migrations live in `supabase/migrations/` and must be run manually in the Supaba
 | `013_lost_pets.sql` | `lost_pets` + `lost_pet_sightings` tables + RLS — anon SELECT for public `/lost/[id]` |
 | `014_blood.sql` | `blood_donors`, `blood_requests`, `blood_responses` tables + RLS — `blood_responses` visible only to donor owner or request owner |
 | `015_health.sql` | `health_records` table + RLS — SELECT/INSERT/UPDATE/DELETE เฉพาะเจ้าของ (ผ่าน `owns_pet()`) |
+| `016_vet_bookings.sql` | `vet_bookings` table + owner-only RLS — Phase 11 Tele-vet demo |
 
-Numbers are non-sequential (no `003`–`007`) — they reflect actual build order, not the phase numbering suggested in the roadmap (`DEVLOG.md`). The next new migration should be `016_*.sql`.
+Numbers are non-sequential (no `003`–`007`) — they reflect actual build order, not the phase numbering suggested in the roadmap (`DEVLOG.md`). The next new migration would be `017_*.sql`.
 
 **RLS pattern**: `owns_pet(pet_id)` is a SECURITY DEFINER helper that checks `pets.owner_id = auth.uid()`. Use it in policies instead of inlining the join. `is_in_match(match_id)` checks that the caller's pet is a participant.
 
@@ -145,8 +149,9 @@ Bottom sheets and modals above the swipe deck use `z-[60]`; match popup uses `z-
 - Phase 8 — Lost Pet Board (`013_lost_pets.sql`, `app/app/care/lost/*`, `app/lost/[id]`, `components/lost/*`)
 - Phase 9 — Blood Donation Center (`014_blood.sql`, `lib/blood-matching.ts`, `app/app/care/blood/*`)
 - Phase 10 — Health Book (`015_health.sql`, `lib/health.ts`, `app/app/care/health/page.tsx`, `components/care/HealthRecordForm.tsx`, `components/care/CareDueBadge.tsx`)
+- Phase 11 — Tele-vet Demo (`016_vet_bookings.sql`, `lib/data/mock-vets.ts`, `app/app/care/vet-online/*`, `components/care/VetBookingWizard.tsx`)
 
-**Phase 11 — Tele-vet demo (optional, not yet built):** migration `016_vet_bookings.sql`. Read `DEVLOG.md` ROADMAP section for the full spec. Note the roadmap's illustrative migration numbers (`003_hospitals.sql`, etc.) don't match what actually shipped — check the migration table above for the real numbers.
+All phases 0–11 are now complete. `DEVLOG.md` holds the full roadmap history.
 
 ## Environment variables
 

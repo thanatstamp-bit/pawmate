@@ -1,7 +1,7 @@
 # PawMate — Developer Log & Handoff Notes (รวมศูนย์)
 
 > บันทึกสิ่งที่ทำไปในแต่ละ session + roadmap + แผนเฟสถัดไป รวมไว้ในไฟล์เดียว
-> อัปเดตล่าสุด: 2026-06-19 (Session 20 — Landing page navbar)
+> อัปเดตล่าสุด: 2026-06-19 (Session 21 — Phase 11 Tele-vet Demo)
 >
 > **โครงไฟล์เอกสารโปรเจกต์ตอนนี้มี 2 ไฟล์:**
 > - `CLAUDE.md` — instructions ที่ Claude Code โหลดอัตโนมัติทุก session (architecture, rules, design system) — **แก้ที่นั่นเมื่อ architecture เปลี่ยน**
@@ -49,7 +49,7 @@ Portfolio project ที่ใช้งานได้จริง — เป้
 ✅ Phase 8 — Lost Pet Board / ประกาศสัตว์หาย (Session 15) — public share page ยกระดับให้ตรง wireframe (Session 18)
 ✅ Phase 9 — Blood Donation Center / ศูนย์บริจาคเลือด (Session 17)
 ✅ **Phase 10 — สมุดสุขภาพ (Health Book) — เสร็จสมบูรณ์ (Session 19)** — commit `e4fdbfc`
-🔲 Phase 11 — Tele-vet demo (optional)
+✅ **Phase 11 — Tele-vet Demo — เสร็จสมบูรณ์ (Session 21)**
 
 ### ⚠️ ค้างทำก่อนใช้งานจริง (blockers)
 
@@ -457,6 +457,9 @@ Greeting ใช้ `activePet?.name` แทน `profile.display_name` (ลบ ow
 **Session 20 (06-19) — Landing Page Navbar**
 เพิ่ม sticky navbar บน landing page (`app/page.tsx`): logo + "PawMate" ซ้าย, ปุ่ม "เข้าสู่ระบบ" (outline) + "สมัครฟรี" (coral fill) ขวา — `sticky top-0 z-50 backdrop-blur`. commit `82b623a`.
 
+**Session 21 (06-19) — Phase 11 Tele-vet Demo**
+`016_vet_bookings.sql` (vet_bookings table + owner-only RLS). `lib/data/mock-vets.ts` (5 vets hardcoded + `getSlotsForDay` + `getNextAvailableSlots` + Thai date helpers). `app/app/care/vet-online/page.tsx` (server component — vet list, amber badge, emergency disclaimer → /app/care/hospitals, slot chips per card, "นัดหมาย" button). `app/app/care/vet-online/book/[vetId]/page.tsx` (server wrapper reads dynamic param → `VetBookingWizard`). `components/care/VetBookingWizard.tsx` (client — 3-step wizard: day tabs + 4-col slot grid → textarea + suggestion prompts → success + booking ref #DEMO-XXXX). `app/app/care/vet-online/bookings/page.tsx` (client — my bookings list + waiting room state: countdown MM:SS + disabled video frame + hatch bg). `app/app/care/page.tsx` เพิ่ม tile ที่ 5 "ปรึกษาสัตวแพทย์" (Stethoscope icon). TypeScript 0 errors. รัน `016_vet_bookings.sql` ใน Supabase SQL Editor ก่อนใช้งาน.
+
 ---
 
 ## ROADMAP — Expansion Kit (Phase 6–11)
@@ -497,7 +500,7 @@ Greeting ใช้ `activePet?.name` แทน `profile.display_name` (ลบ ow
 | 8 Lost Pet Board | ✅ Session 15 + S18 | 013 | โพสต์+แจ้งเบาะแสได้, ลิงก์แชร์เปิดไม่ล็อกอิน, OG preview ขึ้นรูป, กดพบแล้ว → สถานะเปลี่ยน |
 | 9 Blood Donation | ✅ Session 17 | 014 | checklist ประเมินถูก, ขอเลือด→อีกบัญชีกดช่วย→เจ้าของเห็น contact, ปิดประกาศได้ |
 | 10 Health Book | ✅ Session 19 | 015 | เพิ่ม/แก้/ลบ record, บันทึกวัคซีนพิษสุนัขบ้า → badge ✅ ขึ้นการ์ดปัดอัตโนมัติ, banner + ตัวเลขบน tab ดูแล |
-| 11 Tele-vet demo | 🔲 optional | 016 | จองคิว → confirmation + ห้องรอ, ทุกหน้ามีป้าย ระบบสาธิต, ลิงก์ฉุกเฉิน → รพ.สัตว์ |
+| 11 Tele-vet demo | ✅ Session 21 | 016 | จองคิว → confirmation + ห้องรอ, ทุกหน้ามีป้าย ระบบสาธิต, ลิงก์ฉุกเฉิน → รพ.สัตว์ |
 
 ### Phase 11 (OPTIONAL) — Tele-Triage Demo (สรุป prompt)
 

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ChevronLeft, Hospital, Megaphone, Droplet, BookOpenText, Bell, ChevronRight } from "lucide-react";
+import { ChevronLeft, Hospital, Megaphone, Droplet, BookOpenText, Bell, ChevronRight, Stethoscope } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
 const CARE_CARDS = [
@@ -32,6 +32,13 @@ const CARE_CARDS = [
     subtitle: "วัคซีน นัดหมอ บันทึกสุขภาพ",
     href: "/app/care/health",
     icon: BookOpenText,
+    comingSoon: false,
+  },
+  {
+    label: "ปรึกษาสัตวแพทย์",
+    subtitle: "สอบถามอาการ นัดออนไลน์",
+    href: "/app/care/vet-online",
+    icon: Stethoscope,
     comingSoon: false,
   },
 ];
