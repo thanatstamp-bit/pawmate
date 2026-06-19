@@ -1,7 +1,7 @@
 # PawMate — Developer Log & Handoff Notes (รวมศูนย์)
 
 > บันทึกสิ่งที่ทำไปในแต่ละ session + roadmap + แผนเฟสถัดไป รวมไว้ในไฟล์เดียว
-> อัปเดตล่าสุด: 2026-06-19 (Session 25 — Google OAuth login)
+> อัปเดตล่าสุด: 2026-06-19 (Session 26 — Facebook OAuth login)
 >
 > **โครงไฟล์เอกสารโปรเจกต์ตอนนี้มี 2 ไฟล์:**
 > - `CLAUDE.md` — instructions ที่ Claude Code โหลดอัตโนมัติทุก session (architecture, rules, design system) — **แก้ที่นั่นเมื่อ architecture เปลี่ยน**
@@ -463,6 +463,17 @@ Greeting ใช้ `activePet?.name` แทน `profile.display_name` (ลบ ow
 
 **Session 22 (06-19) — Vet-Online Bookings Shortcut**
 เพิ่มทางเข้า "การจองของฉัน" จากหน้ารายชื่อหมอโดยตรง (ก่อนหน้านี้เข้าได้เฉพาะหลังจองสำเร็จ): (1) CalendarDays icon มุมขวา header → `/app/care/vet-online/bookings`; (2) shortcut card (teal icon + "ดูนัดหมายและห้องรอ" + ChevronRight) ใต้ intro card. รัน `016_vet_bookings.sql` ใน Supabase SQL Editor แล้ว. Push ขึ้น GitHub. commit `056b35f`.
+
+**Session 26 (06-19) — Facebook OAuth login**
+เพิ่มปุ่ม "เข้าสู่ระบบด้วย Facebook" — โครงโค้ดพร้อมอยู่แล้วจาก Session 25 (callback route + `handleOAuth(provider)` รับ provider เป็น parameter อยู่แล้ว) จึงแก้แค่ `components/AuthForm.tsx` (import `FacebookLogo` + เพิ่มปุ่มที่เรียก `handleOAuth("facebook")`). ไม่แตะ callback route (รองรับทุก provider แบบ generic — Facebook ส่งชื่อมาใน `user_metadata.name` ซึ่ง fallback ไว้แล้ว). TypeScript 0 errors. เทส flow จริงบน localhost ผ่าน (Facebook → consent → /onboarding).
+**Meta dashboard config (ทำแล้ว Session 26 — gotchas ที่เจอ บันทึกไว้เผื่อ setup ใหม่):**
+- Meta for Developers → Create App (Consumer / "Authenticate and request data with Facebook Login") → UI ใหม่ใช้ระบบ **Use cases** (ไม่มีเมนู "Facebook Login → Set up" แบบเก่า)
+- **Valid OAuth Redirect URIs** อยู่ใน Use cases → Customize → Settings → ใส่ `https://wbxryllyewprswalbwpg.supabase.co/auth/v1/callback`
+- **gotcha 1 — "Can't load URL":** ต้องเพิ่มโดเมน Supabase ใน App settings → Basic → **App Domains** = `wbxryllyewprswalbwpg.supabase.co` (+ Add Platform → Website → Site URL)
+- **gotcha 2 — "Invalid Scopes: email":** ต้องเพิ่ม permission **`email`** ใน Use case (นอกจาก `public_profile`) — Standard access ใช้ได้กับ admin/tester โดยไม่ต้อง App Review
+- **gotcha 3 — code ค้างที่ landing root:** Supabase Redirect URLs ต้องมี callback ของแต่ละ origin ครบ ไม่งั้น fallback ไป Site URL — เพิ่ม `http://localhost:3000/auth/callback` + `https://pawmate-mu.vercel.app/auth/callback`
+- App อยู่โหมด **Development** = ล็อกอินได้เฉพาะ admin/tester; จะ publish ต้องมี Privacy Policy + อาจต้อง Business Verification + App Review (พอสำหรับ portfolio demo)
+- **โดเมน production จริง:** `pawmate-mu.vercel.app` (บันทึกครั้งแรก — เดิม DEVLOG ไม่เคยจดไว้)
 
 **Session 25 (06-19) — Google OAuth login**
 เพิ่มล็อกอินด้วย Google (social login) — ทำ Google ก่อน, วางโครงให้ provider เป็น parameter เผื่อเพิ่ม Facebook ทีหลัง (Facebook ภาระ setup หนัก ต้องผ่าน Meta App Review). **ไฟล์ใหม่:** `app/auth/callback/route.ts` (route handler ตัวแรกของโปรเจกต์ — `exchangeCodeForSession` → upsert `profiles` ดึง display_name จาก `user_metadata.full_name`/`name`/email → route ตาม pet เหมือน password login → redirect; error/cancel → `/login?error=oauth`), `components/icons/GoogleLogo.tsx` (inline SVG 4 สี — lucide ไม่มี brand icon), `components/icons/FacebookLogo.tsx` (เตรียมไว้ ยังไม่ใช้). **แก้:** `components/AuthForm.tsx` (ปุ่ม "เข้าสู่ระบบด้วย Google" ใต้ divider, `handleOAuth(provider)` ส่ง `redirectTo=${origin}/auth/callback?next=…`, แสดง error เมื่อ `?error=oauth`). ไม่เพิ่ม DB migration/trigger — สร้าง profile ใน callback ตาม pattern เดิม (`demoLogin` upsert). ไม่แตะ middleware (`/auth/callback` อยู่นอก matcher = public). TypeScript 0 errors, เทส flow จริงผ่าน (Google → consent → /app/swipe).

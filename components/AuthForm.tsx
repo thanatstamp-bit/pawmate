@@ -6,6 +6,7 @@ import { Loader2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { demoLogin } from "@/app/login/actions";
 import GoogleLogo from "@/components/icons/GoogleLogo";
+import FacebookLogo from "@/components/icons/FacebookLogo";
 
 type Tab = "login" | "signup";
 
@@ -255,8 +256,7 @@ export default function AuthForm() {
         <div className="h-px flex-1 bg-black/10" />
       </div>
 
-      {/* Social login — Google (Facebook can be added once its Supabase
-          provider is enabled: render a second button calling handleOAuth("facebook")) */}
+      {/* Social login — Google + Facebook */}
       <button
         type="button"
         onClick={() => handleOAuth("google")}
@@ -265,6 +265,15 @@ export default function AuthForm() {
       >
         <GoogleLogo size={18} />
         เข้าสู่ระบบด้วย Google
+      </button>
+      <button
+        type="button"
+        onClick={() => handleOAuth("facebook")}
+        disabled={busy}
+        className="mb-3 flex w-full items-center justify-center gap-2.5 rounded-full border border-black/10 bg-white py-3 font-bold text-brown transition-colors hover:bg-cream disabled:opacity-60"
+      >
+        <FacebookLogo size={18} />
+        เข้าสู่ระบบด้วย Facebook
       </button>
 
       {/* Demo login — the most important button on this page */}
