@@ -31,7 +31,7 @@ No test suite exists — `npx tsc --noEmit` is the primary correctness check.
 | Path | Description |
 |---|---|
 | `/` | Public landing page — sticky navbar (logo + เข้าสู่ระบบ + สมัครฟรี), hero, how-it-works, two-modes, CTA, footer |
-| `/login` | Auth (email/password + demo button) |
+| `/login` | Auth (email/password + demo button); "จดจำอีเมล" checkbox prefills the email from `localStorage["pawmate_remembered_email"]` (email only — never the password) |
 | `/onboarding` | 4-step pet profile wizard (protected) |
 | `/app/home` | Home page — active pet card + quick stats |
 | `/app/swipe` | Core swipe feed with mode toggle |

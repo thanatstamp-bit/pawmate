@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
@@ -24,6 +24,10 @@ function thaiAuthError(message: string): string {
   return "เกิดข้อผิดพลาด ลองใหม่อีกครั้งนะ";
 }
 
+// Remembers only the email (never the password) so the login field
+// pre-fills on return visits without storing a credential in the browser.
+const REMEMBER_EMAIL_KEY = "pawmate_remembered_email";
+
 const inputClass =
   "w-full rounded-xl border border-black/10 bg-white px-4 py-3 text-sm " +
   "placeholder:text-brown-muted/60 focus:border-coral focus:outline-none " +
@@ -42,7 +46,17 @@ export default function AuthForm() {
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [remember, setRemember] = useState(true);
   const [demoPending, startDemo] = useTransition();
+
+  // Pre-fill the email field from a previous "remember email" choice.
+  useEffect(() => {
+    const saved = localStorage.getItem(REMEMBER_EMAIL_KEY);
+    if (saved) {
+      setEmail(saved);
+      setRemember(true);
+    }
+  }, []);
 
   function switchTab(next: Tab) {
     setTab(next);
@@ -59,6 +73,9 @@ export default function AuthForm() {
       setError(thaiAuthError(error.message));
       return;
     }
+    // Remember (or forget) the email for next time — never the password.
+    if (remember) localStorage.setItem(REMEMBER_EMAIL_KEY, email);
+    else localStorage.removeItem(REMEMBER_EMAIL_KEY);
     // Route by whether this account already has a pet profile
     // (limit(1) before maybeSingle() — accounts can own multiple pets,
     // and a bare maybeSingle() errors on >1 rows, silently looking like
@@ -176,6 +193,18 @@ export default function AuthForm() {
           minLength={6}
           className={inputClass}
         />
+
+        {tab === "login" && (
+          <label className="flex cursor-pointer select-none items-center gap-2 px-1 text-sm text-brown-muted">
+            <input
+              type="checkbox"
+              checked={remember}
+              onChange={(e) => setRemember(e.target.checked)}
+              className="h-4 w-4 rounded border-black/20 accent-coral"
+            />
+            จดจำอีเมล
+          </label>
+        )}
 
         {error && (
           <p className="rounded-xl bg-coral/10 px-4 py-2 text-sm text-coral-dark">

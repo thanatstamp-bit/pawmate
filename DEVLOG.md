@@ -1,7 +1,7 @@
 # PawMate — Developer Log & Handoff Notes (รวมศูนย์)
 
 > บันทึกสิ่งที่ทำไปในแต่ละ session + roadmap + แผนเฟสถัดไป รวมไว้ในไฟล์เดียว
-> อัปเดตล่าสุด: 2026-06-19 (Session 23 — Swipe Gestures / drag-to-swipe)
+> อัปเดตล่าสุด: 2026-06-19 (Session 24 — Remember Email บนหน้า login)
 >
 > **โครงไฟล์เอกสารโปรเจกต์ตอนนี้มี 2 ไฟล์:**
 > - `CLAUDE.md` — instructions ที่ Claude Code โหลดอัตโนมัติทุก session (architecture, rules, design system) — **แก้ที่นั่นเมื่อ architecture เปลี่ยน**
@@ -463,6 +463,9 @@ Greeting ใช้ `activePet?.name` แทน `profile.display_name` (ลบ ow
 
 **Session 22 (06-19) — Vet-Online Bookings Shortcut**
 เพิ่มทางเข้า "การจองของฉัน" จากหน้ารายชื่อหมอโดยตรง (ก่อนหน้านี้เข้าได้เฉพาะหลังจองสำเร็จ): (1) CalendarDays icon มุมขวา header → `/app/care/vet-online/bookings`; (2) shortcut card (teal icon + "ดูนัดหมายและห้องรอ" + ChevronRight) ใต้ intro card. รัน `016_vet_bookings.sql` ใน Supabase SQL Editor แล้ว. Push ขึ้น GitHub. commit `056b35f`.
+
+**Session 24 (06-19) — Remember Email บนหน้า login**
+เพิ่มฟีเจอร์ "จดจำอีเมล" บนหน้าเข้าสู่ระบบ (`components/AuthForm.tsx`). ผู้ใช้ขอ "จดจำรหัสผ่าน" แต่หลังคุยเรื่อง security trade-off เลือกเก็บ**เฉพาะอีเมล** (ไม่เก็บรหัสผ่าน plaintext ใน localStorage). พฤติกรรม: checkbox "จดจำอีเมล" (default ติ๊ก, โชว์เฉพาะแท็บ login) → เปิดหน้ามาอ่าน `localStorage["pawmate_remembered_email"]` มา prefill ช่องอีเมล → ล็อกอินสำเร็จแล้วถ้าติ๊กไว้เก็บอีเมล ถ้าไม่ติ๊กก็ลบ (เก็บหลังสำเร็จเท่านั้น กันจำอีเมลที่พิมพ์ผิด). **บริบทสำคัญ:** Supabase (`createBrowserClient`) persist session ให้อยู่แล้ว → ปกติไม่เห็นหน้า login ซ้ำจนกว่าจะ logout/session หมด ฟีเจอร์นี้ช่วยเฉพาะตอนเด้งกลับมาหน้า login. localStorage key ใหม่นอกเหนือจาก `pawmate_active_pet_id` เดิม. TypeScript 0 errors.
 
 **Session 23 (06-19) — Swipe Gestures (drag-to-swipe)**
 เพิ่ม drag-to-swipe บนการ์ดปัด ด้วย **native Pointer Events** (ไม่เพิ่ม dependency — ไม่ใช้ framer-motion ตามที่ backlog เคยเขียนไว้ เพื่อ keep deps ลีนตาม pattern เดิมที่ detail sheet ก็ใช้ touch handler มือเขียนเอง). `PetCard.tsx`: ลากซ้าย/ขวา → การ์ดเลื่อน+เอียงตามทิศ, ป้าย "ถูกใจ"(coral ซ้าย)/"ผ่าน"(เทา ขวา) จางเข้าตามระยะลาก, ลากเกิน `SWIPE_THRESHOLD` 110px → บินออกจอ, ไม่ถึง → เด้งกลับ. **สำคัญ:** ใส่ `transform` เฉพาะ "หน้าการ์ด" ไม่ครอบ overlay — เลี่ยง CSS gotcha ที่ ancestor มี `transform` ทำให้ลูกที่เป็น `fixed` (detail sheet) ยึดกับ element นั้นแทน viewport. กัน tap หลังลากไม่ให้เผลอเปิด detail sheet (`onClickCapture` + `didDrag` ref). `touch-none` กันเบราว์เซอร์ hijack เป็น back-gesture. `swipe/page.tsx`: ปุ่ม ✕/♥ route ผ่าน fly-off animation เดียวกัน (`triggerSwipe` prop + `onSwipe` เส้นเดียว), `key={pet.id}` ต่อใบให้ drag state รีเซ็ตสะอาด. match logic / demo counter / auto-recycle / block / filter เดิมทำงานครบเหมือนเดิม. TypeScript 0 errors.
