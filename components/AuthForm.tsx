@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { demoLogin } from "@/app/login/actions";
+import GoogleLogo from "@/components/icons/GoogleLogo";
 
 type Tab = "login" | "signup";
 
@@ -57,6 +58,14 @@ export default function AuthForm() {
       setRemember(true);
     }
   }, []);
+
+  // Surface a failed OAuth round-trip (the callback route bounces back here
+  // with ?error=oauth when the code exchange fails or the user cancels).
+  useEffect(() => {
+    if (searchParams.get("error") === "oauth") {
+      setError("เข้าสู่ระบบด้วยบัญชีโซเชียลไม่สำเร็จ ลองใหม่อีกครั้งนะ");
+    }
+  }, [searchParams]);
 
   function switchTab(next: Tab) {
     setTab(next);
@@ -136,6 +145,19 @@ export default function AuthForm() {
       const result = await demoLogin();
       if (result?.error) setError(result.error);
     });
+  }
+
+  // Social login — redirects to the provider, which returns to /auth/callback
+  // (works for both login and signup; OAuth is sign-in-or-up in one step).
+  async function handleOAuth(provider: "google" | "facebook") {
+    setError(null);
+    setNotice(null);
+    const next = redirectTo ? `?next=${encodeURIComponent(redirectTo)}` : "";
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider,
+      options: { redirectTo: `${window.location.origin}/auth/callback${next}` },
+    });
+    if (error) setError("เริ่มการเข้าสู่ระบบไม่สำเร็จ ลองใหม่อีกครั้งนะ");
   }
 
   const busy = loading || demoPending;
@@ -232,6 +254,18 @@ export default function AuthForm() {
         หรือ
         <div className="h-px flex-1 bg-black/10" />
       </div>
+
+      {/* Social login — Google (Facebook can be added once its Supabase
+          provider is enabled: render a second button calling handleOAuth("facebook")) */}
+      <button
+        type="button"
+        onClick={() => handleOAuth("google")}
+        disabled={busy}
+        className="mb-3 flex w-full items-center justify-center gap-2.5 rounded-full border border-black/10 bg-white py-3 font-bold text-brown transition-colors hover:bg-cream disabled:opacity-60"
+      >
+        <GoogleLogo size={18} />
+        เข้าสู่ระบบด้วย Google
+      </button>
 
       {/* Demo login — the most important button on this page */}
       <button

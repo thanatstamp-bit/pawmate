@@ -1,7 +1,7 @@
 # PawMate — Developer Log & Handoff Notes (รวมศูนย์)
 
 > บันทึกสิ่งที่ทำไปในแต่ละ session + roadmap + แผนเฟสถัดไป รวมไว้ในไฟล์เดียว
-> อัปเดตล่าสุด: 2026-06-19 (Session 24 — Remember Email บนหน้า login)
+> อัปเดตล่าสุด: 2026-06-19 (Session 25 — Google OAuth login)
 >
 > **โครงไฟล์เอกสารโปรเจกต์ตอนนี้มี 2 ไฟล์:**
 > - `CLAUDE.md` — instructions ที่ Claude Code โหลดอัตโนมัติทุก session (architecture, rules, design system) — **แก้ที่นั่นเมื่อ architecture เปลี่ยน**
@@ -463,6 +463,14 @@ Greeting ใช้ `activePet?.name` แทน `profile.display_name` (ลบ ow
 
 **Session 22 (06-19) — Vet-Online Bookings Shortcut**
 เพิ่มทางเข้า "การจองของฉัน" จากหน้ารายชื่อหมอโดยตรง (ก่อนหน้านี้เข้าได้เฉพาะหลังจองสำเร็จ): (1) CalendarDays icon มุมขวา header → `/app/care/vet-online/bookings`; (2) shortcut card (teal icon + "ดูนัดหมายและห้องรอ" + ChevronRight) ใต้ intro card. รัน `016_vet_bookings.sql` ใน Supabase SQL Editor แล้ว. Push ขึ้น GitHub. commit `056b35f`.
+
+**Session 25 (06-19) — Google OAuth login**
+เพิ่มล็อกอินด้วย Google (social login) — ทำ Google ก่อน, วางโครงให้ provider เป็น parameter เผื่อเพิ่ม Facebook ทีหลัง (Facebook ภาระ setup หนัก ต้องผ่าน Meta App Review). **ไฟล์ใหม่:** `app/auth/callback/route.ts` (route handler ตัวแรกของโปรเจกต์ — `exchangeCodeForSession` → upsert `profiles` ดึง display_name จาก `user_metadata.full_name`/`name`/email → route ตาม pet เหมือน password login → redirect; error/cancel → `/login?error=oauth`), `components/icons/GoogleLogo.tsx` (inline SVG 4 สี — lucide ไม่มี brand icon), `components/icons/FacebookLogo.tsx` (เตรียมไว้ ยังไม่ใช้). **แก้:** `components/AuthForm.tsx` (ปุ่ม "เข้าสู่ระบบด้วย Google" ใต้ divider, `handleOAuth(provider)` ส่ง `redirectTo=${origin}/auth/callback?next=…`, แสดง error เมื่อ `?error=oauth`). ไม่เพิ่ม DB migration/trigger — สร้าง profile ใน callback ตาม pattern เดิม (`demoLogin` upsert). ไม่แตะ middleware (`/auth/callback` อยู่นอก matcher = public). TypeScript 0 errors, เทส flow จริงผ่าน (Google → consent → /app/swipe).
+**Dashboard config (ทำแล้ว Session 25 — บันทึกไว้เผื่อ setup env อื่น):**
+- Google Cloud Console → OAuth consent screen = **External** + เพิ่มอีเมลตัวเองใน **Test users** (ยังไม่ publish = ล็อกอินได้เฉพาะ test users)
+- Google → Credentials → OAuth client ID (Web application) → **Authorized redirect URI = `https://wbxryllyewprswalbwpg.supabase.co/auth/v1/callback`** (callback ของ Supabase ไม่ใช่ของแอป)
+- Supabase → Authentication → Providers → Google = enable + วาง Client ID/Secret
+- Supabase → URL Configuration → Site URL + **Redirect URLs** = `http://localhost:3000/auth/callback` (+ ต้องเพิ่มโดเมน Vercel `https://<domain>/auth/callback` ตอน deploy production — ยังค้าง)
 
 **Session 24 (06-19) — Remember Email บนหน้า login**
 เพิ่มฟีเจอร์ "จดจำอีเมล" บนหน้าเข้าสู่ระบบ (`components/AuthForm.tsx`). ผู้ใช้ขอ "จดจำรหัสผ่าน" แต่หลังคุยเรื่อง security trade-off เลือกเก็บ**เฉพาะอีเมล** (ไม่เก็บรหัสผ่าน plaintext ใน localStorage). พฤติกรรม: checkbox "จดจำอีเมล" (default ติ๊ก, โชว์เฉพาะแท็บ login) → เปิดหน้ามาอ่าน `localStorage["pawmate_remembered_email"]` มา prefill ช่องอีเมล → ล็อกอินสำเร็จแล้วถ้าติ๊กไว้เก็บอีเมล ถ้าไม่ติ๊กก็ลบ (เก็บหลังสำเร็จเท่านั้น กันจำอีเมลที่พิมพ์ผิด). **บริบทสำคัญ:** Supabase (`createBrowserClient`) persist session ให้อยู่แล้ว → ปกติไม่เห็นหน้า login ซ้ำจนกว่าจะ logout/session หมด ฟีเจอร์นี้ช่วยเฉพาะตอนเด้งกลับมาหน้า login. localStorage key ใหม่นอกเหนือจาก `pawmate_active_pet_id` เดิม. TypeScript 0 errors.

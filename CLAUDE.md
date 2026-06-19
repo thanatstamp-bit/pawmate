@@ -31,7 +31,8 @@ No test suite exists — `npx tsc --noEmit` is the primary correctness check.
 | Path | Description |
 |---|---|
 | `/` | Public landing page — sticky navbar (logo + เข้าสู่ระบบ + สมัครฟรี), hero, how-it-works, two-modes, CTA, footer |
-| `/login` | Auth (email/password + demo button); "จดจำอีเมล" checkbox prefills the email from `localStorage["pawmate_remembered_email"]` (email only — never the password) |
+| `/login` | Auth (email/password + demo button + "เข้าสู่ระบบด้วย Google" OAuth); "จดจำอีเมล" checkbox prefills the email from `localStorage["pawmate_remembered_email"]` (email only — never the password) |
+| `/auth/callback` | OAuth code-exchange route handler (the project's only `route.ts`) — `exchangeCodeForSession`, upserts a `profiles` row, then routes to `/app/swipe` or `/onboarding` like password login; failure → `/login?error=oauth` |
 | `/onboarding` | 4-step pet profile wizard (protected) |
 | `/app/home` | Home page — active pet card + quick stats |
 | `/app/swipe` | Core swipe feed with mode toggle |
@@ -53,7 +54,9 @@ No test suite exists — `npx tsc --noEmit` is the primary correctness check.
 
 The `/app/*` layout (`app/app/layout.tsx`) wraps all authenticated pages with a persistent `ConditionalAppHeader` (logo → /app/home) and `BottomNav` (5 tabs: หน้าแรก, ปัดการ์ด, แมตช์, ดูแล, โปรไฟล์). BottomNav แสดง amber count badge บน tab ดูแล เมื่อมี health record ใกล้ถึงกำหนด (ผ่าน `CareDueBadge` component). The chat page suppresses the global header because it has its own navigation header; the swipe page suppresses it too, to give the card deck maximum vertical space; `/app/care/*` suppresses it too — Care Hub and its sub-pages build their own back-arrow header (back → `/app/home` from the hub, back → `/app/care` from sub-pages).
 
-Middleware (`middleware.ts` → `lib/supabase/middleware.ts`) protects `/app/*` and `/onboarding` with a session check that redirects to `/login`.
+Middleware (`middleware.ts` → `lib/supabase/middleware.ts`) protects `/app/*` and `/onboarding` with a session check that redirects to `/login`. `/auth/callback` is intentionally outside the matcher (public).
+
+**OAuth profile-creation gotcha**: `profiles.display_name` is `NOT NULL` and there is no DB trigger on `auth.users`, so a profile row is only ever created in app code. Email/password signup inserts it (with the form's display name); the demo login and the Google OAuth callback `upsert` it (`onConflict: "id", ignoreDuplicates: true`). Any new auth path must create the `profiles` row itself — OAuth users have no profile until the callback makes one. Provider config (Google client ID/secret, Supabase redirect URLs) lives in the Google Cloud + Supabase dashboards, not the repo — see DEVLOG Session 25.
 
 ### Supabase client usage
 
