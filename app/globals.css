@@ -98,6 +98,35 @@
       transform: translateX(100%);
     }
   }
+
+  /* Landing page "soft-plush" decorations (organic blobs + float) */
+  .animate-blob {
+    animation: blob 7s infinite;
+  }
+  @keyframes blob {
+    0%,
+    100% {
+      transform: translate(0, 0) scale(1);
+    }
+    33% {
+      transform: translate(30px, -50px) scale(1.1);
+    }
+    66% {
+      transform: translate(-20px, 20px) scale(0.9);
+    }
+  }
+  .pm-float {
+    animation: pm-float 6s ease-in-out infinite;
+  }
+  @keyframes pm-float {
+    0%,
+    100% {
+      transform: translateY(0) rotate(0deg);
+    }
+    50% {
+      transform: translateY(-10px) rotate(2deg);
+    }
+  }
 }
 
 /* Respect reduced-motion: disable all decorative animation */
