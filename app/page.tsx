@@ -10,7 +10,21 @@ import {
   PartyPopper,
   Star,
   Stethoscope,
+  Github,
+  Mail,
 } from "lucide-react";
+
+const GITHUB_URL = "https://github.com/thanatstamp-bit/pawmate";
+const CONTACT_EMAIL = "thanat.stamp@gmail.com";
+
+function FooterCol({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <p className="text-sm font-bold text-white">{title}</p>
+      <ul className="mt-3 flex flex-col gap-2.5 text-sm text-white/60">{children}</ul>
+    </div>
+  );
+}
 
 export default function LandingPage() {
   return (
@@ -123,7 +137,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── HOW IT WORKS ── */}
-      <section className="bg-white px-6 py-16">
+      <section id="how" className="scroll-mt-16 bg-white px-6 py-16">
         <div className="mx-auto max-w-lg text-center">
           <h2 className="text-2xl font-bold tracking-title text-ink">ใช้งานยังไง?</h2>
           <p className="mt-2 text-ink-2">ง่ายแค่ 3 ขั้นตอน</p>
@@ -150,7 +164,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── TWO MODES ── */}
-      <section className="px-6 py-16">
+      <section id="modes" className="scroll-mt-16 px-6 py-16">
         <div className="mx-auto max-w-lg text-center">
           <h2 className="text-2xl font-bold tracking-title text-ink">เลือกโหมดที่ใช่</h2>
           <p className="mt-2 text-ink-2">เปิดได้ทั้ง 2 โหมดพร้อมกัน</p>
@@ -213,15 +227,73 @@ export default function LandingPage() {
       </section>
 
       {/* ── FOOTER ── */}
-      <footer className="bg-ink px-6 py-8 text-center text-white/60">
-        <p className="text-sm">
-          Portfolio project by{" "}
-          <span className="font-bold text-white">Thanat Tam Kongchasingha</span>
-        </p>
-        <p className="mt-1 text-xs">Built with Next.js · Supabase · Tailwind CSS</p>
-        <Link href="/privacy" className="mt-3 inline-block text-xs text-white/70 underline hover:text-white">
-          นโยบายความเป็นส่วนตัว
-        </Link>
+      <footer className="bg-ink text-white/70">
+        <div className="mx-auto max-w-5xl px-6 py-12">
+          <div className="flex flex-col gap-10 md:flex-row md:justify-between">
+            {/* Brand */}
+            <div className="max-w-xs">
+              <div className="flex items-center gap-2.5">
+                <span className="flex h-8 w-8 items-center justify-center rounded-[10px] bg-gradient-logo shadow-[0_6px_14px_-6px_rgba(239,78,60,.6)]">
+                  <PawPrint size={18} className="text-white" fill="currentColor" />
+                </span>
+                <span className="text-lg font-bold tracking-tight2 text-white">PawMate</span>
+              </div>
+              <p className="mt-3 text-sm leading-relaxed text-white/55">
+                หาเพื่อน หาคู่ ให้เจ้าตัวน้อยของคุณ — แอปจับคู่หมาและแมวในไทย พร้อมบริการดูแลน้องครบในที่เดียว
+              </p>
+              <div className="mt-4 flex gap-2.5">
+                <a
+                  href={GITHUB_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="GitHub"
+                  className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/10 text-white/80 transition-colors hover:bg-white/20 hover:text-white"
+                >
+                  <Github size={17} />
+                </a>
+                <a
+                  href={`mailto:${CONTACT_EMAIL}`}
+                  aria-label="อีเมล"
+                  className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/10 text-white/80 transition-colors hover:bg-white/20 hover:text-white"
+                >
+                  <Mail size={17} />
+                </a>
+              </div>
+            </div>
+
+            {/* Link columns */}
+            <div className="grid grid-cols-2 gap-8 sm:grid-cols-3">
+              <FooterCol title="ฟีเจอร์">
+                <li><a href="#how" className="transition-colors hover:text-white">วิธีใช้งาน</a></li>
+                <li><a href="#modes" className="transition-colors hover:text-white">หาเพื่อนเล่น / หาคู่</a></li>
+                <li><a href="#modes" className="transition-colors hover:text-white">ดูแลน้อง</a></li>
+              </FooterCol>
+              <FooterCol title="เริ่มต้น">
+                <li><Link href="/login" className="transition-colors hover:text-white">ลองเดโม</Link></li>
+                <li><Link href="/login" className="transition-colors hover:text-white">เข้าสู่ระบบ</Link></li>
+                <li><Link href="/login" className="transition-colors hover:text-white">สมัครฟรี</Link></li>
+              </FooterCol>
+              <FooterCol title="ข้อมูล">
+                <li><Link href="/privacy" className="transition-colors hover:text-white">นโยบายความเป็นส่วนตัว</Link></li>
+                <li><a href={`mailto:${CONTACT_EMAIL}`} className="transition-colors hover:text-white">ติดต่อเรา</a></li>
+                <li>
+                  <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-white">
+                    ซอร์สโค้ด (GitHub)
+                  </a>
+                </li>
+              </FooterCol>
+            </div>
+          </div>
+
+          {/* Bottom bar */}
+          <div className="mt-10 flex flex-col gap-2 border-t border-white/10 pt-6 text-xs text-white/45 sm:flex-row sm:items-center sm:justify-between">
+            <p>
+              © {new Date().getFullYear()} PawMate · โปรเจกต์พอร์ตโฟลิโอโดย{" "}
+              <span className="font-semibold text-white/70">Thanat Tam Kongchasingha</span>
+            </p>
+            <p>Built with Next.js · Supabase · Tailwind CSS</p>
+          </div>
+        </div>
       </footer>
     </main>
   );
