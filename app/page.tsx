@@ -287,10 +287,7 @@ export default function LandingPage() {
 
           {/* Bottom bar */}
           <div className="mt-10 flex flex-col gap-2 border-t border-white/10 pt-6 text-xs text-white/45 sm:flex-row sm:items-center sm:justify-between">
-            <p>
-              © {new Date().getFullYear()} PawMate · โปรเจกต์พอร์ตโฟลิโอโดย{" "}
-              <span className="font-semibold text-white/70">Thanat Tam Kongchasingha</span>
-            </p>
+            <p>© {new Date().getFullYear()} PawMate</p>
             <p>Built with Next.js · Supabase · Tailwind CSS</p>
           </div>
         </div>
