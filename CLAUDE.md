@@ -7,8 +7,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ```bash
 npm run dev       # start dev server (localhost:3000)
 npm run build     # production build + type-check
-npm run lint      # ESLint via next lint
 npx tsc --noEmit  # type-check without building (use this to verify changes)
+# npm run lint  — NOT configured (no .eslintrc / eslint dep); `next lint` prompts interactively. Don't rely on it; tsc is the check.
 
 # Seed fake pets into Supabase (requires .env.local with service role key)
 npx ts-node --project scripts/tsconfig.json scripts/seed.ts
@@ -131,21 +131,33 @@ Numbers are non-sequential (no `003`–`007`) — they reflect actual build orde
 
 **Block semantics**: never delete match or message rows on block. `getBlockedPetIds()` reads both directions and the caller filters in memory.
 
-## Design system (Tailwind)
+## Design system (Tailwind) — v2 (Session 29 redesign)
 
-Custom tokens in `tailwind.config.ts`:
+Tokens in `tailwind.config.ts`, mirrored as CSS vars in `app/globals.css`. The whole app was visually redesigned in Session 29 (see DEVLOG); these are the live values.
 
-| Token | Value | Usage |
+| Family | Variants | Usage |
 |---|---|---|
-| `bg-cream` | `#FFF8F0` | Page backgrounds |
-| `coral` / `coral-dark` | `#FF6B5B` / `#E85647` | Primary actions, likes |
-| `teal` / `teal-dark` | `#2EC4B6` / `#26A89C` | Playdate mode accent |
-| `amber` / `amber-dark` | `#FFB84C` / `#F0A636` | Breeding mode accent |
-| `brown` / `brown-muted` | `#2D2A26` / `#8A8580` | Body text / secondary text |
-| `rounded-card` | `20px` | Card border radius |
-| `shadow-card` | `0 4px 16px rgba(0,0,0,0.06)` | Card elevation |
+| `coral` | `DEFAULT #FF6B5B` · `deep #EF4E3C` · `soft #FFE9E4` · `ink #C13B2C` · `dark #E85647`(back-compat) | Primary / likes; CTA gradient end = deep |
+| `teal` | `DEFAULT #2EC4B6` · `soft #DCF5F2` · `ink #137F75` · `dark` | Playdate / positive / found |
+| `amber` | `DEFAULT #FFB84C` · `deep #C49010` · `soft #FFF1DA` · `dark` | Breeding / due-soon warnings |
+| `rose` | `DEFAULT #E0445A` · `soft #FBE2E6` · `ink #B12C3F` | Destructive / urgent / lost status only |
+| **`blue`** (NEW) | `DEFAULT #5B8DEF` · `soft #E5EDFC` · `ink #2F5FBF` | Health-book accent (de-overloads teal) |
+| `ink` (text) | `DEFAULT #2D2A26` · `2 #6B655E` · `3 #A39D95` | Body / secondary / muted. `brown`/`brown-muted` kept as aliases; **`brown-muted` remapped `#8A8580`→`#6B655E`** for AA |
+| neutrals | `cream #FFF8F0` · `surface #FFFFFF` · `line #F1ECE7` (hairline) · `fill-{1 #F7F3EF, 2 #F4EEE9, 3 #E5DCD3}` · `bg-top #FFF4EE` · `bg-bot #FFFBF8` | |
 
-Font: Prompt (covers Thai + Latin) via `var(--font-prompt)`. Icons: `lucide-react` only — no emoji as UI icons.
+- **Radius**: `rounded-card` 24 / `rounded-panel` 18 / `rounded-chip` 14. **NEVER override Tailwind's `lg`/`md`/`sm` defaults** — existing `rounded-lg`/`rounded-md` depend on them. Chips are soft rounded-rects, not full pills; `rounded-full` reserved for avatars/toggles/dots/FABs.
+- **Shadow**: `shadow-card` (warm two-layer brown-tint) · `shadow-cta` (coral glow on primary buttons) · `shadow-sheet` · `shadow-popup`.
+- **Gradients** (backgroundImage): `bg-gradient-app` (page bg, on `<body>`) · `bg-gradient-cta` (primary buttons) · `bg-gradient-avatar` (photo fallback) · `bg-gradient-logo`.
+- **Motion**: `animate-fade-up` / `animate-cta-pulse` / `animate-shimmer` (+ `.skeleton`) / `animate-pop` / `animate-bloom`; `.cta-sheen` sweep; all behind a `prefers-reduced-motion` guard in `globals.css`. Tracking: `tracking-title` (-.02em headings), `tracking-tight2` (-.01em card/section heads).
+
+**Color tokens are literal hex (not CSS vars) in the config** so Tailwind alpha modifiers (`bg-coral/10`, `bg-teal/15`) keep working — `globals.css` mirrors the same hex as `--coral`… vars for raw CSS and the Care-zone inline-style sweep; keep the two in sync.
+
+### Shared UI primitives — `components/ui/` (NEW in Session 29)
+Reusable building blocks; import from `@/components/ui`: `Button`, `Card`, `Chip`, `Badge`, `Avatar` (gradient fallback + initial; root carries its shape class so ring/border follow the circle), `IconTile`, `Sheet` (encodes the z-`[60]`/`[70]` convention), `SegmentedControl`, `Skeleton`, plus `cn()`.
+**`cn()` is a tiny no-dependency combiner that does NOT merge Tailwind classes** — so primitives can't be radius-overridden via `className`; pass radius through props instead (`<IconTile rounded="rounded-xl">`, `<Card radius="card">`). The `className` prop is always appended last.
+Prefer these primitives over re-declaring card/button/chip/sheet idioms inline.
+
+Font: Prompt (covers Thai + Latin) via `var(--font-prompt)`. Icons: `lucide-react` only — no emoji as UI icons. Note: this lucide version does **not** export `Venus`/`Mars` (use `UserRound` etc.).
 
 Bottom sheets and modals above the swipe deck use `z-[60]`; match popup uses `z-[70]`. Bottom sheets use `env(safe-area-inset-bottom)` for safe area padding.
 
