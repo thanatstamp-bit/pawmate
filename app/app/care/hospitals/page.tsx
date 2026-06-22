@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
-import { ChevronLeft, ChevronDown, Search, Info, SearchX } from "lucide-react";
+import { ChevronLeft, ChevronDown, Search, Info, SearchX, List, Map as MapIcon } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { haversineKm } from "@/lib/geo";
 import { PROVINCES } from "@/lib/data/provinces";
@@ -126,65 +126,77 @@ export default function HospitalFinderPage() {
   return (
     <div className="flex min-h-screen flex-col">
       {/* Header — back arrow + page title, no logo (own navigation header) */}
-      <div className="flex h-14 shrink-0 items-center gap-1 border-b border-black/5 px-1">
-        <Link href="/app/care" className="flex h-11 w-11 shrink-0 items-center justify-center text-brown">
+      <div className="flex shrink-0 items-center gap-3 px-[22px] pb-3 pt-1">
+        <Link
+          href="/app/care"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[13px] border-[1.5px] border-line bg-white text-ink shadow-[0_6px_16px_-10px_rgba(120,72,60,.3)] transition-transform active:scale-95"
+        >
           <ChevronLeft size={20} />
         </Link>
-        <span className="flex-1 truncate text-[17px] font-bold text-brown">โรงพยาบาลสัตว์ใกล้ฉัน</span>
-        <div className="h-11 w-11 shrink-0" />
+        <span className="flex-1 truncate text-[21px] font-bold tracking-title text-ink">โรงพยาบาลสัตว์</span>
       </div>
 
-      <div className="flex flex-1 flex-col px-5 pb-6 pt-4">
+      <div className="flex flex-1 flex-col px-[22px] pb-6 pt-2">
         {/* รายการ | แผนที่ segment toggle */}
-        <div className="flex rounded-full bg-cream p-1">
+        <div className="flex gap-[5px] rounded-chip bg-[#F4EEE9] p-[5px]">
           <button
             type="button"
             onClick={() => setView("list")}
-            className={`flex-1 rounded-full py-2 text-sm font-bold transition-all ${
-              view === "list" ? "bg-white text-brown shadow-card" : "text-brown-muted"
+            className={`flex flex-1 items-center justify-center gap-1.5 rounded-[10px] py-2 text-sm font-bold tracking-tight2 transition-all ${
+              view === "list" ? "bg-white text-ink shadow-card" : "text-ink-3"
             }`}
           >
+            <List size={15} />
             รายการ
           </button>
           <button
             type="button"
             onClick={() => setView("map")}
-            className={`flex-1 rounded-full py-2 text-sm font-bold transition-all ${
-              view === "map" ? "bg-white text-brown shadow-card" : "text-brown-muted"
+            className={`flex flex-1 items-center justify-center gap-1.5 rounded-[10px] py-2 text-sm font-bold tracking-tight2 transition-all ${
+              view === "map" ? "bg-white text-ink shadow-card" : "text-ink-3"
             }`}
           >
+            <MapIcon size={15} />
             แผนที่
           </button>
         </div>
 
-        {/* Filter row */}
-        <div className="mt-3 flex items-center gap-2">
-          <div className="relative shrink-0">
+        {/* Full-width search bar */}
+        <div className="mt-3 flex h-[46px] items-center gap-2 rounded-[14px] border-[1.5px] border-[#ECE5DF] bg-white px-3.5">
+          <Search size={16} className="shrink-0 text-ink-3" />
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="ค้นหาชื่อโรงพยาบาล"
+            className="w-full min-w-0 bg-transparent text-[15px] text-ink placeholder:text-ink-3 focus:outline-none"
+          />
+        </div>
+
+        {/* Province + 24h row */}
+        <div className="mt-2.5 flex items-center gap-2">
+          <div className="relative flex h-[42px] min-w-0 flex-1 items-center rounded-xl border-[1.5px] border-[#ECE5DF] bg-white pl-3.5 pr-7">
             <select
               value={province}
               onChange={(e) => setProvince(e.target.value)}
-              className="appearance-none rounded-xl bg-cream py-2 pl-3 pr-7 text-sm font-medium text-brown focus:outline-none"
+              className="w-full appearance-none bg-transparent text-sm font-semibold text-ink focus:outline-none"
             >
               <option value="">ทุกจังหวัด</option>
               {PROVINCES.map((p) => (
                 <option key={p} value={p}>{p}</option>
               ))}
             </select>
-            <ChevronDown
-              size={14}
-              className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-brown-muted"
-            />
+            <ChevronDown size={15} className="pointer-events-none absolute right-2.5 text-ink-3" />
           </div>
 
           <button
             type="button"
             onClick={() => setOpen24hOnly((v) => !v)}
-            className={`flex shrink-0 items-center gap-1.5 rounded-xl px-2.5 py-2 text-xs font-medium transition-colors ${
-              open24hOnly ? "bg-coral/10 text-coral" : "bg-cream text-brown-muted"
+            className={`flex h-[42px] shrink-0 items-center gap-1.5 rounded-xl border-[1.5px] px-3 text-[13px] font-semibold transition-colors ${
+              open24hOnly ? "border-coral/40 bg-coral-soft text-coral-ink" : "border-[#ECE5DF] bg-white text-ink-2"
             }`}
           >
             เปิด 24 ชม.
-            <span className={`relative h-4 w-7 shrink-0 rounded-full transition-colors ${open24hOnly ? "bg-coral" : "bg-black/15"}`}>
+            <span className={`relative h-4 w-7 shrink-0 rounded-full transition-colors ${open24hOnly ? "bg-coral" : "bg-fill-3"}`}>
               <span
                 className={`absolute top-0.5 h-3 w-3 rounded-full bg-white transition-all ${
                   open24hOnly ? "left-3.5" : "left-0.5"
@@ -192,26 +204,19 @@ export default function HospitalFinderPage() {
               />
             </span>
           </button>
-
-          <div className="flex min-w-0 flex-1 items-center gap-1.5 rounded-xl bg-cream px-2.5 py-2">
-            <Search size={13} className="shrink-0 text-brown-muted/60" />
-            <input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="ชื่อโรงพยาบาล"
-              className="w-full min-w-0 bg-transparent text-xs text-brown placeholder:text-brown-muted/60 focus:outline-none"
-            />
-          </div>
         </div>
 
         {/* Location denied — neutral fallback note, app keeps working */}
         {locationState === "denied" && (
-          <div className="mt-3 flex items-start gap-2 rounded-xl bg-cream px-3 py-2.5">
-            <Info size={14} className="mt-0.5 shrink-0 text-brown-muted" />
-            <p className="text-xs leading-relaxed text-brown-muted">
-              ไม่สามารถเข้าถึงตำแหน่งของคุณ — เรียงผลตามจังหวัดของน้อง{" "}
-              <strong className="text-brown">({petProvince ?? "ไม่ระบุ"})</strong>
-            </p>
+          <div className="mt-3 flex items-start gap-2 rounded-[14px] border border-[#ECE5DF] bg-fill-2 px-3.5 py-3">
+            <Info size={15} className="mt-0.5 shrink-0 text-ink-3" />
+            <div>
+              <p className="text-[13.5px] font-bold text-ink">ไม่ได้เปิดตำแหน่ง</p>
+              <p className="text-xs text-ink-2">
+                กำลังเรียงตามจังหวัด{" "}
+                <strong className="text-ink-2">({petProvince ?? "ไม่ระบุ"})</strong> แทนระยะทาง
+              </p>
+            </div>
           </div>
         )}
 
@@ -223,6 +228,9 @@ export default function HospitalFinderPage() {
             <EmptyState onClear={clearFilters} />
           ) : view === "list" ? (
             <div className="flex flex-col gap-2.5">
+              <p className="text-[13px] font-semibold text-ink-3">
+                พบ {filtered.length} แห่ง{province ? ` · ${province}` : ""}
+              </p>
               {filtered.map((h) => (
                 <HospitalCard key={h.id} hospital={h} onClick={() => setSelected(h)} />
               ))}
@@ -242,18 +250,20 @@ export default function HospitalFinderPage() {
 
 function EmptyState({ onClear }: { onClear: () => void }) {
   return (
-    <div className="flex flex-col items-center gap-3.5 px-10 pt-12 text-center">
-      <SearchX size={56} className="text-black/15" />
+    <div className="flex flex-col items-center gap-4 px-10 pt-10 text-center">
+      <div className="flex h-[84px] w-[84px] items-center justify-center rounded-[26px] bg-fill-2">
+        <SearchX size={40} strokeWidth={1.6} className="text-ink-3" />
+      </div>
       <div>
-        <p className="font-bold text-brown">ไม่พบโรงพยาบาลตามตัวกรอง</p>
-        <p className="mt-2 text-sm leading-relaxed text-brown-muted">
-          ลองเปลี่ยนจังหวัด หรือปิดตัวกรอง &quot;เปิด 24 ชม.&quot;
+        <p className="text-lg font-bold tracking-tight2 text-ink">ไม่พบโรงพยาบาลตามตัวกรอง</p>
+        <p className="mt-2 text-sm leading-relaxed text-ink-2">
+          ลองปรับจังหวัดหรือล้างตัวกรองเพื่อดูผลลัพธ์เพิ่มเติม
         </p>
       </div>
       <button
         type="button"
         onClick={onClear}
-        className="rounded-2xl border-[1.5px] border-coral px-6 py-2.5 text-sm font-bold text-coral"
+        className="flex h-12 items-center justify-center rounded-[14px] bg-gradient-cta px-6 text-[15px] font-bold tracking-tight2 text-white shadow-cta transition-transform active:scale-95"
       >
         ล้างตัวกรอง
       </button>

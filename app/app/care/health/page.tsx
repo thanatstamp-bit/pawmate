@@ -15,6 +15,14 @@ import {
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import HealthRecordForm, { type HealthRecord } from "@/components/care/HealthRecordForm";
+import { Avatar } from "@/components/ui";
+
+const TYPE_LABEL: Record<HealthRecord["type"], string> = {
+  vaccine: "วัคซีน",
+  deworm: "ถ่ายพยาธิ",
+  checkup: "ตรวจสุขภาพ",
+  other: "อื่นๆ",
+};
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -29,16 +37,15 @@ type Pet = {
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-const SPECIES_LABEL: Record<string, string> = { dog: "สุนัข", cat: "แมว" };
-
 const TYPE_META: Record<
   HealthRecord["type"],
   { icon: typeof ShieldPlus; dotColor: string; iconBg: string; iconColor: string }
 > = {
-  vaccine:  { icon: ShieldPlus, dotColor: "#FF6B5B", iconBg: "rgba(255,107,91,0.09)",   iconColor: "#FF6B5B" },
-  deworm:   { icon: Pill,       dotColor: "#1A8A6A", iconBg: "rgba(26,138,106,0.09)",   iconColor: "#1A8A6A" },
-  checkup:  { icon: Activity,   dotColor: "#5A8FD4", iconBg: "rgba(90,143,212,0.10)",   iconColor: "#5A8FD4" },
-  other:    { icon: FileText,   dotColor: "#B5B0AA", iconBg: "#F5F3F0",                 iconColor: "#8A8580" },
+  // Semantic timeline colors aligned to the design tokens (coral/teal/blue/ink).
+  vaccine:  { icon: ShieldPlus, dotColor: "#FF6B5B", iconBg: "#FFE9E4", iconColor: "#C13B2C" },
+  deworm:   { icon: Pill,       dotColor: "#2EC4B6", iconBg: "#DCF5F2", iconColor: "#137F75" },
+  checkup:  { icon: Activity,   dotColor: "#5B8DEF", iconBg: "#E5EDFC", iconColor: "#2F5FBF" },
+  other:    { icon: FileText,   dotColor: "#A39D95", iconBg: "#F4EEE9", iconColor: "#6B655E" },
 };
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -62,34 +69,11 @@ function formatDateThai(dateStr: string): string {
   });
 }
 
-function shortMonthThai(dateStr: string): string {
-  return new Date(dateStr + "T00:00:00").toLocaleDateString("th-TH", {
-    month: "short",
-    year: "2-digit",
-  });
-}
-
 function daysUntil(dateStr: string): number {
   const now = new Date();
   now.setHours(0, 0, 0, 0);
   const due = new Date(dateStr + "T00:00:00");
   return Math.floor((due.getTime() - now.getTime()) / 86400000);
-}
-
-function nextDueChip(
-  nextDueDate: string
-): { label: string; bg: string; color: string } | null {
-  const days = daysUntil(nextDueDate);
-  const month = shortMonthThai(nextDueDate);
-  const label = `ครั้งต่อไป ${month}`;
-
-  if (days < 0)
-    return { label: `เลยกำหนด ${Math.abs(days)} วัน`, bg: "rgba(155,34,34,0.11)", color: "#8B1A1A" };
-  if (days <= 7)
-    return { label, bg: "rgba(155,34,34,0.11)", color: "#8B1A1A" };
-  if (days <= 30)
-    return { label, bg: "rgba(168,112,24,0.12)", color: "#A06820" };
-  return { label, bg: "rgba(26,138,106,0.11)", color: "#146A52" };
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -197,9 +181,9 @@ export default function HealthPage() {
   if (loading) {
     return (
       <div className="flex min-h-screen flex-col">
-        <header className="flex h-14 shrink-0 items-center border-b border-black/5 px-1">
+        <header className="flex h-14 shrink-0 items-center border-b border-line px-1">
           <div className="flex h-11 w-11 items-center justify-center">
-            <ChevronLeft size={20} className="text-brown" />
+            <ChevronLeft size={20} className="text-ink" />
           </div>
           <div className="flex-1 text-center">
             <div className="mx-auto h-5 w-28 animate-pulse rounded bg-black/10" />
@@ -208,42 +192,42 @@ export default function HealthPage() {
         </header>
         <div className="flex flex-col gap-4 px-5 pt-4">
           {/* Pet header skeleton */}
-          <div className="flex items-center gap-3.5 rounded-2xl bg-[#F5F3F0] px-3.5 py-3">
-            <div className="h-16 w-16 shrink-0 animate-pulse rounded-full bg-[#E5E2DE]" />
+          <div className="flex items-center gap-3.5 rounded-2xl bg-fill-1 px-3.5 py-3">
+            <div className="h-16 w-16 shrink-0 animate-pulse rounded-full bg-fill-3" />
             <div className="flex flex-1 flex-col gap-2 pt-1">
-              <div className="h-[17px] w-[44%] animate-pulse rounded bg-[#E5E2DE]" />
-              <div className="h-3 w-[62%] animate-pulse rounded bg-[#EDEAE6]" />
+              <div className="h-[17px] w-[44%] animate-pulse rounded bg-fill-3" />
+              <div className="h-3 w-[62%] animate-pulse rounded bg-line" />
             </div>
-            <div className="h-8 w-8 shrink-0 animate-pulse rounded-xl bg-[#E5E2DE]" />
+            <div className="h-8 w-8 shrink-0 animate-pulse rounded-xl bg-fill-3" />
           </div>
           {/* Due section skeleton */}
-          <div className="flex flex-col gap-2.5 rounded-[14px] border-[1.5px] border-[#EDEAE6] p-3.5">
-            <div className="h-3 w-[36%] animate-pulse rounded bg-[#E5E2DE]" />
+          <div className="flex flex-col gap-2.5 rounded-panel border-[1.5px] border-line p-3.5">
+            <div className="h-3 w-[36%] animate-pulse rounded bg-fill-3" />
             {[0, 1, 2].map((i) => (
               <div key={i} className="flex items-center justify-between">
-                <div className="h-3 w-[44%] animate-pulse rounded bg-[#E5E2DE]" />
-                <div className="h-5 w-18 animate-pulse rounded-md bg-[#E5E2DE]" />
+                <div className="h-3 w-[44%] animate-pulse rounded bg-fill-3" />
+                <div className="h-5 w-18 animate-pulse rounded-md bg-fill-3" />
               </div>
             ))}
           </div>
           {/* Timeline skeleton */}
           <div className="flex flex-col gap-0">
             <div className="mb-2.5 flex items-center gap-2.5">
-              <div className="h-3.5 w-3.5 shrink-0 animate-pulse rounded-full bg-[#E5E2DE]" />
-              <div className="h-2.5 w-9 animate-pulse rounded bg-[#E5E2DE]" />
+              <div className="h-3.5 w-3.5 shrink-0 animate-pulse rounded-full bg-fill-3" />
+              <div className="h-2.5 w-9 animate-pulse rounded bg-fill-3" />
             </div>
             {[0, 1].map((i) => (
               <div key={i} className="mb-3.5 flex gap-2.5">
                 <div className="flex w-5 shrink-0 flex-col items-center">
-                  <div className="mt-[7px] h-2.5 w-2.5 shrink-0 animate-pulse rounded-full bg-[#E5E2DE]" />
-                  <div className="min-h-8 w-[1.5px] flex-1 bg-[#EDEAE6]" />
+                  <div className="mt-[7px] h-2.5 w-2.5 shrink-0 animate-pulse rounded-full bg-fill-3" />
+                  <div className="min-h-8 w-[1.5px] flex-1 bg-line" />
                 </div>
                 <div className="flex flex-1 gap-2 pb-3.5">
-                  <div className="mt-0.5 h-[30px] w-[30px] shrink-0 animate-pulse rounded-[9px] bg-[#E5E2DE]" />
+                  <div className="mt-0.5 h-[30px] w-[30px] shrink-0 animate-pulse rounded-[9px] bg-fill-3" />
                   <div className="flex flex-1 flex-col gap-1.5 pt-0.5">
-                    <div className="h-3 w-[62%] animate-pulse rounded bg-[#E5E2DE]" />
-                    <div className="h-2.5 w-[40%] animate-pulse rounded bg-[#EDEAE6]" />
-                    <div className="h-3 w-[76%] animate-pulse rounded bg-[#EDEAE6]" />
+                    <div className="h-3 w-[62%] animate-pulse rounded bg-fill-3" />
+                    <div className="h-2.5 w-[40%] animate-pulse rounded bg-line" />
+                    <div className="h-3 w-[76%] animate-pulse rounded bg-line" />
                   </div>
                 </div>
               </div>
@@ -252,7 +236,7 @@ export default function HealthPage() {
         </div>
         {/* FAB skeleton */}
         <div className="ml-auto mr-5 mt-auto pb-[calc(4.5rem+env(safe-area-inset-bottom))] pt-3">
-          <div className="h-[52px] w-[52px] animate-pulse rounded-full bg-[#E5E2DE]" />
+          <div className="h-[52px] w-[52px] animate-pulse rounded-full bg-fill-3" />
         </div>
       </div>
     );
@@ -261,81 +245,71 @@ export default function HealthPage() {
   return (
     <div className="flex min-h-screen flex-col">
 
-      {/* ── Header ── */}
-      <header className="flex h-14 shrink-0 items-center border-b border-black/5 px-1">
+      {/* ── Header — back + pet avatar + name (matches Health mockup) ── */}
+      <div className="flex shrink-0 items-center gap-3 border-b border-line px-[22px] pb-3.5 pt-1">
         <Link
           href="/app/care"
-          className="flex h-11 w-11 shrink-0 items-center justify-center text-brown"
+          className="flex h-[38px] w-[38px] shrink-0 items-center justify-center rounded-xl border-[1.5px] border-line bg-white text-ink transition-transform active:scale-95"
         >
           <ChevronLeft size={20} />
         </Link>
-        <p className="flex-1 text-center text-base font-bold text-brown">สมุดสุขภาพ</p>
-        {/* share icon — visual only */}
-        <div className="flex h-11 w-11 shrink-0 items-center justify-center text-brown-muted">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle cx="18" cy="19" r="3" />
-            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" /><line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
-          </svg>
-        </div>
-      </header>
-
-      <div className="flex flex-col gap-3.5 px-5 pb-[calc(6rem+env(safe-area-inset-bottom))] pt-4">
-
-        {/* ── Pet Header ── */}
         {activePet && (
           <button
             type="button"
             onClick={() => pets.length > 1 && setSwitcherOpen(true)}
-            className="flex w-full items-center gap-3.5 rounded-2xl bg-[#F5F3F0] px-3.5 py-3 text-left"
+            className="flex min-w-0 flex-1 items-center gap-3 text-left"
           >
-            <div className="h-16 w-16 shrink-0 overflow-hidden rounded-full border-2 border-[#D5D1CC] bg-cream">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={activePet.photos[0]} alt={activePet.name} className="h-full w-full object-cover" />
-            </div>
+            <Avatar src={activePet.photos[0]} name={activePet.name} size={50} square />
             <div className="min-w-0 flex-1">
-              <p className="text-lg font-bold text-brown">{activePet.name}</p>
-              <p className="mt-0.5 text-xs text-brown-muted">
-                {SPECIES_LABEL[activePet.species] ?? activePet.species} · {activePet.breed} · {calcAge(activePet.birth_month)}
+              <p className="text-[11.5px] font-semibold text-ink-3">สมุดสุขภาพ</p>
+              <p className="truncate text-lg font-bold leading-[1.1] tracking-title text-ink">
+                {activePet.name}{" "}
+                <span className="text-sm font-medium text-ink-2">· {calcAge(activePet.birth_month)}</span>
               </p>
             </div>
-            {pets.length > 1 && (
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px] border border-[#EDEAE6] bg-white">
-                <ChevronDown size={14} className="text-brown-muted" />
-              </div>
-            )}
+            {pets.length > 1 && <ChevronDown size={16} className="shrink-0 text-ink-3" />}
           </button>
         )}
+      </div>
 
-        {/* ── ใกล้ถึงกำหนด ── */}
+      <div className="flex flex-col gap-5 px-[22px] pb-[calc(6rem+env(safe-area-inset-bottom))] pt-4">
+
+        {/* ── ใกล้ถึงกำหนด ── separate colored cards per item */}
         {dueRecords.length > 0 && (
-          <div
-            className="rounded-[14px] p-3.5"
-            style={{ background: "rgba(155,34,34,0.03)", border: "1.5px solid rgba(155,34,34,0.18)" }}
-          >
+          <div>
             <div className="mb-2.5 flex items-center gap-1.5">
-              <Clock size={13} style={{ color: "#8B1A1A" }} />
-              <span className="text-xs font-bold" style={{ color: "#8B1A1A" }}>ใกล้ถึงกำหนด</span>
+              <Clock size={15} className="text-ink" />
+              <span className="text-base font-bold tracking-tight2 text-ink">ใกล้ถึงกำหนด</span>
             </div>
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2.5">
               {dueRecords.map((r) => {
                 const days = daysUntil(r.next_due_date!);
                 const urgent = days <= 7;
                 const Meta = TYPE_META[r.type];
                 const Icon = Meta.icon;
                 return (
-                  <div key={r.id} className="flex items-center gap-2">
+                  <div
+                    key={r.id}
+                    className="flex items-center gap-3 rounded-panel border bg-white p-3.5"
+                    style={{ borderColor: urgent ? "rgba(224,68,90,.30)" : "rgba(255,184,76,.45)" }}
+                  >
                     <div
-                      className="flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-[7px]"
+                      className="flex h-[38px] w-[38px] shrink-0 items-center justify-center rounded-xl"
                       style={{ background: Meta.iconBg }}
                     >
-                      <Icon size={11} style={{ color: Meta.iconColor }} />
+                      <Icon size={18} style={{ color: Meta.iconColor }} />
                     </div>
-                    <span className="flex-1 text-xs font-medium text-brown">{r.title}</span>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[14.5px] font-bold leading-tight text-ink">{r.title}</p>
+                      <p className="mt-px text-[12.5px] text-ink-2">
+                        ครบกำหนด {formatDateThai(r.next_due_date!)}
+                      </p>
+                    </div>
                     <span
-                      className="shrink-0 rounded-[6px] px-2 py-0.5 text-[11px] font-bold"
+                      className="shrink-0 rounded-lg px-2.5 py-1 text-[11px] font-bold"
                       style={{
-                        background: urgent ? "rgba(155,34,34,0.12)" : "rgba(168,112,24,0.12)",
-                        color:      urgent ? "#8B1A1A"              : "#A06820",
+                        background: urgent ? "#FBE2E6" : "#FFF1DA",
+                        color:      urgent ? "#B12C3F" : "#C49010",
                       }}
                     >
                       {days === 0 ? "วันนี้" : `อีก ${days} วัน`}
@@ -351,19 +325,19 @@ export default function HealthPage() {
         {records.length === 0 ? (
           /* Empty state */
           <div className="flex flex-col items-center gap-3.5 py-8 text-center">
-            <div className="flex h-[88px] w-[88px] items-center justify-center rounded-full bg-[#F5F3F0]">
-              <FilePlus size={38} strokeWidth={1.6} className="text-[#D5D1CC]" />
+            <div className="flex h-[88px] w-[88px] items-center justify-center rounded-full bg-blue-soft">
+              <FilePlus size={38} strokeWidth={1.6} className="text-blue-ink" />
             </div>
             <div>
-              <p className="text-base font-bold text-brown">ยังไม่มีบันทึกสุขภาพ</p>
-              <p className="mx-auto mt-2 max-w-[240px] text-[13px] leading-[1.7] text-brown-muted">
+              <p className="text-base font-bold tracking-tight2 text-ink">ยังไม่มีบันทึกสุขภาพ</p>
+              <p className="mx-auto mt-2 max-w-[240px] text-[13px] leading-[1.7] text-ink-2">
                 บันทึกวัคซีน การถ่ายพยาธิ และการตรวจสุขภาพไว้ที่นี่ เพื่อรับการแจ้งเตือนอัตโนมัติ
               </p>
             </div>
             <button
               type="button"
               onClick={handleOpenAdd}
-              className="mt-1 flex h-[52px] items-center justify-center gap-2 rounded-2xl bg-coral px-7 font-bold text-white shadow-[0_4px_14px_rgba(255,107,91,0.30)]"
+              className="mt-1 flex h-[52px] items-center justify-center gap-2 rounded-2xl bg-gradient-cta px-7 font-bold tracking-tight2 text-white shadow-cta transition-transform active:scale-[.98]"
             >
               <Plus size={16} strokeWidth={2.5} />
               เพิ่มบันทึกแรก
@@ -371,23 +345,16 @@ export default function HealthPage() {
           </div>
         ) : (
           /* Timeline */
-          <div className="flex flex-col">
+          <div className="flex flex-col gap-1">
             {years.map((year) => {
               const yearRecords = byYear[year];
               return (
                 <div key={year}>
-                  {/* Year node */}
-                  <div className="mb-0.5 flex items-start gap-2.5">
-                    <div className="flex w-5 shrink-0 flex-col items-center">
-                      <div
-                        className="h-3.5 w-3.5 shrink-0 rounded-full"
-                        style={{ background: "#F5F3F0", border: "1.5px solid #EDEAE6" }}
-                      />
-                      <div className="min-h-2 w-[1.5px] flex-1 bg-[#EDEAE6]" />
-                    </div>
-                    <span className="pt-px text-[11px] font-bold tracking-widest text-brown-muted">
-                      {year}
-                    </span>
+                  {/* Year header — label + divider + count */}
+                  <div className="mb-3 flex items-center gap-2.5">
+                    <span className="text-[15px] font-bold tracking-tight2 text-ink">{year}</span>
+                    <div className="h-px flex-1 bg-line" />
+                    <span className="text-xs font-semibold text-ink-3">{yearRecords.length} รายการ</span>
                   </div>
 
                   {/* Entries */}
@@ -396,58 +363,50 @@ export default function HealthPage() {
                     entryIndex++;
                     const Meta = TYPE_META[r.type];
                     const Icon = Meta.icon;
-                    const chip = r.next_due_date ? nextDueChip(r.next_due_date) : null;
 
                     return (
                       <button
                         key={r.id}
                         type="button"
                         onClick={() => handleOpenEdit(r)}
-                        className="flex w-full items-start gap-2.5 text-left"
+                        className="flex w-full items-stretch gap-3 text-left"
                       >
-                        {/* Dot + vertical line */}
-                        <div className="flex w-5 shrink-0 flex-col items-center">
+                        {/* Type icon + connector line */}
+                        <div className="flex flex-col items-center">
                           <div
-                            className="mt-[7px] h-2.5 w-2.5 shrink-0 rounded-full bg-white"
-                            style={{ border: `2px solid ${Meta.dotColor}` }}
-                          />
-                          {!isLast && (
-                            <div className="min-h-3 w-[1.5px] flex-1 bg-[#EDEAE6]" />
-                          )}
+                            className="flex h-[38px] w-[38px] shrink-0 items-center justify-center rounded-xl"
+                            style={{ background: Meta.iconBg }}
+                          >
+                            <Icon size={18} style={{ color: Meta.iconColor }} />
+                          </div>
+                          {!isLast && <div className="min-h-3 w-[1.5px] flex-1 bg-line" />}
                         </div>
 
                         {/* Entry card */}
-                        <div className="flex flex-1 items-start gap-2 pb-3.5">
-                          {/* Type icon */}
-                          <div
-                            className="mt-px flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-[9px]"
-                            style={{ background: Meta.iconBg }}
-                          >
-                            <Icon size={14} style={{ color: Meta.iconColor }} />
-                          </div>
-
-                          {/* Text */}
-                          <div className="min-w-0 flex-1">
-                            <div className="mb-[3px] flex items-start justify-between gap-1.5">
-                              <span className="text-[13px] font-bold leading-[1.3] text-brown">
-                                {r.title}
-                              </span>
-                              {chip && (
-                                <span
-                                  className="shrink-0 rounded-[6px] px-1.5 py-[2px] text-[10px] font-semibold"
-                                  style={{ background: chip.bg, color: chip.color }}
-                                >
-                                  {chip.label}
-                                </span>
-                              )}
-                            </div>
-                            <span className="block text-[11px] text-[#B5B0AA]">
+                        <div className="min-w-0 flex-1 pb-5">
+                          <div className="flex items-baseline justify-between gap-2">
+                            <span className="truncate text-[15px] font-bold leading-tight tracking-tight2 text-ink">
+                              {r.title}
+                            </span>
+                            <span className="shrink-0 text-xs font-semibold text-ink-3">
                               {formatDateThai(r.record_date)}
                             </span>
-                            {r.notes && (
-                              <span className="mt-[3px] block text-xs text-[#5A5650]">{r.notes}</span>
-                            )}
                           </div>
+                          <span
+                            className="mt-1.5 inline-flex rounded-md px-2 py-[2px] text-[11px] font-semibold"
+                            style={{ background: Meta.iconBg, color: Meta.iconColor }}
+                          >
+                            {TYPE_LABEL[r.type]}
+                          </span>
+                          {r.notes && (
+                            <p className="mt-1.5 text-[13px] leading-relaxed text-ink-2">{r.notes}</p>
+                          )}
+                          {r.next_due_date && (
+                            <div className="mt-2 inline-flex items-center gap-1 rounded-[9px] bg-fill-2 px-2.5 py-1 text-[11.5px] font-semibold text-ink-2">
+                              <Clock size={11} />
+                              ครั้งถัดไป {formatDateThai(r.next_due_date)}
+                            </div>
+                          )}
                         </div>
                       </button>
                     );
@@ -464,8 +423,7 @@ export default function HealthPage() {
         <button
           type="button"
           onClick={handleOpenAdd}
-          className="fixed bottom-[calc(4.5rem+env(safe-area-inset-bottom))] right-5 flex h-[52px] w-[52px] items-center justify-center rounded-full bg-coral text-white"
-          style={{ boxShadow: "0 4px 16px rgba(255,107,91,0.36)" }}
+          className="fixed bottom-[calc(4.5rem+env(safe-area-inset-bottom))] right-5 flex h-[52px] w-[52px] items-center justify-center rounded-full bg-gradient-cta text-white shadow-cta transition-transform active:scale-95"
         >
           <Plus size={22} strokeWidth={2.5} />
         </button>
@@ -475,8 +433,8 @@ export default function HealthPage() {
       {switcherOpen && (
         <div className="fixed inset-0 z-[60] flex flex-col bg-black/50">
           <div className="flex-1" onClick={() => setSwitcherOpen(false)} />
-          <div className="mx-auto flex w-full max-w-[480px] flex-col rounded-t-[28px] bg-white p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))]">
-            <p className="mb-3 font-bold text-brown">สลับน้อง</p>
+          <div className="mx-auto flex w-full max-w-[480px] flex-col rounded-t-card bg-white p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))]">
+            <p className="mb-3 font-bold text-ink">สลับน้อง</p>
             <div className="flex flex-col gap-2">
               {pets.map((pet) => (
                 <button
@@ -489,7 +447,7 @@ export default function HealthPage() {
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={pet.photos[0]} alt={pet.name} className="h-12 w-12 rounded-xl object-cover" />
-                  <span className="font-bold text-brown">{pet.name}</span>
+                  <span className="font-bold text-ink">{pet.name}</span>
                   {pet.id === activePetId && (
                     <span className="ml-auto rounded-full bg-coral/15 px-2 py-0.5 text-[10px] font-bold text-coral">
                       กำลังใช้อยู่

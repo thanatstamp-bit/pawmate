@@ -2,7 +2,17 @@
 
 import { use, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { ChevronLeft, MapPin, Phone, Check, CheckCheck } from "lucide-react";
+import {
+  ChevronLeft,
+  MapPin,
+  Phone,
+  Check,
+  CheckCheck,
+  Droplet,
+  AlertTriangle,
+  HeartHandshake,
+  SearchX,
+} from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { matchDonors, type DonorRow, type MatchResult } from "@/lib/blood-matching";
 
@@ -52,12 +62,14 @@ function DonorCard({
   isOwner,
   requestId,
   hasResponded,
+  crossmatch,
   onResponded,
 }: {
   donor: DonorRow;
   isOwner: boolean;
   requestId: string;
   hasResponded: boolean;
+  crossmatch?: boolean;
   onResponded: () => void;
 }) {
   const supabase = createClient();
@@ -67,9 +79,6 @@ function DonorCard({
   const [done, setDone] = useState(hasResponded);
 
   const pet = donor.pets;
-  const profileName = Array.isArray(pet.profiles)
-    ? pet.profiles[0]?.display_name
-    : (pet.profiles as { display_name: string | null } | null)?.display_name;
 
   async function respond() {
     if (!message.trim()) return;
@@ -86,64 +95,80 @@ function DonorCard({
   }
 
   return (
-    <div className="rounded-2xl bg-white p-4 shadow-card">
+    <div
+      className={`rounded-[16px] p-3 ${
+        crossmatch ? "border border-[#F1E6CE] bg-[#FFFBF5]" : "bg-white shadow-[0_8px_22px_-14px_rgba(120,72,60,.2)]"
+      }`}
+    >
       <div className="flex items-center gap-3">
-        <div className="h-11 w-11 overflow-hidden rounded-xl bg-cream">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={pet.photos[0]} alt={pet.name} className="h-full w-full object-cover" />
+        <div className="flex h-[46px] w-[46px] shrink-0 items-center justify-center overflow-hidden rounded-[14px] bg-gradient-avatar">
+          {pet.photos?.[0] ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={pet.photos[0]} alt={pet.name} className="h-full w-full object-cover" />
+          ) : (
+            <span className="text-[19px] font-bold text-white">{pet.name?.trim()?.[0] ?? "🐾"}</span>
+          )}
         </div>
         <div className="min-w-0 flex-1">
-          <p className="font-bold text-brown">{pet.name}</p>
-          <p className="text-[12px] text-brown-muted">
-            กรุ๊ป {bloodTypeLabel(donor.blood_type)} · {donor.weight_kg} กก.
-          </p>
-          <div className="mt-0.5 flex items-center gap-1 text-[12px] text-brown-muted">
-            <MapPin size={10} />
-            <span>{pet.province}</span>
-          </div>
+          <p className="text-[15px] font-bold text-ink">{pet.name}</p>
+          <p className="mt-px text-[12.5px] text-ink-2">{donor.weight_kg} กก.</p>
         </div>
         {done ? (
-          <span className="flex items-center gap-1 text-[12px] font-bold text-teal-dark">
+          <span className="flex shrink-0 items-center gap-1 text-[12px] font-bold text-teal-ink">
             <CheckCheck size={14} /> แจ้งแล้ว
           </span>
-        ) : !isOwner && (
-          <button
-            type="button"
-            onClick={() => setShowForm(true)}
-            className="rounded-xl bg-teal/10 px-3 py-2 text-[12px] font-bold text-teal-dark"
-          >
-            แจ้งความสนใจ
-          </button>
+        ) : crossmatch ? (
+          <span className="shrink-0 whitespace-nowrap rounded-[10px] bg-amber-soft px-[11px] py-1.5 text-[12px] font-semibold text-amber-deep">
+            ไม่ทราบหมู่
+          </span>
+        ) : (
+          <span className="shrink-0 whitespace-nowrap rounded-[10px] bg-teal-soft px-[11px] py-1.5 text-[13px] font-bold text-teal-ink">
+            {bloodTypeLabel(donor.blood_type)}
+          </span>
         )}
       </div>
 
-      {showForm && !done && (
-        <div className="mt-3 flex flex-col gap-2">
-          <textarea
-            rows={2}
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            placeholder="ข้อความถึงเจ้าของประกาศ..."
-            className="w-full resize-none rounded-xl border border-black/10 bg-cream px-3 py-2.5 text-sm text-brown placeholder:text-brown-muted/50"
-          />
-          <div className="flex gap-2">
+      {/* Respond action (non-owner, not yet responded) */}
+      {!isOwner && !done && (
+        <>
+          {!showForm ? (
             <button
               type="button"
-              onClick={() => setShowForm(false)}
-              className="flex-1 rounded-xl border border-black/10 py-2.5 text-sm font-semibold text-brown-muted"
+              onClick={() => setShowForm(true)}
+              className="mt-3 flex h-11 w-full items-center justify-center gap-2 rounded-[12px] bg-gradient-cta text-[14px] font-bold text-white shadow-cta transition-transform active:scale-[.98]"
             >
-              ยกเลิก
+              <HeartHandshake size={16} />
+              ยินดีช่วยเหลือ
             </button>
-            <button
-              type="button"
-              onClick={respond}
-              disabled={submitting || !message.trim()}
-              className="flex-1 rounded-xl bg-teal py-2.5 text-sm font-bold text-white disabled:opacity-40"
-            >
-              {submitting ? "กำลังส่ง..." : "ส่ง"}
-            </button>
-          </div>
-        </div>
+          ) : (
+            <div className="mt-3 flex flex-col gap-2">
+              <textarea
+                rows={2}
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                placeholder="ข้อความถึงเจ้าของประกาศ..."
+                className="w-full resize-none rounded-[12px] border-[1.5px] border-line bg-[#FBF7F3] px-3 py-2.5 text-sm text-ink outline-none placeholder:text-ink-3/60"
+              />
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowForm(false)}
+                  className="flex-1 rounded-[12px] border-[1.5px] border-line py-2.5 text-sm font-semibold text-ink-2"
+                >
+                  ยกเลิก
+                </button>
+                <button
+                  type="button"
+                  onClick={respond}
+                  disabled={submitting || !message.trim()}
+                  className="flex-1 rounded-[12px] bg-gradient-cta py-2.5 text-sm font-bold text-white shadow-cta disabled:opacity-40"
+                >
+                  {submitting ? "กำลังส่ง..." : "ส่ง"}
+                </button>
+              </div>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
@@ -154,21 +179,26 @@ function DonorCard({
 function ResponseRow({ resp }: { resp: ResponseRecord & { pets: { name: string; photos: string[]; province: string } | null } }) {
   if (!resp.pets) return null;
   return (
-    <div className="flex items-start gap-3 rounded-2xl bg-white p-4 shadow-card">
-      <div className="h-10 w-10 overflow-hidden rounded-xl bg-cream">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={resp.pets.photos[0]} alt={resp.pets.name} className="h-full w-full object-cover" />
-      </div>
-      <div className="min-w-0 flex-1">
-        <p className="font-bold text-brown">{resp.pets.name}</p>
-        <div className="flex items-center gap-1 text-[11px] text-brown-muted">
-          <MapPin size={10} />
-          <span>{resp.pets.province}</span>
-          <span className="mx-1">·</span>
-          <span>{timeAgo(resp.created_at)}</span>
+    <div className="rounded-[16px] bg-white p-3.5 shadow-[0_8px_22px_-14px_rgba(120,72,60,.2)]">
+      <div className="flex items-center gap-3">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gradient-avatar">
+          {resp.pets.photos?.[0] ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={resp.pets.photos[0]} alt={resp.pets.name} className="h-full w-full object-cover" />
+          ) : (
+            <span className="text-[16px] font-bold text-white">{resp.pets.name?.trim()?.[0] ?? "🐾"}</span>
+          )}
         </div>
-        {resp.message && <p className="mt-1 text-[13px] text-brown">{resp.message}</p>}
+        <div className="min-w-0 flex-1">
+          <p className="text-[14.5px] font-bold text-ink">{resp.pets.name}</p>
+          <div className="mt-px flex items-center gap-1 text-[12px] text-ink-2">
+            <MapPin size={11} />
+            <span>{resp.pets.province}</span>
+          </div>
+        </div>
+        <span className="shrink-0 text-[11.5px] font-medium text-ink-3">{timeAgo(resp.created_at)}</span>
       </div>
+      {resp.message && <p className="mt-2.5 text-[13.5px] leading-relaxed text-ink">{resp.message}</p>}
     </div>
   );
 }
@@ -275,16 +305,26 @@ export default function BloodDetailPage({ params }: { params: Promise<{ id: stri
     setFulfilling(false);
   }
 
+  function Header() {
+    return (
+      <div className="flex shrink-0 items-center gap-3 border-b border-line px-[22px] pb-3 pt-1">
+        <Link
+          href="/app/care/blood"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[13px] border-[1.5px] border-line bg-white text-ink shadow-[0_6px_16px_-10px_rgba(120,72,60,.3)] transition-transform active:scale-95"
+        >
+          <ChevronLeft size={20} />
+        </Link>
+        <h1 className="flex-1 truncate text-[19px] font-bold tracking-title text-ink">คำขอรับบริจาคเลือด</h1>
+      </div>
+    );
+  }
+
   if (loading) {
     return (
       <div className="flex min-h-screen flex-col">
-        <div className="flex h-14 items-center gap-1 border-b border-black/5 px-1">
-          <Link href="/app/care/blood" className="flex h-11 w-11 items-center justify-center text-brown">
-            <ChevronLeft size={20} />
-          </Link>
-        </div>
+        <Header />
         <div className="flex flex-1 items-center justify-center">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-black/10 border-t-rose" />
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-line border-t-rose" />
         </div>
       </div>
     );
@@ -293,116 +333,123 @@ export default function BloodDetailPage({ params }: { params: Promise<{ id: stri
   if (!request) {
     return (
       <div className="flex min-h-screen flex-col">
-        <div className="flex h-14 items-center gap-1 border-b border-black/5 px-1">
-          <Link href="/app/care/blood" className="flex h-11 w-11 items-center justify-center text-brown">
-            <ChevronLeft size={20} />
-          </Link>
-        </div>
+        <Header />
         <div className="flex flex-1 items-center justify-center">
-          <p className="text-brown-muted">ไม่พบประกาศนี้</p>
+          <p className="text-ink-2">ไม่พบประกาศนี้</p>
         </div>
       </div>
     );
   }
 
-  const speciesIcon = request.species === "dog" ? "🐕" : "🐈";
+  const fulfilled = request.status === "fulfilled";
+  const totalMatched = matchResult.exact.length + matchResult.crossmatch.length;
 
   return (
     <div className="flex min-h-screen flex-col pb-28">
-      {/* Header */}
-      <div className="flex h-14 shrink-0 items-center gap-1 border-b border-black/5 px-1">
-        <Link href="/app/care/blood" className="flex h-11 w-11 items-center justify-center text-brown">
-          <ChevronLeft size={20} />
-        </Link>
-        <p className="font-bold text-brown">รายละเอียดประกาศ</p>
-      </div>
+      <Header />
 
-      <div className="flex flex-col gap-4 px-5 pt-4">
-        {/* Request card */}
-        <div className="rounded-2xl bg-white p-5 shadow-card">
-          <div className="mb-3 flex items-start justify-between gap-2">
-            <div className="flex items-center gap-2.5">
-              <span className="text-3xl">{speciesIcon}</span>
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="text-2xl font-bold text-brown">{bloodTypeLabel(request.blood_type_needed)}</span>
-                  {request.urgency === "urgent" && (
-                    <span className="rounded-full bg-rose/10 px-2.5 py-0.5 text-[12px] font-bold text-rose">ด่วนมาก</span>
-                  )}
-                </div>
-                <p className="text-[13px] text-brown-muted">{request.species === "dog" ? "สุนัข" : "แมว"}</p>
-              </div>
-            </div>
-            <span className={`rounded-full px-2.5 py-1 text-[11px] font-bold ${
-              request.status === "open" ? "bg-teal/10 text-teal-dark" : "bg-black/8 text-brown-muted"
-            }`}>
-              {request.status === "open" ? "เปิดรับ" : "ปิดแล้ว"}
+      <div className="flex flex-col gap-3 px-[22px] pt-4">
+        {/* Request summary card */}
+        <div className="rounded-card bg-white p-[18px] shadow-card">
+          <div className="mb-3.5 flex items-center justify-between">
+            <span className="inline-flex items-center gap-1.5 rounded-[10px] bg-fill-2 px-2.5 py-1 text-[12.5px] font-semibold text-ink-2">
+              <Droplet size={14} />
+              {request.species === "dog" ? "สุนัข" : "แมว"}
             </span>
-          </div>
-
-          <div className="flex flex-col gap-1.5 border-t border-black/5 pt-3">
-            <div className="flex items-start gap-2">
-              <span className="min-w-[72px] text-[12px] text-brown-muted">โรงพยาบาล</span>
-              <span className="text-[13px] font-semibold text-brown">{request.hospital_name}</span>
-            </div>
-            <div className="flex items-start gap-2">
-              <span className="min-w-[72px] text-[12px] text-brown-muted">จังหวัด</span>
-              <span className="flex items-center gap-1 text-[13px] font-semibold text-brown">
-                <MapPin size={12} className="text-brown-muted" />
-                {request.province}
+            {fulfilled ? (
+              <span className="inline-flex items-center rounded-[9px] bg-teal-soft px-2.5 py-1 text-[11.5px] font-bold text-teal-ink">
+                ปิดแล้ว
               </span>
-            </div>
-            {request.details && (
-              <div className="flex items-start gap-2">
-                <span className="min-w-[72px] text-[12px] text-brown-muted">รายละเอียด</span>
-                <span className="text-[13px] text-brown">{request.details}</span>
-              </div>
+            ) : request.urgency === "urgent" ? (
+              <span className="inline-flex items-center rounded-[9px] bg-rose px-2.5 py-1 text-[11.5px] font-bold text-white">
+                ด่วนมาก
+              </span>
+            ) : (
+              <span className="inline-flex items-center rounded-[9px] bg-fill-2 px-2.5 py-1 text-[11.5px] font-semibold text-ink-2">
+                ทั่วไป
+              </span>
             )}
-            <div className="flex items-start gap-2">
-              <span className="min-w-[72px] text-[12px] text-brown-muted">โพสต์เมื่อ</span>
-              <span className="text-[12px] text-brown-muted">{timeAgo(request.created_at)}</span>
-            </div>
           </div>
 
-          {/* Contact — visible to all */}
-          <a
-            href={`tel:${request.contact}`}
-            className="mt-4 flex h-11 items-center justify-center gap-2 rounded-xl bg-rose/10 font-bold text-rose"
-          >
-            <Phone size={16} />
-            <span>โทร {request.contact}</span>
-          </a>
+          <div className="flex items-center gap-3.5">
+            <div className="flex h-[58px] w-[58px] shrink-0 items-center justify-center rounded-[17px] bg-rose-soft">
+              <Droplet size={26} className="text-rose" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-[12px] font-semibold text-ink-3">ต้องการหมู่เลือด</p>
+              <p className="text-[30px] font-bold leading-[1.05] tracking-title text-ink">
+                {bloodTypeLabel(request.blood_type_needed)}
+              </p>
+            </div>
+            <span className="shrink-0 self-start text-[12.5px] font-medium text-ink-3">{timeAgo(request.created_at)}</span>
+          </div>
 
-          {/* Mark fulfilled (owner only) */}
-          {isOwner && request.status === "open" && (
-            <button
-              type="button"
-              onClick={markFulfilled}
-              disabled={fulfilling}
-              className="mt-2 flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-teal/10 font-bold text-teal-dark disabled:opacity-40"
-            >
-              <Check size={16} />
-              {fulfilling ? "กำลังอัปเดต..." : "ทำเครื่องหมายว่าหาได้แล้ว"}
-            </button>
+          {request.details && (
+            <p className="mt-3.5 border-t border-[#F4EDE7] pt-3.5 text-[14px] leading-relaxed text-ink">
+              {request.details}
+            </p>
           )}
+
+          <div className="mt-3.5 flex items-center gap-2">
+            <MapPin size={15} className="shrink-0 text-ink-3" />
+            <span className="text-[13.5px] font-semibold text-ink">{request.hospital_name}</span>
+            <span className="text-[13px] text-ink-3">· {request.province}</span>
+          </div>
         </div>
 
+        {/* Contact card */}
+        <a
+          href={`tel:${request.contact}`}
+          className="flex items-center gap-3 rounded-panel bg-white p-3.5 shadow-card transition-transform active:scale-[.99]"
+        >
+          <div className="flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-[13px] bg-teal-soft">
+            <Phone size={18} className="text-teal-ink" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-[14.5px] font-bold text-ink">โทรหาผู้ประสานงาน</p>
+            <p className="mt-px text-[12.5px] text-ink-2">{request.contact}</p>
+          </div>
+          <div className="flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-[13px] bg-blue-soft">
+            <Phone size={18} className="text-blue-ink" />
+          </div>
+        </a>
+
+        {/* Fulfilled celebration */}
+        {fulfilled && (
+          <div className="flex animate-pop items-center gap-3 rounded-panel border border-teal/45 bg-teal-soft p-4">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[15px] bg-teal shadow-[0_8px_18px_-8px_rgba(46,196,182,.6)]">
+              <Check size={24} className="text-white" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-[16px] font-bold tracking-tight2 text-teal-ink">ได้รับความช่วยเหลือแล้ว</p>
+              <p className="mt-0.5 text-[13px] text-teal-ink">ขอบคุณผู้บริจาคทุกคนที่ช่วยชีวิตน้อง</p>
+            </div>
+          </div>
+        )}
+
         {/* ─── Donor section (non-owner sees matching donors) ─── */}
-        {!isOwner && request.status === "open" && (
+        {!isOwner && !fulfilled && (
           <>
-            {matchResult.exact.length === 0 && matchResult.crossmatch.length === 0 ? (
-              <div className="rounded-2xl border-2 border-dashed border-black/8 bg-white/60 py-8 text-center">
-                <p className="font-bold text-brown">ยังไม่มีผู้บริจาคที่ตรงเกณฑ์</p>
-                <p className="mt-1 text-sm text-brown-muted">ลองเช็คใหม่ภายหลัง หรือโทรติดต่อโดยตรง</p>
+            {totalMatched === 0 ? (
+              <div className="mt-3 flex flex-col items-center rounded-panel border-[1.5px] border-dashed border-fill-3 bg-[#FBF7F3] px-6 py-[30px] text-center">
+                <div className="flex h-14 w-14 items-center justify-center rounded-[18px] bg-fill-2">
+                  <SearchX size={26} className="text-ink-3" />
+                </div>
+                <p className="mt-3.5 text-[15px] font-bold text-ink">ยังไม่มีผู้บริจาคที่เข้าเกณฑ์</p>
+                <p className="mt-1.5 text-[13px] leading-relaxed text-ink-2">
+                  ยังไม่มีผู้บริจาคเข้าเกณฑ์ในจังหวัดนี้ — ลองเช็คใหม่ภายหลัง หรือโทรติดต่อโดยตรง
+                </p>
               </div>
             ) : (
               <>
+                {/* Exact-match donors */}
+                <div className="mb-1 mt-3 flex items-baseline gap-2 px-0.5">
+                  <span className="text-[16px] font-bold tracking-tight2 text-ink">ผู้บริจาคที่เข้าเกณฑ์ในจังหวัดนี้</span>
+                  <span className="text-[14px] font-bold text-teal-ink">{totalMatched} ตัว</span>
+                </div>
+
                 {matchResult.exact.length > 0 && (
-                  <div className="flex flex-col gap-3">
-                    <div className="flex items-center gap-2">
-                      <p className="text-[13px] font-bold text-brown">กรุ๊ปตรง ({matchResult.exact.length})</p>
-                      <div className="h-px flex-1 bg-black/8" />
-                    </div>
+                  <div className="flex flex-col gap-2.5">
                     {matchResult.exact.map((d) => (
                       <DonorCard
                         key={d.id}
@@ -415,24 +462,28 @@ export default function BloodDetailPage({ params }: { params: Promise<{ id: stri
                     ))}
                   </div>
                 )}
+
+                {/* Crossmatch donors */}
                 {matchResult.crossmatch.length > 0 && (
-                  <div className="flex flex-col gap-3">
-                    <div className="flex items-center gap-2">
-                      <p className="text-[13px] font-bold text-brown">ต้องตรวจ crossmatch ({matchResult.crossmatch.length})</p>
-                      <div className="h-px flex-1 bg-black/8" />
+                  <>
+                    <div className="mb-1 mt-2 flex items-center gap-1.5 px-0.5">
+                      <AlertTriangle size={15} className="text-amber-deep" />
+                      <span className="text-[13.5px] font-bold text-amber-deep">ต้องตรวจ crossmatch ก่อน</span>
                     </div>
-                    <p className="text-[11px] text-brown-muted">กรุ๊ปเลือดไม่ทราบ ต้องตรวจ crossmatch ก่อนรับบริจาค</p>
-                    {matchResult.crossmatch.map((d) => (
-                      <DonorCard
-                        key={d.id}
-                        donor={d}
-                        isOwner={isOwner}
-                        requestId={request.id}
-                        hasResponded={respondedIds.has(d.pet_id)}
-                        onResponded={() => setRespondedIds((prev) => new Set(Array.from(prev).concat(d.pet_id)))}
-                      />
-                    ))}
-                  </div>
+                    <div className="flex flex-col gap-2.5">
+                      {matchResult.crossmatch.map((d) => (
+                        <DonorCard
+                          key={d.id}
+                          donor={d}
+                          isOwner={isOwner}
+                          requestId={request.id}
+                          crossmatch
+                          hasResponded={respondedIds.has(d.pet_id)}
+                          onResponded={() => setRespondedIds((prev) => new Set(Array.from(prev).concat(d.pet_id)))}
+                        />
+                      ))}
+                    </div>
+                  </>
                 )}
               </>
             )}
@@ -441,25 +492,40 @@ export default function BloodDetailPage({ params }: { params: Promise<{ id: stri
 
         {/* ─── Responses section (request owner sees who responded) ─── */}
         {isOwner && (
-          <div className="flex flex-col gap-3">
-            <div className="flex items-center gap-2">
-              <p className="text-[13px] font-bold text-brown">
-                ผู้แจ้งความสนใจ {responses.length > 0 ? `(${responses.length})` : ""}
-              </p>
-              <div className="h-px flex-1 bg-black/8" />
+          <>
+            <div className="mb-1 mt-3 flex items-baseline gap-2 px-0.5">
+              <span className="text-[16px] font-bold tracking-tight2 text-ink">การตอบรับ</span>
+              {responses.length > 0 && (
+                <span className="text-[14px] font-bold text-coral-ink">{responses.length}</span>
+              )}
             </div>
             {responses.length === 0 ? (
-              <div className="rounded-2xl border-2 border-dashed border-black/8 bg-white/60 py-8 text-center">
-                <p className="text-sm text-brown-muted">ยังไม่มีผู้แจ้งความสนใจ</p>
+              <div className="rounded-panel border-[1.5px] border-dashed border-fill-3 bg-[#FBF7F3] py-8 text-center">
+                <p className="text-sm text-ink-2">ยังไม่มีผู้แจ้งความสนใจ</p>
               </div>
             ) : (
-              responses.map((r) => <ResponseRow key={r.id} resp={r} />)
+              <div className="flex flex-col gap-2.5">
+                {responses.map((r) => <ResponseRow key={r.id} resp={r} />)}
+              </div>
             )}
-          </div>
+
+            {/* Mark fulfilled */}
+            {request.status === "open" && (
+              <button
+                type="button"
+                onClick={markFulfilled}
+                disabled={fulfilling}
+                className="mt-3 flex h-[54px] w-full items-center justify-center gap-2 rounded-[16px] border-[1.5px] border-teal/40 bg-teal-soft text-[15.5px] font-bold text-teal-ink transition-transform active:scale-[.98] disabled:opacity-40"
+              >
+                <Check size={18} />
+                {fulfilling ? "กำลังอัปเดต..." : "ปิดประกาศ (ได้รับความช่วยเหลือแล้ว)"}
+              </button>
+            )}
+          </>
         )}
 
         {/* Disclaimer */}
-        <p className="text-center text-[11px] leading-relaxed text-brown-muted/70">
+        <p className="mt-1 text-center text-[11px] leading-relaxed text-ink-3">
           PawMate เป็นสื่อกลางเท่านั้น การบริจาคต้องผ่านการตรวจสุขภาพและดูแลโดยสัตวแพทย์
         </p>
       </div>

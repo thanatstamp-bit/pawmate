@@ -88,6 +88,10 @@ export default function PetCard({ pet, mode, myPetId, onBlock, isTop, onSwipe, t
 
   function onCardPointerDown(e: React.PointerEvent) {
     if (!isTop || !onSwipe || phase === "exit") return;
+    // Don't start a drag when the press lands on an interactive control
+    // (the "ดูข้อมูลเพิ่ม" button, photo dots) — otherwise pointer capture +
+    // the drag's click-suppression swallow the control's own click.
+    if ((e.target as HTMLElement).closest("button")) return;
     cardDragging.current = true;
     didDrag.current = false;
     cardStart.current = { x: e.clientX, y: e.clientY };
@@ -174,18 +178,20 @@ export default function PetCard({ pet, mode, myPetId, onBlock, isTop, onSwipe, t
     // front card's height (set by the flex-1 parent) instead of a fixed
     // aspect ratio.
     return (
-      <div className="absolute inset-x-0 top-3 bottom-0 mx-auto max-w-[420px] scale-[0.96] rounded-card bg-white shadow-card" />
+      <div className="absolute inset-x-0 top-3 bottom-0 mx-auto max-w-[420px] scale-[0.94] rounded-[28px] bg-white shadow-[0_12px_30px_-16px_rgba(120,72,60,.4)]" />
     );
   }
 
   return (
     <>
-      {/* Main card — fills the height given by its flex-1 parent (which is
-          itself bounded by the page's fixed viewport height). The photo
-          (flex-1 below) absorbs whatever space is left after the info strip,
-          so it's as large as possible while the page still can't scroll. */}
+      {/* Main card — full-bleed photo filling the height given by its flex-1
+          parent (bounded by the page's fixed viewport height). All content is
+          overlaid on the photo with a bottom gradient scrim, so the page can't
+          scroll. The drag handlers + faceStyle transform live on this same
+          outer div; the detail sheet renders OUTSIDE it (a fixed sibling) so a
+          transform here never reparents the sheet. */}
       <div
-        className={`relative mx-auto flex h-full max-w-[420px] flex-col overflow-hidden rounded-card bg-white shadow-card ${
+        className={`relative mx-auto h-full max-w-[420px] overflow-hidden rounded-[28px] bg-cream shadow-[0_18px_44px_-18px_rgba(120,72,60,.5),0_4px_12px_-6px_rgba(120,72,60,.2)] ${
           isTop && onSwipe ? "touch-none select-none will-change-transform" : ""
         }`}
         style={isTop && onSwipe ? faceStyle : undefined}
@@ -195,89 +201,89 @@ export default function PetCard({ pet, mode, myPetId, onBlock, isTop, onSwipe, t
         onPointerCancel={onCardPointerUp}
         onClickCapture={onCardClickCapture}
       >
+        {/* Photo (tap to open detail) */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={photo}
+          alt={pet.name}
+          className="absolute inset-0 h-full w-full cursor-pointer object-cover"
+          onClick={() => setDetailOpen(true)}
+        />
+
+        {/* Bottom gradient scrim */}
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+
         {/* Swipe direction labels — fade in with the drag distance */}
         {isTop && onSwipe && (
           <>
             <div
-              className="pointer-events-none absolute left-5 top-6 z-10 -rotate-12 rounded-xl border-[3px] border-coral px-3 py-0.5 text-2xl font-extrabold uppercase text-coral"
+              className="pointer-events-none absolute left-5 top-6 z-10 -rotate-12 rounded-2xl border-[3px] border-coral px-3 py-0.5 text-2xl font-extrabold uppercase text-coral"
               style={{ opacity: likeOpacity }}
             >
               ถูกใจ
             </div>
             <div
-              className="pointer-events-none absolute right-5 top-6 z-10 rotate-12 rounded-xl border-[3px] border-brown-muted px-3 py-0.5 text-2xl font-extrabold uppercase text-brown-muted"
+              className="pointer-events-none absolute right-5 top-6 z-10 rotate-12 rounded-2xl border-[3px] border-white px-3 py-0.5 text-2xl font-extrabold uppercase text-white"
               style={{ opacity: nopeOpacity }}
             >
               ผ่าน
             </div>
           </>
         )}
-        {/* Photo */}
-        <div
-          className="relative min-h-0 flex-1 cursor-pointer bg-cream"
-          onClick={() => setDetailOpen(true)}
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={photo}
-            alt={pet.name}
-            className="h-full w-full object-cover"
-          />
 
-          {/* Photo dots */}
-          {pet.photos.length > 1 && (
-            <div className="absolute left-0 right-0 top-3 flex justify-center gap-1.5">
-              {pet.photos.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={(e) => { e.stopPropagation(); setPhotoIdx(i); }}
-                  className={`h-1.5 rounded-full transition-all ${
-                    i === photoIdx ? "w-4 bg-white" : "w-1.5 bg-white/60"
-                  }`}
-                />
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Info strip — below the photo, not overlaid on it */}
-        <div className="flex shrink-0 flex-col px-4 py-3.5">
-          <div className="flex items-baseline gap-1.5">
-            <h2 className="text-xl font-bold text-brown">{pet.name}</h2>
-            <span className="text-base font-medium text-brown-muted">· {age}</span>
+        {/* Photo dots */}
+        {pet.photos.length > 1 && (
+          <div className="absolute left-0 right-0 top-3 z-10 flex justify-center gap-1.5">
+            {pet.photos.map((_, i) => (
+              <button
+                key={i}
+                onClick={(e) => { e.stopPropagation(); setPhotoIdx(i); }}
+                className={`h-1.5 rounded-full transition-all ${
+                  i === photoIdx ? "w-5 bg-white" : "w-1.5 bg-white/60"
+                }`}
+              />
+            ))}
           </div>
-          <p className="mt-0.5 text-sm text-brown-muted">
+        )}
+
+        {/* Trust badges — frosted-glass pills, top-left */}
+        {(showVaccinated || showNeutered || showVaccineWarning) && (
+          <div className="absolute left-3.5 top-7 z-10 flex flex-col items-start gap-1.5">
+            {showVaccinated && (
+              <span className="flex items-center gap-1 rounded-xl border border-white/30 bg-teal/50 px-2.5 py-1 text-xs font-bold text-white backdrop-blur-md">
+                <ShieldCheck size={12} /> ฉีดวัคซีนแล้ว
+              </span>
+            )}
+            {showNeutered && (
+              <span className="flex items-center gap-1 rounded-xl border border-white/25 bg-black/35 px-2.5 py-1 text-xs font-bold text-white backdrop-blur-md">
+                <Scissors size={12} /> ทำหมันแล้ว
+              </span>
+            )}
+            {showVaccineWarning && (
+              <span className="flex items-center gap-1 rounded-xl border border-white/30 bg-amber/60 px-2.5 py-1 text-xs font-bold text-white backdrop-blur-md">
+                <AlertTriangle size={12} /> ยังไม่ยืนยันวัคซีน
+              </span>
+            )}
+          </div>
+        )}
+
+        {/* Info overlay — over the bottom gradient */}
+        <div className="absolute inset-x-0 bottom-0 z-10 flex flex-col px-4 pb-4 pt-3 text-white">
+          <div className="flex items-baseline gap-1.5">
+            <h2 className="text-[27px] font-bold tracking-title [text-shadow:0_2px_8px_rgba(0,0,0,.4)]">{pet.name}</h2>
+            <span className="text-lg font-medium [text-shadow:0_2px_8px_rgba(0,0,0,.4)]">· {age}</span>
+          </div>
+          <p className="mt-0.5 text-sm text-white/90 [text-shadow:0_2px_8px_rgba(0,0,0,.4)]">
             {pet.breed}{location && ` · ${location}`}
           </p>
 
-          {/* Trust badges */}
-          {(showVaccinated || showNeutered || showVaccineWarning) && (
-            <div className="mt-2.5 flex flex-wrap gap-1.5">
-              {showVaccinated && (
-                <span className="flex items-center gap-1 rounded-full border border-teal/30 bg-teal/10 px-2.5 py-1 text-xs font-bold text-teal-dark">
-                  <ShieldCheck size={12} /> ฉีดวัคซีนแล้ว
-                </span>
-              )}
-              {showNeutered && (
-                <span className="flex items-center gap-1 rounded-full border border-[#D5D1CC] bg-[#F0EEEB] px-2.5 py-1 text-xs font-bold text-[#5A5650]">
-                  <Scissors size={12} /> ทำหมันแล้ว
-                </span>
-              )}
-              {showVaccineWarning && (
-                <span className="flex items-center gap-1 rounded-full border border-amber/40 bg-amber/10 px-2.5 py-1 text-xs font-bold text-amber-dark">
-                  <AlertTriangle size={12} /> ยังไม่ยืนยันวัคซีน
-                </span>
-              )}
-            </div>
-          )}
-
           {/* Personality chips */}
           {pet.personality_tags.length > 0 && (
-            <div className="mt-2 flex flex-wrap gap-1.5">
+            <div className="mt-2.5 flex flex-wrap gap-1.5">
               {pet.personality_tags.slice(0, 4).map((tag) => (
                 <span
                   key={tag}
-                  className="rounded-full bg-cream px-2.5 py-1 text-xs font-bold text-brown-muted"
+                  className="rounded-lg border border-white/25 bg-white/15 px-2.5 py-1 text-xs font-semibold text-white backdrop-blur-md"
                 >
                   {tag}
                 </span>
@@ -289,10 +295,10 @@ export default function PetCard({ pet, mode, myPetId, onBlock, isTop, onSwipe, t
           <button
             type="button"
             onClick={() => setDetailOpen(true)}
-            className="mt-3 flex items-center justify-center gap-1.5 border-t border-black/5 pt-2.5 text-brown-muted"
+            className="mt-3 flex items-center justify-center gap-1.5 self-center rounded-full border border-white/30 bg-white/15 px-4 py-2 text-xs font-semibold backdrop-blur-md transition-transform active:scale-95"
           >
             <Info size={13} />
-            <span className="text-xs font-medium">ดูข้อมูลเพิ่ม</span>
+            ดูข้อมูลเพิ่ม
             <ChevronRight size={13} />
           </button>
         </div>
@@ -328,7 +334,7 @@ export default function PetCard({ pet, mode, myPetId, onBlock, isTop, onSwipe, t
               <button
                 type="button"
                 onClick={() => setDetailOpen(false)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-full bg-black/5 text-brown-muted transition-colors hover:bg-black/10"
+                className="absolute right-4 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-full bg-black/5 text-ink-2 transition-colors hover:bg-black/10"
               >
                 <X size={16} />
               </button>
@@ -357,10 +363,10 @@ export default function PetCard({ pet, mode, myPetId, onBlock, isTop, onSwipe, t
 
             <div className="px-5 pb-8 pt-3">
               <h2 className="text-2xl font-bold">{pet.name}</h2>
-              <p className="text-brown-muted">
+              <p className="text-ink-2">
                 {pet.breed} · {age} · {pet.sex === "male" ? "เพศผู้" : "เพศเมีย"}
               </p>
-              <div className="mt-1 flex items-center gap-1 text-brown-muted">
+              <div className="mt-1 flex items-center gap-1 text-ink-2">
                 <MapPin size={13} />
                 <span className="text-sm">{location}</span>
               </div>
@@ -391,14 +397,14 @@ export default function PetCard({ pet, mode, myPetId, onBlock, isTop, onSwipe, t
                 <button
                   type="button"
                   onClick={() => setReportOpen(true)}
-                  className="flex h-10 flex-1 items-center justify-center gap-1.5 rounded-xl border-[1.5px] border-[#EDEAE6] text-[13px] font-medium text-[#8A8580]"
+                  className="flex h-11 flex-1 items-center justify-center gap-1.5 rounded-2xl border-[1.5px] border-line bg-fill-1 text-[13px] font-semibold text-ink-2 transition-transform active:scale-95"
                 >
                   <Megaphone size={14} /> รายงาน
                 </button>
                 <button
                   type="button"
                   onClick={() => setBlockOpen(true)}
-                  className="flex h-10 flex-1 items-center justify-center gap-1.5 rounded-xl border-[1.5px] border-rose/30 bg-rose/[0.04] text-[13px] font-medium text-rose"
+                  className="flex h-11 flex-1 items-center justify-center gap-1.5 rounded-2xl bg-rose-soft text-[13px] font-semibold text-rose transition-transform active:scale-95"
                 >
                   <Ban size={14} /> บล็อก
                 </button>
@@ -420,7 +426,7 @@ export default function PetCard({ pet, mode, myPetId, onBlock, isTop, onSwipe, t
 
               {/* Bio */}
               {pet.bio && (
-                <p className="mt-4 text-sm leading-relaxed text-brown">
+                <p className="mt-4 text-sm leading-relaxed text-ink">
                   {pet.bio}
                 </p>
               )}

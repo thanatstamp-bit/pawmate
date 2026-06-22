@@ -1,6 +1,6 @@
 "use client";
 
-import { Users, Heart, AlertTriangle } from "lucide-react";
+import { Users, Heart, AlertTriangle, CheckCircle2 } from "lucide-react";
 
 interface Props {
   modes: ("playdate" | "breeding")[];
@@ -24,7 +24,7 @@ function YesNoToggle({
 }) {
   return (
     <div>
-      <p className="mb-2 text-sm font-bold text-brown">{label}</p>
+      <p className="mb-2 text-sm font-bold text-ink">{label}</p>
       <div className="grid grid-cols-2 gap-3">
         {(
           [
@@ -36,10 +36,10 @@ function YesNoToggle({
             key={String(v)}
             type="button"
             onClick={() => onSelect(v)}
-            className={`rounded-full border-2 py-2.5 text-sm font-bold transition-all ${
+            className={`rounded-2xl border-2 py-2.5 text-sm font-bold transition-all ${
               value === v
                 ? "border-teal bg-teal text-white"
-                : "border-black/10 bg-white text-brown-muted hover:border-teal/40"
+                : "border-black/10 bg-white text-ink-2 hover:border-teal/40"
             }`}
           >
             {l}
@@ -63,7 +63,7 @@ export default function Step4Modes({ modes, vaccinated, neutered, onChange }: Pr
 
   return (
     <div className="flex flex-col gap-5">
-      <p className="text-sm text-brown-muted">เลือกได้มากกว่า 1 โหมด</p>
+      <p className="text-sm text-ink-2">เลือกได้มากกว่า 1 โหมด</p>
 
       {/* Mode cards */}
       <div className="flex flex-col gap-3">
@@ -71,56 +71,62 @@ export default function Step4Modes({ modes, vaccinated, neutered, onChange }: Pr
         <button
           type="button"
           onClick={() => toggleMode("playdate")}
-          className={`flex items-start gap-4 rounded-card border-2 p-4 text-left transition-all ${
+          className={`relative flex items-start gap-4 rounded-card border-2 p-4 text-left transition-all ${
             modes.includes("playdate")
-              ? "border-teal bg-teal/10"
+              ? "border-teal bg-teal-soft shadow-card"
               : "border-black/10 bg-white hover:border-teal/40"
           }`}
         >
           <div
-            className={`mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${
-              modes.includes("playdate") ? "bg-teal text-white" : "bg-black/5 text-brown-muted"
+            className={`mt-0.5 flex h-11 w-11 shrink-0 items-center justify-center rounded-chip ${
+              modes.includes("playdate") ? "bg-teal text-white" : "bg-fill-2 text-ink-3"
             }`}
           >
             <Users size={20} />
           </div>
-          <div>
-            <p className="font-bold text-brown">หาเพื่อนเล่น</p>
-            <p className="text-sm text-brown-muted">
+          <div className="pr-7">
+            <p className="font-bold tracking-tight2 text-ink">หาเพื่อนเล่น</p>
+            <p className="text-sm text-ink-2">
               หาน้องหมา/แมวแถวบ้านมาเป็นเพื่อนเล่น นัดเจอกัน ออกกำลังกายด้วยกัน
             </p>
           </div>
+          {modes.includes("playdate") && (
+            <CheckCircle2 size={22} className="absolute right-3.5 top-3.5 text-teal" fill="white" />
+          )}
         </button>
 
         {/* Breeding */}
         <button
           type="button"
           onClick={() => toggleMode("breeding")}
-          className={`flex items-start gap-4 rounded-card border-2 p-4 text-left transition-all ${
+          className={`relative flex items-start gap-4 rounded-card border-2 p-4 text-left transition-all ${
             breedingOn
-              ? "border-amber bg-amber/10"
+              ? "border-amber bg-amber-soft shadow-card"
               : "border-black/10 bg-white hover:border-amber/40"
           }`}
         >
           <div
-            className={`mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${
-              breedingOn ? "bg-amber text-white" : "bg-black/5 text-brown-muted"
+            className={`mt-0.5 flex h-11 w-11 shrink-0 items-center justify-center rounded-chip ${
+              breedingOn ? "bg-amber text-white" : "bg-fill-2 text-ink-3"
             }`}
           >
             <Heart size={20} />
           </div>
-          <div>
-            <p className="font-bold text-brown">หาคู่ผสมพันธุ์</p>
-            <p className="text-sm text-brown-muted">
+          <div className="pr-7">
+            <p className="font-bold tracking-tight2 text-ink">หาคู่ผสมพันธุ์</p>
+            <p className="text-sm text-ink-2">
               หาคู่สายพันธุ์เดียวกัน เพื่อให้ได้ลูกที่สุขภาพดีและมีสายพันธุ์แท้
             </p>
           </div>
+          {breedingOn && (
+            <CheckCircle2 size={22} className="absolute right-3.5 top-3.5 text-amber-deep" fill="white" />
+          )}
         </button>
       </div>
 
       {/* Breeding extra fields */}
       {breedingOn && (
-        <div className="flex flex-col gap-4 rounded-card bg-amber/5 p-4">
+        <div className="flex flex-col gap-4 rounded-card bg-amber-soft p-4">
           <YesNoToggle
             label="ฉีดวัคซีนครบแล้ว?"
             value={vaccinated}
@@ -132,7 +138,7 @@ export default function Step4Modes({ modes, vaccinated, neutered, onChange }: Pr
             onSelect={(v) => onChange({ neutered: v })}
           />
           {showNeuteredWarning && (
-            <div className="flex items-start gap-2 rounded-xl bg-amber/20 px-3 py-2.5 text-sm text-amber-dark">
+            <div className="flex items-start gap-2 rounded-2xl bg-amber/20 px-3 py-2.5 text-sm text-amber-deep">
               <AlertTriangle size={16} className="mt-0.5 shrink-0" />
               <p>
                 น้องที่ทำหมันแล้วอาจผสมพันธุ์ไม่ได้ ตรวจสอบกับสัตวแพทย์ก่อนนัดเจอกันนะ

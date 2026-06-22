@@ -21,7 +21,7 @@ export default function LogoutButton() {
       type="button"
       onClick={handleLogout}
       disabled={loading}
-      className="flex items-center justify-center gap-2 rounded-full border-2 border-coral px-6 py-2.5 font-bold text-coral transition-colors hover:bg-coral hover:text-white disabled:opacity-60"
+      className="flex items-center justify-center gap-2 rounded-2xl border-2 border-coral px-6 py-2.5 font-bold text-coral transition-colors hover:bg-coral hover:text-white disabled:opacity-60"
     >
       {loading ? (
         <Loader2 size={18} className="animate-spin" />

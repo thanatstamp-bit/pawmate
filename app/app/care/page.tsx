@@ -2,43 +2,49 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ChevronLeft, Hospital, Megaphone, Droplet, BookOpenText, Bell, ChevronRight, Stethoscope } from "lucide-react";
+import { ChevronLeft, Hospital, Megaphone, Droplet, BookOpenText, Bell, ChevronRight, Stethoscope, HeartPulse } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { IconTile, cn } from "@/components/ui";
 
 const CARE_CARDS = [
   {
-    label: "โรงพยาบาลสัตว์\nใกล้ฉัน",
-    subtitle: "ค้นหา รพ.สัตว์และคลินิก",
+    label: "โรงพยาบาลสัตว์ใกล้ฉัน",
+    subtitle: "หาที่ใกล้คุณ · เปิด 24 ชม.",
     href: "/app/care/hospitals",
     icon: Hospital,
+    tone: "teal" as const,
     comingSoon: false,
   },
   {
     label: "ประกาศสัตว์หาย",
-    subtitle: "ลงประกาศ / ตามหาน้อง",
+    subtitle: "ตามหา · แจ้งเบาะแส",
     href: "/app/care/lost",
     icon: Megaphone,
+    tone: "rose" as const,
     comingSoon: false,
   },
   {
     label: "ศูนย์บริจาคเลือด",
-    subtitle: "หาผู้บริจาคเลือดสัตว์",
+    subtitle: "หาผู้บริจาคด่วน",
     href: "/app/care/blood",
     icon: Droplet,
+    tone: "rose" as const,
     comingSoon: false,
   },
   {
     label: "สมุดสุขภาพ",
-    subtitle: "วัคซีน นัดหมอ บันทึกสุขภาพ",
+    subtitle: "วัคซีน · นัดหมาย",
     href: "/app/care/health",
     icon: BookOpenText,
+    tone: "blue" as const,
     comingSoon: false,
   },
   {
     label: "ปรึกษาสัตวแพทย์",
-    subtitle: "สอบถามอาการ นัดออนไลน์",
+    subtitle: "ปรึกษาออนไลน์",
     href: "/app/care/vet-online",
     icon: Stethoscope,
+    tone: "coral" as const,
     comingSoon: false,
   },
 ];
@@ -91,47 +97,53 @@ export default function CareHubPage() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      {/* Header */}
-      <div className="flex h-14 shrink-0 items-center gap-1 border-b border-black/5 px-1">
+      {/* Header — back + title + subtitle (matches the Care mockup) */}
+      <div className="flex shrink-0 items-center gap-3 px-[22px] pb-2 pt-1">
         <Link
           href="/app/home"
-          className="flex h-11 w-11 shrink-0 items-center justify-center text-brown"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[13px] border-[1.5px] border-line bg-white text-ink shadow-[0_6px_16px_-10px_rgba(120,72,60,.3)] transition-transform active:scale-95"
         >
           <ChevronLeft size={20} />
         </Link>
-        <Link href="/app/home" className="flex flex-1 items-center gap-2">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.png" alt="PawMate" className="h-9 w-9 object-contain drop-shadow-sm" />
-          <span className="text-xl font-medium text-brown">PawMate</span>
-        </Link>
+        <div className="min-w-0 flex-1">
+          <h1 className="text-[22px] font-bold leading-[1.1] tracking-title text-ink">ดูแลน้อง</h1>
+          <p className="text-[13px] text-ink-2">บริการดูแลน้องครบในที่เดียว</p>
+        </div>
       </div>
 
-      <div className="px-5 pb-8 pt-6">
-        <h1 className="mb-5 text-2xl font-bold text-brown">ดูแลน้อง</h1>
-
-        {/* Reminder banner */}
-        {dueCount > 0 && (
+      <div className="px-[22px] pb-24 pt-2">
+        {/* Reminder banner — amber when due items exist, else teal "all good" */}
+        {dueCount > 0 ? (
           <Link
             href="/app/care/health"
-            className="mb-5 flex items-center gap-3 rounded-xl border px-4 py-3.5"
-            style={{
-              background: "rgba(255,184,76,0.10)",
-              borderColor: "rgba(255,184,76,0.40)",
-              borderWidth: "1.5px",
-            }}
+            className="mb-6 flex items-center gap-3 rounded-panel border border-amber/50 bg-amber-soft p-3.5 shadow-[0_8px_22px_-14px_rgba(196,144,16,.4)] transition-transform active:scale-[.99]"
           >
-            <Bell size={18} style={{ color: "#b08000", flexShrink: 0 }} />
+            <span className="flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-[13px] bg-amber/30">
+              <Bell size={20} className="text-amber-deep" />
+            </span>
             <div className="min-w-0 flex-1">
-              <p className="text-sm font-bold text-brown">
+              <p className="text-[14.5px] font-bold leading-tight text-ink">
                 มี {dueCount} รายการใกล้ถึงกำหนด
               </p>
-              <p className="text-xs text-brown-muted">วัคซีน + นัดหมอ → สมุดสุขภาพ</p>
+              <p className="mt-px text-[12.5px] font-semibold text-amber-deep">แตะเพื่อดูสมุดสุขภาพของน้อง</p>
             </div>
-            <ChevronRight size={16} className="shrink-0 text-brown-muted" />
+            <ChevronRight size={16} className="shrink-0 text-amber-deep" />
           </Link>
+        ) : (
+          <div className="mb-6 flex items-center gap-3 rounded-panel border border-teal/40 bg-teal-soft p-3.5">
+            <span className="flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-[13px] bg-teal/25">
+              <HeartPulse size={20} className="text-teal-ink" />
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="text-[14.5px] font-bold leading-tight text-ink">น้องสุขภาพดี ไม่มีนัดใกล้ถึงกำหนด</p>
+              <p className="mt-px text-[12.5px] font-semibold text-teal-ink">ดูแลน้องได้ดีมากเลย</p>
+            </div>
+          </div>
         )}
 
-        <div className="grid grid-cols-2 gap-3.5">
+        <p className="mb-3 px-0.5 text-[15px] font-bold tracking-tight2 text-ink">บริการดูแลน้อง</p>
+
+        <div className="grid grid-cols-2 gap-[13px]">
           {CARE_CARDS.map((card) => {
             const Icon = card.icon;
             const isHealth = card.href === "/app/care/health";
@@ -139,31 +151,32 @@ export default function CareHubPage() {
 
             const inner = (
               <div
-                className={`relative flex min-h-[140px] flex-col gap-3 rounded-card bg-white p-4 shadow-card ${
-                  card.comingSoon ? "opacity-60" : ""
-                } ${showDueBadge ? "border-[1.5px] border-amber/50 bg-amber/5" : ""}`}
+                className={cn(
+                  "relative flex min-h-[154px] flex-col rounded-card bg-white p-4 shadow-card transition-transform active:scale-[.97]",
+                  card.comingSoon && "opacity-60",
+                )}
               >
                 {card.comingSoon && (
-                  <span className="absolute right-3 top-3 rounded-md bg-amber px-1.5 py-0.5 text-[10px] font-bold text-white">
+                  <span className="absolute right-3.5 top-3.5 rounded-lg bg-amber px-2 py-[3px] text-[10px] font-bold tracking-wide text-white">
                     เร็วๆ นี้
                   </span>
                 )}
                 {showDueBadge && (
-                  <span className="absolute right-3 top-3 flex h-5 min-w-5 items-center justify-center rounded-full bg-amber px-1.5 text-[10px] font-bold text-white">
+                  <span className="absolute right-3.5 top-3.5 flex h-5 min-w-5 items-center justify-center rounded-lg bg-coral px-1.5 text-[10px] font-bold tabular-nums text-white">
                     {dueCount}
                   </span>
                 )}
-                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-cream">
-                  <Icon size={22} className="text-brown-muted" />
-                </div>
-                <div>
-                  <p className="whitespace-pre-line text-sm font-bold leading-tight text-brown">
-                    {card.label}
-                  </p>
-                  <p className="mt-1 text-[11px] leading-tight text-brown-muted">
-                    {card.subtitle}
-                  </p>
-                </div>
+                <IconTile tone={card.tone} size={46} rounded="rounded-[14px]">
+                  <Icon size={22} />
+                </IconTile>
+                <div className="flex-1" />
+                <p className="mt-3.5 text-[15px] font-bold leading-[1.25] tracking-tight2 text-ink">
+                  {card.label}
+                </p>
+                <p className="mt-[3px] text-xs font-medium text-ink-2">{card.subtitle}</p>
+                {!card.comingSoon && (
+                  <ChevronRight size={16} className="absolute bottom-4 right-4 text-ink-3" />
+                )}
               </div>
             );
 

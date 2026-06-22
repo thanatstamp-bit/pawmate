@@ -54,8 +54,8 @@ function spotIcon(type: string) {
   if (type === "park")   return <Trees  size={16} className="shrink-0 text-teal" />;
   if (type === "cafe")   return <Coffee size={16} className="shrink-0 text-amber-dark" />;
   if (type === "beach")  return <Waves  size={16} className="shrink-0 text-teal" />;
-  if (type === "resort") return <Hotel  size={16} className="shrink-0 text-brown-muted" />;
-  return                        <MapPin size={16} className="shrink-0 text-brown-muted" />;
+  if (type === "resort") return <Hotel  size={16} className="shrink-0 text-ink-2" />;
+  return                        <MapPin size={16} className="shrink-0 text-ink-2" />;
 }
 
 const DATES = buildDates();
@@ -160,7 +160,7 @@ export default function ScheduleSheet({ matchId, myPetId, province, onClose, onS
           <button type="button" onClick={onClose} className="rounded-full p-1 hover:bg-cream">
             <X size={20} />
           </button>
-          <h2 className="text-base font-bold text-brown">นัดหมาย</h2>
+          <h2 className="text-base font-bold text-ink">นัดหมาย</h2>
           <div className="w-8" />
         </div>
 
@@ -170,7 +170,7 @@ export default function ScheduleSheet({ matchId, myPetId, province, onClose, onS
 
             {/* ── Date strip ── */}
             <div>
-              <p className="mb-3 text-sm font-bold text-brown">เลือกวัน</p>
+              <p className="mb-3 text-sm font-bold text-ink">เลือกวัน</p>
               <div ref={dateScrollRef} className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
                 {DATES.map((d, i) => {
                   const active = d.toDateString() === selectedDate.toDateString();
@@ -182,7 +182,7 @@ export default function ScheduleSheet({ matchId, myPetId, province, onClose, onS
                       className={`flex shrink-0 flex-col items-center rounded-2xl px-3 py-2.5 transition-all ${
                         active
                           ? "bg-coral text-white"
-                          : "bg-cream text-brown hover:bg-coral/10"
+                          : "bg-cream text-ink hover:bg-coral/10"
                       }`}
                     >
                       <span className="text-[10px] font-bold">{SHORT_DAY[d.getDay()]}</span>
@@ -196,12 +196,12 @@ export default function ScheduleSheet({ matchId, myPetId, province, onClose, onS
 
             {/* ── Time ── */}
             <div>
-              <p className="mb-2 text-sm font-bold text-brown">เวลา</p>
+              <p className="mb-2 text-sm font-bold text-ink">เวลา</p>
               <div className="relative">
                 <select
                   value={selectedTime}
                   onChange={(e) => setSelectedTime(e.target.value)}
-                  className="w-full appearance-none rounded-xl border border-black/10 bg-white px-4 py-3 text-sm focus:border-coral focus:outline-none focus:ring-2 focus:ring-coral/30"
+                  className="w-full appearance-none rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm focus:border-coral focus:outline-none focus:ring-2 focus:ring-coral/30"
                 >
                   {TIME_OPTIONS.map((t) => (
                     <option key={t} value={t}>{t} น.</option>
@@ -209,14 +209,14 @@ export default function ScheduleSheet({ matchId, myPetId, province, onClose, onS
                 </select>
                 <ChevronRight
                   size={16}
-                  className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 rotate-90 text-brown-muted"
+                  className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 rotate-90 text-ink-2"
                 />
               </div>
             </div>
 
             {/* ── Spot picker ── */}
             <div>
-              <p className="mb-2 text-sm font-bold text-brown">
+              <p className="mb-2 text-sm font-bold text-ink">
                 สถานที่แนะนำใน{province}
               </p>
 
@@ -230,7 +230,7 @@ export default function ScheduleSheet({ matchId, myPetId, province, onClose, onS
                     className={`shrink-0 rounded-full border-2 px-3 py-1 text-xs font-bold transition-all ${
                       spotFilter === opt.value
                         ? "border-teal bg-teal text-white"
-                        : "border-black/10 text-brown-muted hover:border-teal/40"
+                        : "border-black/10 text-ink-2 hover:border-teal/40"
                     }`}
                   >
                     {opt.label}
@@ -239,7 +239,7 @@ export default function ScheduleSheet({ matchId, myPetId, province, onClose, onS
               </div>
 
               {filteredSpots.length === 0 ? (
-                <p className="rounded-xl bg-cream px-4 py-3 text-sm text-brown-muted">
+                <p className="rounded-xl bg-cream px-4 py-3 text-sm text-ink-2">
                   ไม่มีสถานที่แนะนำสำหรับจังหวัดนี้ — ระบุเองด้านล่างได้เลย
                 </p>
               ) : (
@@ -260,12 +260,12 @@ export default function ScheduleSheet({ matchId, myPetId, province, onClose, onS
                     >
                       <div className="mt-0.5">{spotIcon(spot.type)}</div>
                       <div className="min-w-0">
-                        <p className="text-sm font-bold text-brown">{spot.name}</p>
+                        <p className="text-sm font-bold text-ink">{spot.name}</p>
                         {spot.district && (
-                          <p className="text-xs text-brown-muted">{spot.district}, {spot.province}</p>
+                          <p className="text-xs text-ink-2">{spot.district}, {spot.province}</p>
                         )}
                         {spot.description && (
-                          <p className="mt-0.5 text-xs text-brown-muted">{spot.description}</p>
+                          <p className="mt-0.5 text-xs text-ink-2">{spot.description}</p>
                         )}
                       </div>
                     </button>
@@ -275,7 +275,7 @@ export default function ScheduleSheet({ matchId, myPetId, province, onClose, onS
 
               {/* Custom location input */}
               <div className="mt-3">
-                <p className="mb-1.5 text-xs font-medium text-brown-muted">หรือระบุสถานที่เอง</p>
+                <p className="mb-1.5 text-xs font-medium text-ink-2">หรือระบุสถานที่เอง</p>
                 <input
                   type="text"
                   value={customLoc}
@@ -284,21 +284,21 @@ export default function ScheduleSheet({ matchId, myPetId, province, onClose, onS
                     if (e.target.value) setSelectedSpot(null);
                   }}
                   placeholder="พิมพ์ชื่อสถานที่..."
-                  className="w-full rounded-xl border border-black/10 px-4 py-3 text-sm focus:border-coral focus:outline-none focus:ring-2 focus:ring-coral/30"
+                  className="w-full rounded-2xl border border-black/10 px-4 py-3 text-sm focus:border-coral focus:outline-none focus:ring-2 focus:ring-coral/30"
                 />
               </div>
             </div>
 
             {/* ── Note ── */}
             <div className="pb-2">
-              <p className="mb-2 text-sm font-bold text-brown">หมายเหตุ (ไม่บังคับ)</p>
+              <p className="mb-2 text-sm font-bold text-ink">หมายเหตุ (ไม่บังคับ)</p>
               <textarea
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
                 placeholder="เช่น นัดแถวทางเข้าหลัก / เจอกันตอนบ่าย"
                 rows={2}
                 maxLength={200}
-                className="w-full resize-none rounded-xl border border-black/10 px-4 py-3 text-sm focus:border-coral focus:outline-none focus:ring-2 focus:ring-coral/30"
+                className="w-full resize-none rounded-2xl border border-black/10 px-4 py-3 text-sm focus:border-coral focus:outline-none focus:ring-2 focus:ring-coral/30"
               />
             </div>
 
@@ -307,12 +307,12 @@ export default function ScheduleSheet({ matchId, myPetId, province, onClose, onS
 
         {/* Footer */}
         <div className="border-t border-black/5 px-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] pt-4">
-          {error && <p className="mb-3 text-center text-sm text-red-500">{error}</p>}
+          {error && <p className="mb-3 text-center text-sm text-rose">{error}</p>}
           <button
             type="button"
             onClick={handleSubmit}
             disabled={submitting || !location}
-            className="w-full rounded-full bg-coral py-3 font-bold text-white transition-all hover:bg-coral-dark disabled:opacity-40"
+            className="h-12 w-full rounded-2xl bg-gradient-cta font-bold tracking-tight2 text-white shadow-cta transition-transform active:scale-[.98] disabled:opacity-40 disabled:active:scale-100"
           >
             {submitting ? "กำลังส่ง..." : "ส่งคำขอนัดหมาย"}
           </button>

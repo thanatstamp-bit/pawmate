@@ -78,13 +78,13 @@ export default function ProposalBanner({ proposal, myPetId, matchId, onRefetch }
           <Check size={16} strokeWidth={2.5} />
           <span className="text-xs font-bold">นัดหมายยืนยันแล้ว!</span>
         </div>
-        <p className="mt-1 text-sm font-medium text-brown">{dateStr}</p>
-        <div className="mt-0.5 flex items-center gap-1 text-xs text-brown-muted">
+        <p className="mt-1 text-sm font-medium text-ink">{dateStr}</p>
+        <div className="mt-0.5 flex items-center gap-1 text-xs text-ink-2">
           <MapPin size={12} />
           <span>{location}{district ? `, ${district}` : ""}</span>
         </div>
         {proposal.note && (
-          <p className="mt-1 text-xs text-brown-muted">💬 {proposal.note}</p>
+          <p className="mt-1 text-xs text-ink-2">💬 {proposal.note}</p>
         )}
       </div>
     );
@@ -103,13 +103,13 @@ export default function ProposalBanner({ proposal, myPetId, matchId, onRefetch }
             type="button"
             onClick={() => updateStatus("cancelled")}
             disabled={loading}
-            className="text-xs text-brown-muted underline disabled:opacity-40"
+            className="text-xs text-ink-2 underline disabled:opacity-40"
           >
             ยกเลิก
           </button>
         </div>
-        <p className="mt-1 text-sm font-medium text-brown">{dateStr}</p>
-        <div className="mt-0.5 flex items-center gap-1 text-xs text-brown-muted">
+        <p className="mt-1 text-sm font-medium text-ink">{dateStr}</p>
+        <div className="mt-0.5 flex items-center gap-1 text-xs text-ink-2">
           <MapPin size={12} />
           <span>{location}{district ? `, ${district}` : ""}</span>
         </div>
@@ -125,20 +125,20 @@ export default function ProposalBanner({ proposal, myPetId, matchId, onRefetch }
           <CalendarDays size={16} />
           <span className="text-xs font-bold">ได้รับคำขอนัดหมาย</span>
         </div>
-        <p className="mt-1 text-sm font-medium text-brown">{dateStr}</p>
-        <div className="mt-0.5 flex items-center gap-1 text-xs text-brown-muted">
+        <p className="mt-1 text-sm font-medium text-ink">{dateStr}</p>
+        <div className="mt-0.5 flex items-center gap-1 text-xs text-ink-2">
           <MapPin size={12} />
           <span>{location}{district ? `, ${district}` : ""}</span>
         </div>
         {proposal.note && (
-          <p className="mt-1 text-xs text-brown-muted">💬 {proposal.note}</p>
+          <p className="mt-1 text-xs text-ink-2">💬 {proposal.note}</p>
         )}
         <div className="mt-3 flex gap-2">
           <button
             type="button"
             onClick={() => updateStatus("accepted")}
             disabled={loading}
-            className="flex flex-1 items-center justify-center gap-1.5 rounded-full bg-teal py-2 text-sm font-bold text-white disabled:opacity-40"
+            className="flex flex-1 items-center justify-center gap-1.5 rounded-2xl bg-teal py-2 text-sm font-bold text-white transition-transform active:scale-[.98] disabled:opacity-40"
           >
             <Check size={15} strokeWidth={2.5} /> ยืนยัน
           </button>
@@ -146,7 +146,7 @@ export default function ProposalBanner({ proposal, myPetId, matchId, onRefetch }
             type="button"
             onClick={() => updateStatus("declined")}
             disabled={loading}
-            className="flex flex-1 items-center justify-center gap-1.5 rounded-full border-2 border-black/10 py-2 text-sm font-bold text-brown-muted disabled:opacity-40"
+            className="flex flex-1 items-center justify-center gap-1.5 rounded-2xl border-2 border-black/10 py-2 text-sm font-bold text-ink-2 disabled:opacity-40"
           >
             <X size={15} /> ปฏิเสธ
           </button>

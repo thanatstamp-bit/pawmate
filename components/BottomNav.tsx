@@ -19,7 +19,7 @@ export default function BottomNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-black/5 bg-white">
+    <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-line bg-white/90 backdrop-blur-xl">
       <div className="mx-auto flex max-w-[480px] items-stretch justify-around pb-[env(safe-area-inset-bottom)]">
         {tabs.map(({ href, label, icon: Icon, badge }) => {
           const active = pathname.startsWith(href);
@@ -27,8 +27,8 @@ export default function BottomNav() {
             <Link
               key={href}
               href={href}
-              className={`flex flex-1 flex-col items-center gap-1 py-2.5 text-xs font-bold transition-colors ${
-                active ? "text-coral" : "text-brown-muted hover:text-brown"
+              className={`flex flex-1 flex-col items-center gap-1 py-2.5 text-[10.5px] font-semibold transition-colors ${
+                active ? "text-coral" : "text-ink-3 hover:text-ink-2"
               }`}
             >
               <div className="relative">

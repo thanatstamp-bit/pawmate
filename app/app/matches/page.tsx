@@ -5,6 +5,7 @@ import Link from "next/link";
 import { MessageCircle, CalendarDays, MapPin, Clock, CheckCircle2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { getBlockedPetIds } from "@/lib/blocks";
+import { Avatar, Chip, cn } from "@/components/ui";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -14,6 +15,7 @@ type MatchRow = {
   otherPet: { id: string; name: string; photos: string[] };
   lastMessage: string | null;
   lastFromOther: boolean;
+  lastAt: string | null; // last message time (null = no messages yet)
 };
 
 type PlaydateRow = {
@@ -39,6 +41,18 @@ function formatPlaydate(iso: string): string {
 
 function isPast(iso: string) {
   return new Date(iso) < new Date();
+}
+
+// Short Thai "time ago" for the chat-row timestamp
+function timeAgo(iso: string): string {
+  const mins = Math.floor((Date.now() - new Date(iso).getTime()) / 60000);
+  if (mins < 1) return "เมื่อสักครู่";
+  if (mins < 60) return `${mins} นาที`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `${hours} ชม.`;
+  const days = Math.floor(hours / 24);
+  if (days < 7) return `${days} วัน`;
+  return `${Math.floor(days / 7)} สัปดาห์`;
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
@@ -114,7 +128,7 @@ export default function MatchesPage() {
 
         const { data: lastMsg } = await supabase
           .from("messages")
-          .select("content, sender_pet_id")
+          .select("content, sender_pet_id, created_at")
           .eq("match_id", m.id)
           .order("created_at", { ascending: false })
           .limit(1)
@@ -124,8 +138,16 @@ export default function MatchesPage() {
           id: m.id, mode: m.mode, otherPet,
           lastMessage:   lastMsg?.content ?? null,
           lastFromOther: lastMsg?.sender_pet_id === otherId,
+          lastAt:        lastMsg?.created_at ?? null,
         });
       }
+      // Most recently active conversations first; ties keep match order.
+      rows.sort((a, b) => {
+        if (!a.lastAt && !b.lastAt) return 0;
+        if (!a.lastAt) return 1;
+        if (!b.lastAt) return -1;
+        return new Date(b.lastAt).getTime() - new Date(a.lastAt).getTime();
+      });
       setMatches(rows);
 
       // ── Fetch playdate proposals ───────────────────────────────────────────
@@ -195,14 +217,14 @@ export default function MatchesPage() {
   if (matches.length === 0) {
     return (
       <div className="flex min-h-[80vh] flex-col items-center justify-center gap-4 p-6 text-center">
-        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-white shadow-card">
-          <MessageCircle size={36} className="text-brown-muted" />
+        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-coral-soft">
+          <MessageCircle size={36} className="text-coral" />
         </div>
         <div>
-          <p className="font-bold text-brown">ยังไม่มีแมตช์</p>
-          <p className="mt-1 text-sm text-brown-muted">ไปปัดการ์ดกันเถอะ!</p>
+          <p className="font-bold tracking-tight2 text-ink">ยังไม่มีแมตช์</p>
+          <p className="mt-1 text-sm text-ink-2">ไปปัดการ์ดกันเถอะ!</p>
         </div>
-        <Link href="/app/swipe" className="rounded-full bg-coral px-6 py-3 font-bold text-white">
+        <Link href="/app/swipe" className="rounded-2xl bg-gradient-cta px-6 py-3 font-bold text-white shadow-cta">
           ไปปัดการ์ด
         </Link>
       </div>
@@ -213,13 +235,13 @@ export default function MatchesPage() {
     <div className="flex flex-col">
       {/* Page header + segment control */}
       <div className="px-5 pb-3 pt-6">
-        <h1 className="mb-3 text-xl font-bold text-brown">แมตช์ของฉัน</h1>
-        <div className="flex rounded-full bg-white p-1 shadow-card">
+        <h1 className="mb-3 text-2xl font-bold tracking-title text-ink">แมตช์ของฉัน</h1>
+        <div className="flex gap-[5px] rounded-chip bg-[#F4EEE9] p-[5px]">
           <button
             type="button"
             onClick={() => setTab("chat")}
-            className={`flex-1 rounded-full py-2 text-sm font-bold transition-all ${
-              tab === "chat" ? "bg-coral text-white" : "text-brown-muted"
+            className={`flex-1 rounded-[11px] py-2 text-[13.5px] font-bold tracking-tight2 transition-all ${
+              tab === "chat" ? "bg-coral text-white shadow-card" : "text-ink-3"
             }`}
           >
             แชท
@@ -227,8 +249,8 @@ export default function MatchesPage() {
           <button
             type="button"
             onClick={() => setTab("playdates")}
-            className={`flex-1 flex items-center justify-center gap-1.5 rounded-full py-2 text-sm font-bold transition-all ${
-              tab === "playdates" ? "bg-teal text-white" : "text-brown-muted"
+            className={`flex flex-1 items-center justify-center gap-1.5 rounded-[11px] py-2 text-[13.5px] font-bold tracking-tight2 transition-all ${
+              tab === "playdates" ? "bg-teal text-white shadow-card" : "text-ink-3"
             }`}
           >
             <CalendarDays size={14} />
@@ -245,65 +267,96 @@ export default function MatchesPage() {
       </div>
 
       {/* ── Chat tab ──────────────────────────────────────────────────────── */}
-      {tab === "chat" && (
-        <ul>
-          {matches.map((m) => (
-            <li key={m.id}>
-              <Link
-                href={`/app/chat/${m.id}`}
-                className="flex items-center gap-3 px-5 py-3.5 hover:bg-white/60 active:bg-white"
-              >
-                <div className="relative shrink-0">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={m.otherPet.photos[0]}
-                    alt={m.otherPet.name}
-                    className="h-14 w-14 rounded-full object-cover"
-                  />
-                  {m.lastFromOther && (
-                    <span className="absolute right-0 top-0 h-3 w-3 rounded-full border-2 border-cream bg-coral" />
-                  )}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2">
-                    <span className="font-bold text-brown">{m.otherPet.name}</span>
-                    <span
-                      className={`rounded-full px-2 py-0.5 text-xs font-bold ${
-                        m.mode === "playdate"
-                          ? "bg-teal/15 text-teal-dark"
-                          : "bg-amber/20 text-amber-dark"
-                      }`}
+      {tab === "chat" && (() => {
+        const newMatches = matches.filter((m) => !m.lastAt);
+        const convos = matches.filter((m) => m.lastAt);
+        return (
+          <div>
+            {/* แมตช์ใหม่ — horizontal avatar rail of matches with no messages yet */}
+            {newMatches.length > 0 && (
+              <div className="pb-2 pt-1">
+                <p className="px-5 pb-2 text-xs font-bold uppercase tracking-wider text-ink-3">
+                  แมตช์ใหม่
+                </p>
+                <div className="flex gap-3.5 overflow-x-auto px-5 pb-1" style={{ scrollbarWidth: "none" }}>
+                  {newMatches.map((m) => (
+                    <Link
+                      key={m.id}
+                      href={`/app/chat/${m.id}`}
+                      className="flex w-[68px] shrink-0 flex-col items-center gap-1.5"
                     >
-                      {m.mode === "playdate" ? "เพื่อนเล่น" : "หาคู่"}
-                    </span>
-                  </div>
-                  <p className="mt-0.5 truncate text-sm text-brown-muted">
-                    {m.lastMessage ?? "เริ่มคุยกันเลย!"}
-                  </p>
+                      <div className="rounded-full p-[3px] [background:linear-gradient(135deg,#FF8C6B,#FF5E7A)]">
+                        <div className="rounded-full bg-white p-[2px]">
+                          <Avatar src={m.otherPet.photos[0]} name={m.otherPet.name} size={54} />
+                        </div>
+                      </div>
+                      <span className="w-full truncate text-center text-[11px] font-medium text-ink-2">
+                        {m.otherPet.name}
+                      </span>
+                    </Link>
+                  ))}
                 </div>
-              </Link>
-              <div className="mx-5 h-px bg-black/5" />
-            </li>
-          ))}
-        </ul>
-      )}
+              </div>
+            )}
+
+            {/* ข้อความ — conversations sorted by most recent */}
+            {convos.length > 0 && (
+              <p className="px-5 pb-1 pt-3 text-xs font-bold uppercase tracking-wider text-ink-3">
+                ข้อความ
+              </p>
+            )}
+            <ul>
+              {convos.map((m) => (
+                <li key={m.id}>
+                  <Link
+                    href={`/app/chat/${m.id}`}
+                    className="flex items-center gap-3 px-5 py-3.5 transition-colors hover:bg-white/60 active:bg-white"
+                  >
+                    <div className="relative shrink-0">
+                      <Avatar src={m.otherPet.photos[0]} name={m.otherPet.name} size={56} />
+                      {m.lastFromOther && (
+                        <span className="absolute right-0 top-0 h-3 w-3 rounded-full border-2 border-cream bg-coral" />
+                      )}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold tracking-tight2 text-ink">{m.otherPet.name}</span>
+                        <Chip tone={m.mode === "playdate" ? "teal" : "amber"}>
+                          {m.mode === "playdate" ? "เพื่อนเล่น" : "หาคู่"}
+                        </Chip>
+                        {m.lastAt && (
+                          <span className="ml-auto shrink-0 text-[11px] text-ink-3">{timeAgo(m.lastAt)}</span>
+                        )}
+                      </div>
+                      <p className={cn("mt-0.5 truncate text-sm", m.lastFromOther ? "font-semibold text-ink" : "text-ink-2")}>
+                        {m.lastMessage}
+                      </p>
+                    </div>
+                  </Link>
+                  <div className="mx-5 h-px bg-line" />
+                </li>
+              ))}
+            </ul>
+          </div>
+        );
+      })()}
 
       {/* ── Playdates tab ─────────────────────────────────────────────────── */}
       {tab === "playdates" && (
         <div className="px-5 pb-6">
           {playdates.length === 0 ? (
             <div className="flex flex-col items-center gap-3 py-12 text-center">
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white shadow-card">
-                <CalendarDays size={28} className="text-brown-muted" />
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-teal-soft">
+                <CalendarDays size={28} className="text-teal-ink" />
               </div>
-              <p className="font-bold text-brown">ยังไม่มีนัดหมาย</p>
-              <p className="text-sm text-brown-muted">
+              <p className="font-bold tracking-tight2 text-ink">ยังไม่มีนัดหมาย</p>
+              <p className="text-sm text-ink-2">
                 เข้าแชทกับคู่แมตช์ แล้วกดไอคอนปฏิทินเพื่อนัดหมาย
               </p>
               <button
                 type="button"
                 onClick={() => setTab("chat")}
-                className="rounded-full border-2 border-teal px-5 py-2.5 text-sm font-bold text-teal"
+                className="rounded-2xl border-2 border-teal px-5 py-2.5 text-sm font-bold text-teal-ink transition-transform active:scale-95"
               >
                 ไปที่แชท
               </button>
@@ -313,7 +366,7 @@ export default function MatchesPage() {
               {/* Upcoming */}
               {upcomingPlaydates.length > 0 && (
                 <div className="mb-6">
-                  <p className="mb-3 text-xs font-bold uppercase tracking-wider text-brown-muted">
+                  <p className="mb-3 text-xs font-bold uppercase tracking-wider text-ink-3">
                     กำลังจะมาถึง
                   </p>
                   <div className="flex flex-col gap-3">
@@ -327,7 +380,7 @@ export default function MatchesPage() {
               {/* Past */}
               {pastPlaydates.length > 0 && (
                 <div>
-                  <p className="mb-3 text-xs font-bold uppercase tracking-wider text-brown-muted">
+                  <p className="mb-3 text-xs font-bold uppercase tracking-wider text-ink-3">
                     ที่ผ่านมา
                   </p>
                   <div className="flex flex-col gap-3">
@@ -365,41 +418,30 @@ function PlaydateCard({
   const statusBadge =
     past             ? null
     : p.status === "accepted" ? (
-      <span className="flex items-center gap-1 rounded-full bg-teal/15 px-2 py-0.5 text-[10px] font-bold text-teal-dark">
-        <CheckCircle2 size={10} /> ยืนยันแล้ว
-      </span>
+      <Chip tone="teal"><CheckCircle2 size={10} /> ยืนยันแล้ว</Chip>
     ) : p.isProposer ? (
-      <span className="flex items-center gap-1 rounded-full bg-amber/20 px-2 py-0.5 text-[10px] font-bold text-amber-dark">
-        <Clock size={10} /> รอตอบรับ
-      </span>
+      <Chip tone="amber"><Clock size={10} /> รอตอบรับ</Chip>
     ) : (
-      <span className="flex items-center gap-1 rounded-full bg-coral/15 px-2 py-0.5 text-[10px] font-bold text-coral">
-        <CalendarDays size={10} /> รอคุณตอบ
-      </span>
+      <Chip tone="coral"><CalendarDays size={10} /> รอคุณตอบ</Chip>
     );
 
   return (
     <Link
       href={`/app/chat/${p.matchId}`}
-      className={`flex items-center gap-3 rounded-2xl border-2 p-4 transition-all hover:shadow-card ${statusColor}`}
+      className={cn("flex items-center gap-3 rounded-panel border p-4 transition-all hover:shadow-card", statusColor)}
     >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={p.otherPet.photos[0]}
-        alt={p.otherPet.name}
-        className={`h-12 w-12 rounded-full object-cover ${past ? "opacity-60" : ""}`}
-      />
+      <Avatar src={p.otherPet.photos[0]} name={p.otherPet.name} size={48} className={past ? "opacity-60" : ""} />
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
-          <span className={`font-bold ${past ? "text-brown-muted" : "text-brown"}`}>
+          <span className={cn("font-bold tracking-tight2", past ? "text-ink-3" : "text-ink")}>
             {p.otherPet.name}
           </span>
           {statusBadge}
         </div>
-        <p className={`mt-0.5 text-xs ${past ? "text-brown-muted/70" : "text-brown-muted"}`}>
+        <p className={cn("mt-0.5 text-xs", past ? "text-ink-3" : "text-ink-2")}>
           {formatPlaydate(p.proposedAt)}
         </p>
-        <div className={`mt-0.5 flex items-center gap-1 text-xs ${past ? "text-brown-muted/70" : "text-brown-muted"}`}>
+        <div className={cn("mt-0.5 flex items-center gap-1 text-xs", past ? "text-ink-3" : "text-ink-2")}>
           <MapPin size={11} />
           <span className="truncate">{p.location}</span>
         </div>

@@ -1,215 +1,120 @@
 import Link from "next/link";
-import { ChevronLeft, Star, AlertOctagon, ChevronRight, UserPlus, CalendarDays } from "lucide-react";
+import { ChevronLeft, Star, AlertOctagon, ChevronRight, Stethoscope, CalendarDays } from "lucide-react";
 import {
   MOCK_VETS,
   getNextAvailableSlots,
   thaiDayLabel,
 } from "@/lib/data/mock-vets";
-
-function AvatarPlaceholder({ size = 46 }: { size?: number }) {
-  return (
-    <div
-      className="shrink-0 overflow-hidden rounded-full border-[1.5px] flex items-center justify-center"
-      style={{
-        width: size,
-        height: size,
-        background:
-          "repeating-linear-gradient(135deg,#EDEAE6 0px,#EDEAE6 4px,#E0DDD9 4px,#E0DDD9 8px)",
-        borderColor: "#D5D1CC",
-      }}
-    >
-      <span className="font-mono text-[8px] font-semibold" style={{ color: "#C5C1BC" }}>
-        foto
-      </span>
-    </div>
-  );
-}
+import { Avatar } from "@/components/ui";
 
 function DemoBadge() {
   return (
-    <div className="flex justify-center">
-      <div
-        className="flex items-center gap-1.5 rounded-full border px-3 py-1"
-        style={{
-          background: "rgba(168,112,24,0.13)",
-          borderColor: "rgba(168,112,24,0.30)",
-        }}
-      >
-        <AlertOctagon size={10} style={{ color: "#A06820" }} />
-        <span className="text-[11px] font-bold" style={{ color: "#7A5818" }}>
-          ระบบสาธิต (Demo)
-        </span>
-      </div>
-    </div>
+    <span className="inline-flex shrink-0 items-center gap-1.5 rounded-[9px] bg-amber-soft px-2.5 py-[5px] text-[11.5px] font-bold text-amber-deep">
+      <AlertOctagon size={11} />
+      ระบบสาธิต (Demo)
+    </span>
   );
 }
 
 export default function VetOnlinePage() {
   return (
-    <div className="flex min-h-screen flex-col bg-cream">
+    <div className="flex min-h-screen flex-col">
       {/* Header */}
-      <div className="flex h-14 shrink-0 items-center border-b border-black/5 bg-white px-1">
+      <header className="flex shrink-0 items-center gap-2.5 border-b border-line px-4 pb-3 pt-0.5">
         <Link
           href="/app/care"
-          className="flex h-11 w-11 shrink-0 items-center justify-center text-brown"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[13px] border-[1.5px] border-line bg-white text-ink shadow-[0_6px_16px_-10px_rgba(120,72,60,.3)] active:scale-95"
         >
           <ChevronLeft size={20} />
         </Link>
-        <span className="flex-1 text-center text-base font-bold text-brown">
-          สัตวแพทย์ออนไลน์
-        </span>
-        <Link
-          href="/app/care/vet-online/bookings"
-          className="flex h-11 w-11 shrink-0 items-center justify-center text-brown"
-        >
-          <CalendarDays size={20} />
-        </Link>
-      </div>
-
-      <div className="flex flex-col gap-3 px-5 pb-8 pt-3">
+        <h1 className="flex-1 text-lg font-bold tracking-title text-ink">ปรึกษาสัตวแพทย์</h1>
         <DemoBadge />
+      </header>
 
+      <div className="flex flex-col px-[22px] pb-8 pt-4">
         {/* Intro card */}
-        <div
-          className="flex items-start gap-3 rounded-[14px] px-3.5 py-3"
-          style={{ background: "#F5F3F0" }}
-        >
-          <div
-            className="mt-0.5 flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-[10px]"
-            style={{ background: "rgba(90,143,212,0.14)" }}
-          >
-            <UserPlus size={16} style={{ color: "#5A8FD4" }} />
+        <div className="mb-4 flex gap-3 rounded-panel bg-blue-soft p-[15px]">
+          <div className="flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-chip bg-white text-blue">
+            <Stethoscope size={20} />
           </div>
-          <p className="flex-1 text-[13px] leading-[1.7] text-brown">
-            ปรึกษาอาการเบื้องต้นกับสัตวแพทย์ เพื่อประเมินว่าควรไป รพ. ด่วนแค่ไหน —{" "}
-            <span className="font-medium" style={{ color: "#8A8580" }}>
-              ไม่ใช่การวินิจฉัยหรือสั่งยา
-            </span>
+          <p className="flex-1 self-center text-[14.5px] font-bold leading-[1.4] text-ink">
+            ปรึกษาอาการเบื้องต้นกับสัตวแพทย์ออนไลน์ ก่อนตัดสินใจพาน้องไปโรงพยาบาล
           </p>
         </div>
+
+        {/* Emergency disclaimer → hospitals */}
+        <Link
+          href="/app/care/hospitals"
+          className="mb-4 flex items-center gap-3 rounded-chip border border-rose/30 bg-rose-soft px-[15px] py-[13px] active:scale-[.99]"
+        >
+          <div className="flex h-[38px] w-[38px] shrink-0 items-center justify-center rounded-xl bg-rose/15 text-rose-ink">
+            <AlertOctagon size={18} />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-[13.5px] font-bold leading-[1.35] text-rose-ink">
+              หากฉุกเฉิน โทรหรือพาน้องไป รพ.สัตว์ทันที
+            </p>
+            <p className="mt-px text-[12px] text-rose-ink/80">ดูโรงพยาบาลใกล้คุณ</p>
+          </div>
+          <ChevronRight size={18} className="shrink-0 text-rose-ink/70" />
+        </Link>
 
         {/* My bookings shortcut */}
         <Link
           href="/app/care/vet-online/bookings"
-          className="flex items-center gap-3 rounded-[14px] border-[1.5px] bg-white px-3.5 py-3"
-          style={{ borderColor: "#EDEAE6" }}
+          className="mb-5 flex items-center gap-3 rounded-chip border-[1.5px] border-line bg-white px-[15px] py-[13px] active:scale-[.99]"
         >
-          <div
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[11px]"
-            style={{ background: "rgba(46,196,182,0.12)" }}
-          >
-            <CalendarDays size={17} style={{ color: "#2EC4B6" }} />
+          <div className="flex h-[38px] w-[38px] shrink-0 items-center justify-center rounded-xl bg-teal-soft text-teal-ink">
+            <CalendarDays size={18} />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-[13px] font-bold text-brown">การจองของฉัน</p>
-            <p className="text-[11px]" style={{ color: "#8A8580" }}>ดูนัดหมายและห้องรอ</p>
+            <p className="text-[13.5px] font-bold text-ink">การจองของฉัน</p>
+            <p className="mt-px text-[12px] text-ink-2">ดูนัดหมายและห้องรอ</p>
           </div>
-          <ChevronRight size={16} style={{ color: "#C5C1BC" }} />
+          <ChevronRight size={18} className="shrink-0 text-ink-3" />
         </Link>
 
-        {/* Emergency disclaimer */}
-        <div
-          className="flex items-center gap-2.5 rounded-[12px] border-[1.5px] px-3 py-2.5"
-          style={{
-            background: "rgba(155,34,34,0.06)",
-            borderColor: "rgba(155,34,34,0.20)",
-          }}
-        >
-          <div
-            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[9px]"
-            style={{ background: "rgba(155,34,34,0.12)" }}
-          >
-            <AlertOctagon size={13} style={{ color: "#8B1A1A" }} />
-          </div>
-          <span
-            className="flex-1 text-[12px] font-medium leading-[1.5]"
-            style={{ color: "#8B1A1A" }}
-          >
-            หากฉุกเฉิน โทรหรือพาน้องไป รพ.สัตว์ทันที
-          </span>
-          <Link
-            href="/app/care/hospitals"
-            className="flex shrink-0 items-center gap-0.5"
-          >
-            <span className="text-[12px] font-bold" style={{ color: "#8B1A1A" }}>
-              ดู รพ.
-            </span>
-            <ChevronRight size={12} style={{ color: "#8B1A1A" }} />
-          </Link>
-        </div>
+        <h2 className="mb-[13px] px-0.5 text-[15px] font-bold tracking-tight2 text-ink">เลือกสัตวแพทย์</h2>
 
         {/* Vet list */}
-        <div className="flex flex-col gap-2.5 pb-5">
+        <div className="flex flex-col gap-3">
           {MOCK_VETS.map((vet) => {
-            const slots = getNextAvailableSlots(vet.id, 2);
+            const slots = getNextAvailableSlots(vet.id, 1);
+            const next = slots[0];
             return (
-              <div
+              <Link
                 key={vet.id}
-                className="flex flex-col gap-2.5 rounded-[16px] border-[1.5px] border-[#EDEAE6] bg-white p-3.5"
+                href={`/app/care/vet-online/book/${vet.id}`}
+                className="rounded-panel bg-white p-[15px] shadow-card transition-transform active:scale-[.985]"
               >
-                {/* Top row */}
-                <div className="flex items-start gap-3">
-                  <AvatarPlaceholder size={46} />
+                <div className="flex gap-3">
+                  <Avatar name={vet.name} size={50} square className="rounded-chip" />
                   <div className="min-w-0 flex-1">
-                    <span className="block text-[13px] font-bold text-brown">
-                      {vet.name}
-                    </span>
-                    <span className="mb-1.5 block text-[11px]" style={{ color: "#8A8580" }}>
-                      {vet.specialty}
-                    </span>
-                    <div className="flex items-center gap-1.5">
-                      <Star size={11} fill="#F59E0B" stroke="none" />
-                      <span className="text-[11px] font-semibold" style={{ color: "#5A5650" }}>
+                    <div className="flex items-center gap-[7px]">
+                      <span className="text-[15.5px] font-bold text-ink">{vet.name}</span>
+                      <span className="inline-flex shrink-0 items-center gap-[3px] text-[12px] font-bold text-amber-deep">
+                        <Star size={12} fill="currentColor" stroke="none" />
                         {vet.rating}
                       </span>
-                      <span className="text-[11px]" style={{ color: "#D5D1CC" }}>·</span>
-                      <span className="text-[12px] font-bold text-brown">฿{vet.fee}</span>
-                      <span className="text-[11px]" style={{ color: "#8A8580" }}>/ครั้ง</span>
+                    </div>
+                    <p className="mt-0.5 text-[12.5px] text-ink-2">{vet.specialty}</p>
+                    <div className="mt-2 flex items-center gap-2">
+                      <span className="text-[12px] font-semibold text-ink">
+                        ฿{vet.fee} <span className="font-medium text-ink-3">/ ครั้ง</span>
+                      </span>
+                      {next && (
+                        <>
+                          <span className="h-[3px] w-[3px] rounded-full bg-fill-3" />
+                          <span className="text-[12px] font-semibold text-teal-ink">
+                            ว่าง {thaiDayLabel(next.dayOffset)} {next.time}
+                          </span>
+                        </>
+                      )}
                     </div>
                   </div>
+                  <ChevronRight size={18} className="shrink-0 self-center text-ink-3" />
                 </div>
-
-                {/* Slot chips + button */}
-                <div className="flex flex-wrap items-center gap-1.5">
-                  <span className="shrink-0 text-[11px]" style={{ color: "#8A8580" }}>
-                    ว่าง:
-                  </span>
-                  {slots.map((s) => (
-                    <div
-                      key={s.slotDate.toISOString()}
-                      className="flex h-6 shrink-0 items-center rounded-[12px] px-2.5"
-                      style={
-                        s.dayOffset === 0
-                          ? { background: "rgba(26,138,106,0.10)" }
-                          : { background: "#F5F3F0" }
-                      }
-                    >
-                      <span
-                        className="text-[11px] font-semibold whitespace-nowrap"
-                        style={{ color: s.dayOffset === 0 ? "#1A8A6A" : "#5A5650" }}
-                      >
-                        {thaiDayLabel(s.dayOffset)} {s.time}
-                      </span>
-                    </div>
-                  ))}
-                  {slots.length === 0 && (
-                    <span className="text-[11px]" style={{ color: "#B5B0AA" }}>
-                      ไม่มีช่องว่าง
-                    </span>
-                  )}
-                  <div className="flex-1" />
-                  <Link
-                    href={`/app/care/vet-online/book/${vet.id}`}
-                    className="flex h-[30px] shrink-0 items-center rounded-[10px] px-3"
-                    style={{
-                      background: "#FF6B5B",
-                      boxShadow: "0 2px 8px rgba(255,107,91,0.24)",
-                    }}
-                  >
-                    <span className="text-[12px] font-semibold text-white">นัดหมาย</span>
-                  </Link>
-                </div>
-              </div>
+              </Link>
             );
           })}
         </div>

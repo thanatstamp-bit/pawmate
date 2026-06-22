@@ -75,12 +75,12 @@ export default function PetProfileSheet({ pet, mode, onClose }: Props) {
               onTouchMove={onHandleTouchMove}
               onTouchEnd={onHandleTouchEnd}
             >
-              <div className="h-1.5 w-12 rounded-full bg-black/15" />
+              <div className="h-1.5 w-12 rounded-full bg-fill-3" />
             </div>
             <button
               type="button"
               onClick={onClose}
-              className="absolute right-4 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-full bg-black/5 text-brown-muted transition-colors hover:bg-black/10"
+              className="absolute right-4 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-full bg-black/5 text-ink-2 transition-colors hover:bg-black/10"
             >
               <X size={16} />
             </button>
@@ -110,12 +110,12 @@ export default function PetProfileSheet({ pet, mode, onClose }: Props) {
           </div>
 
           <div className="px-5 pb-8 pt-3">
-            <h2 className="text-2xl font-bold text-brown">{pet.name}</h2>
-            <p className="text-brown-muted">
+            <h2 className="text-2xl font-bold tracking-title text-ink">{pet.name}</h2>
+            <p className="text-ink-2">
               {pet.breed} · {age} · {pet.sex === "male" ? "เพศผู้" : "เพศเมีย"}
             </p>
             {location && (
-              <div className="mt-1 flex items-center gap-1 text-brown-muted">
+              <div className="mt-1 flex items-center gap-1 text-ink-2">
                 <MapPin size={13} />
                 <span className="text-sm">{location}</span>
               </div>
@@ -130,12 +130,12 @@ export default function PetProfileSheet({ pet, mode, onClose }: Props) {
             {(showVaccinated || showNeutered) && (
               <div className="mt-3 flex flex-wrap gap-2">
                 {showVaccinated && (
-                  <span className="flex items-center gap-1 rounded-full border-[1.5px] border-teal/35 bg-teal/[0.09] px-3 py-1 text-sm font-bold text-teal-dark">
+                  <span className="flex items-center gap-1 rounded-chip border-[1.5px] border-teal/35 bg-teal-soft px-3 py-1 text-sm font-bold text-teal-ink">
                     <ShieldCheck size={14} /> ฉีดวัคซีนแล้ว
                   </span>
                 )}
                 {showNeutered && (
-                  <span className="flex items-center gap-1 rounded-full border-[1.5px] border-[#D5D1CC] bg-[#F0EEEB] px-3 py-1 text-sm font-bold text-[#5A5650]">
+                  <span className="flex items-center gap-1 rounded-chip border-[1.5px] border-fill-3 bg-fill-2 px-3 py-1 text-sm font-bold text-ink-2">
                     <Scissors size={14} /> ทำหมันแล้ว
                   </span>
                 )}
@@ -148,7 +148,7 @@ export default function PetProfileSheet({ pet, mode, onClose }: Props) {
                 {pet.personality_tags.map((tag) => (
                   <span
                     key={tag}
-                    className="rounded-full bg-coral/10 px-3 py-1 text-sm font-bold text-coral"
+                    className="rounded-chip bg-coral-soft px-3 py-1 text-sm font-bold text-coral-ink"
                   >
                     {tag}
                   </span>
@@ -158,15 +158,15 @@ export default function PetProfileSheet({ pet, mode, onClose }: Props) {
 
             {/* Bio */}
             {pet.bio && (
-              <p className="mt-4 text-sm leading-relaxed text-brown">
+              <p className="mt-4 text-sm leading-relaxed text-ink">
                 {pet.bio}
               </p>
             )}
 
             {/* Breeding info */}
             {mode === "breeding" && (
-              <div className="mt-4 rounded-card bg-amber/10 p-4">
-                <p className="mb-2 text-sm font-bold text-amber-dark">
+              <div className="mt-4 rounded-card bg-amber-soft p-4">
+                <p className="mb-2 text-sm font-bold text-amber-deep">
                   ข้อมูลสำหรับผสมพันธุ์
                 </p>
                 <div className="flex gap-4 text-sm">

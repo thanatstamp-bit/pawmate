@@ -287,8 +287,8 @@ export default function SwipePage() {
   if (!myPet) {
     return (
       <div className="flex min-h-[80vh] flex-col items-center justify-center gap-3 p-6 text-center">
-        <p className="font-bold text-brown">ยังไม่มีโปรไฟล์น้อง</p>
-        <a href="/onboarding" className="rounded-full bg-coral px-6 py-3 font-bold text-white">
+        <p className="font-bold text-ink">ยังไม่มีโปรไฟล์น้อง</p>
+        <a href="/onboarding" className="rounded-2xl bg-gradient-cta px-6 py-3 font-bold text-white shadow-cta">
           สร้างโปรไฟล์น้อง
         </a>
       </div>
@@ -296,21 +296,21 @@ export default function SwipePage() {
   }
 
   return (
-    <div className="flex h-[calc(100dvh-5rem)] flex-col overflow-hidden bg-cream">
+    <div className="flex h-[calc(100dvh-5rem)] flex-col overflow-hidden bg-gradient-app">
       {/* Mode toggle + filter — segmented control, no logo header on this screen */}
       <div className="mx-5 mb-3 mt-3 flex shrink-0 items-center gap-3">
-        <div className="grid h-10 flex-1 grid-cols-2 gap-0.5 rounded-xl bg-[#EDEAE6] p-[3px]">
+        <div className="grid h-11 flex-1 grid-cols-2 gap-[5px] rounded-chip bg-[#F4EEE9] p-[5px]">
           <button
             type="button"
             onClick={() => availableModes.includes("playdate") && setMode("playdate")}
             disabled={!availableModes.includes("playdate")}
             title={!availableModes.includes("playdate") ? "เปิดโหมดนี้ได้ที่หน้าโปรไฟล์" : undefined}
-            className={`flex items-center justify-center rounded-[10px] text-sm font-semibold transition-all ${
+            className={`flex items-center justify-center rounded-[11px] text-[13.5px] font-bold tracking-tight2 transition-all ${
               mode === "playdate"
-                ? "bg-teal text-white"
+                ? "bg-teal text-white shadow-card"
                 : availableModes.includes("playdate")
-                ? "text-brown-muted"
-                : "cursor-not-allowed text-brown-muted/30"
+                ? "text-ink-3"
+                : "cursor-not-allowed text-ink-3/40"
             }`}
           >
             หาเพื่อนเล่น
@@ -320,12 +320,12 @@ export default function SwipePage() {
             onClick={() => availableModes.includes("breeding") && setMode("breeding")}
             disabled={!availableModes.includes("breeding")}
             title={!availableModes.includes("breeding") ? "เปิดโหมดนี้ได้ที่หน้าโปรไฟล์" : undefined}
-            className={`flex items-center justify-center rounded-[10px] text-sm font-semibold transition-all ${
+            className={`flex items-center justify-center rounded-[11px] text-[13.5px] font-bold tracking-tight2 transition-all ${
               mode === "breeding"
-                ? "bg-amber text-white"
+                ? "bg-amber text-white shadow-card"
                 : availableModes.includes("breeding")
-                ? "text-brown-muted"
-                : "cursor-not-allowed text-brown-muted/30"
+                ? "text-ink-3"
+                : "cursor-not-allowed text-ink-3/40"
             }`}
           >
             หาคู่
@@ -334,10 +334,10 @@ export default function SwipePage() {
         <button
           type="button"
           onClick={() => setFilterOpen(true)}
-          className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#EDEAE6]"
+          className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-chip bg-white shadow-card"
           title="ตัวกรอง"
         >
-          <SlidersHorizontal size={18} className="text-brown" />
+          <SlidersHorizontal size={18} className="text-ink" />
           {countActiveFilters(filters) > 0 && (
             <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-coral text-[10px] font-bold text-white">
               {countActiveFilters(filters)}
@@ -352,25 +352,15 @@ export default function SwipePage() {
           actually prevents scrolling, not a capped photo size. */}
       <div className="flex min-h-0 flex-1 flex-col px-5">
         {loading ? (
-          <div className="flex h-full min-h-0 w-full max-w-[420px] flex-col overflow-hidden rounded-card bg-white shadow-card">
-            <div className="min-h-0 flex-1 animate-pulse bg-black/5" />
-            <div className="flex shrink-0 flex-col gap-2.5 p-4">
-              <div className="h-5 w-32 animate-pulse rounded bg-black/5" />
-              <div className="h-3.5 w-40 animate-pulse rounded bg-black/5" />
-              <div className="flex gap-2">
-                <div className="h-6 w-24 animate-pulse rounded-full bg-black/5" />
-                <div className="h-6 w-20 animate-pulse rounded-full bg-black/5" />
-              </div>
-            </div>
-          </div>
+          <div className="skeleton h-full min-h-0 w-full max-w-[420px] animate-shimmer self-center rounded-[28px] shadow-card" />
         ) : cards.length === 0 ? (
           <div className="flex h-full min-h-0 flex-1 flex-col items-center justify-center gap-4 text-center">
-            <div className="flex h-20 w-20 items-center justify-center rounded-full bg-black/5">
-              <Search size={32} strokeWidth={1.5} className="text-brown-muted" />
+            <div className="flex h-20 w-20 items-center justify-center rounded-full bg-coral-soft">
+              <Search size={32} strokeWidth={1.5} className="text-coral" />
             </div>
             <div>
-              <p className="text-lg font-bold text-brown">ดูครบแล้ว!</p>
-              <p className="mt-1.5 text-sm leading-relaxed text-brown-muted">
+              <p className="text-lg font-bold tracking-tight2 text-ink">ดูครบแล้ว!</p>
+              <p className="mt-1.5 text-sm leading-relaxed text-ink-2">
                 ไม่มีน้องใหม่ในตอนนี้
                 <br />
                 ลองกลับมาดูใหม่ในภายหลัง
@@ -379,7 +369,7 @@ export default function SwipePage() {
             <button
               type="button"
               onClick={() => fetchCards()}
-              className="flex items-center gap-2 rounded-2xl border-2 border-black/10 px-6 py-3 font-semibold text-brown"
+              className="flex items-center gap-2 rounded-2xl border-2 border-black/10 bg-white px-6 py-3 font-semibold text-ink transition-transform active:scale-95"
             >
               <RefreshCw size={18} />
               ดูใหม่อีกครั้ง
@@ -411,22 +401,22 @@ export default function SwipePage() {
             </div>
 
             {/* Action buttons — fixed row below the card, per wireframe */}
-            <div className="flex shrink-0 items-center justify-center gap-6 py-3">
+            <div className="flex shrink-0 items-center justify-center gap-7 py-3">
               <button
                 type="button"
                 onClick={() => setButtonSwipe("skip")}
                 disabled={buttonSwipe !== null}
-                className="flex h-16 w-16 items-center justify-center rounded-full border-2 border-black/10 bg-white shadow-card transition-transform active:scale-95 disabled:opacity-60"
+                className="flex h-[62px] w-[62px] items-center justify-center rounded-full border border-line bg-white shadow-card transition-transform active:scale-95 disabled:opacity-60"
               >
-                <X size={28} className="text-brown-muted" />
+                <X size={28} className="text-ink-3" />
               </button>
               <button
                 type="button"
                 onClick={() => setButtonSwipe("like")}
                 disabled={buttonSwipe !== null}
-                className="flex h-16 w-16 items-center justify-center rounded-full bg-coral shadow-card transition-transform active:scale-95 disabled:opacity-60"
+                className="flex h-[76px] w-[76px] items-center justify-center rounded-full bg-gradient-cta shadow-cta transition-transform animate-cta-pulse active:scale-95 disabled:opacity-60 disabled:animate-none"
               >
-                <svg viewBox="0 0 24 24" fill="currentColor" className="h-7 w-7 text-white">
+                <svg viewBox="0 0 24 24" fill="currentColor" className="h-8 w-8 text-white">
                   <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
                 </svg>
               </button>

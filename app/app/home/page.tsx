@@ -18,6 +18,9 @@ import {
   ArrowLeftRight,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { Card, Chip, Avatar, IconTile, Sheet, Skeleton, cn } from "@/components/ui";
+
+type Tone = "coral" | "teal" | "amber" | "rose" | "blue" | "neutral";
 
 type Pet = {
   id: string;
@@ -39,6 +42,7 @@ type MenuTile = {
   label: string;
   href: string;
   icon: LucideIcon;
+  tone: Tone;
   comingSoon?: boolean;
   requiresPet?: boolean;
 };
@@ -46,18 +50,18 @@ type MenuTile = {
 const SPECIES_LABEL: Record<string, string> = { dog: "สุนัข", cat: "แมว" };
 
 const MAIN_MENU: MenuTile[] = [
-  { label: "ปัดการ์ดหาคู่", href: "/app/swipe", icon: Shuffle, requiresPet: true },
-  { label: "แมตช์ & แชท", href: "/app/matches", icon: MessageCircle, requiresPet: true },
-  { label: "โปรไฟล์น้อง", href: "/app/profile", icon: UserRound },
-  { label: "นัดเล่น", href: "/app/matches?tab=playdates", icon: CalendarDays, requiresPet: true },
-  { label: "ฝากน้อง", href: "#", icon: Building2, comingSoon: true },
+  { label: "ปัดการ์ดหาคู่", href: "/app/swipe", icon: Shuffle, tone: "coral", requiresPet: true },
+  { label: "แมตช์ & แชท", href: "/app/matches", icon: MessageCircle, tone: "teal", requiresPet: true },
+  { label: "โปรไฟล์น้อง", href: "/app/profile", icon: UserRound, tone: "amber" },
+  { label: "นัดเล่น", href: "/app/matches?tab=playdates", icon: CalendarDays, tone: "teal", requiresPet: true },
+  { label: "ฝากน้อง", href: "#", icon: Building2, tone: "neutral", comingSoon: true },
 ];
 
 const CARE_MENU: MenuTile[] = [
-  { label: "โรงพยาบาลสัตว์ใกล้ฉัน", href: "/app/care/hospitals", icon: Hospital },
-  { label: "ประกาศสัตว์หาย", href: "/app/care/lost", icon: Megaphone, comingSoon: false },
-  { label: "สมุดสุขภาพ", href: "/app/care/health", icon: BookOpenText, comingSoon: false },
-  { label: "ศูนย์บริจาคเลือด", href: "/app/care/blood", icon: Droplet, comingSoon: false },
+  { label: "โรงพยาบาลสัตว์ใกล้ฉัน", href: "/app/care/hospitals", icon: Hospital, tone: "teal" },
+  { label: "ประกาศสัตว์หาย", href: "/app/care/lost", icon: Megaphone, tone: "rose" },
+  { label: "สมุดสุขภาพ", href: "/app/care/health", icon: BookOpenText, tone: "blue" },
+  { label: "ศูนย์บริจาคเลือด", href: "/app/care/blood", icon: Droplet, tone: "coral" },
 ];
 
 function calcAge(birthMonth: string): string {
@@ -148,9 +152,9 @@ export default function HomePage() {
   return (
     <div className="flex flex-col gap-5 px-5 pb-8 pt-5">
       {/* Greeting */}
-      <div>
-        <p className="text-sm text-brown-muted/70">วันนี้</p>
-        <h1 className="text-xl font-bold text-brown">
+      <div className="animate-fade-up">
+        <p className="text-sm text-ink-3">วันนี้</p>
+        <h1 className="text-2xl font-bold tracking-title text-ink">
           สวัสดี{activePet?.name ? `, ${activePet.name}` : ""}
         </h1>
       </div>
@@ -158,45 +162,32 @@ export default function HomePage() {
       {hasPet && activePet ? (
         <>
           {/* Pet hero card */}
-          <div className="flex items-start gap-3.5 rounded-2xl bg-white p-3.5 shadow-card">
-            <div className="h-[72px] w-[72px] shrink-0 overflow-hidden rounded-2xl bg-cream">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={activePet.photos[0]}
-                alt={activePet.name}
-                className="h-full w-full object-cover"
-              />
-            </div>
-            <div className="min-w-0 flex-1 pt-0.5">
-              <p className="font-bold text-brown">{activePet.name}</p>
-              <p className="mt-0.5 text-xs text-brown-muted">
-                {SPECIES_LABEL[activePet.species] ?? activePet.species} · {activePet.breed} ·{" "}
-                {calcAge(activePet.birth_month)}
-              </p>
-              <div className="mt-2 flex flex-wrap gap-1.5">
-                {activePet.modes.includes("playdate") && (
-                  <span className="rounded-lg bg-teal/15 px-2.5 py-0.5 text-[11px] font-bold text-teal-dark">
-                    หาเพื่อนเล่น
-                  </span>
-                )}
-                {activePet.modes.includes("breeding") && (
-                  <span className="rounded-lg bg-amber/20 px-2.5 py-0.5 text-[11px] font-bold text-amber-dark">
-                    หาคู่
-                  </span>
+          <Card radius="card" className="animate-fade-up p-4">
+            <div className="flex items-start gap-3.5">
+              <Avatar src={activePet.photos[0]} name={activePet.name} size={72} square />
+              <div className="min-w-0 flex-1 pt-0.5">
+                <p className="font-bold tracking-tight2 text-ink">{activePet.name}</p>
+                <p className="mt-0.5 text-xs text-ink-2">
+                  {SPECIES_LABEL[activePet.species] ?? activePet.species} · {activePet.breed} ·{" "}
+                  {calcAge(activePet.birth_month)}
+                </p>
+                <div className="mt-2 flex flex-wrap gap-1.5">
+                  {activePet.modes.includes("playdate") && <Chip tone="teal">หาเพื่อนเล่น</Chip>}
+                  {activePet.modes.includes("breeding") && <Chip tone="amber">หาคู่</Chip>}
+                </div>
+                {otherPets.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => setSwitcherOpen(true)}
+                    className="mt-2 inline-flex items-center gap-1.5 rounded-chip bg-fill-1 px-2.5 py-1 text-[11px] font-medium text-ink-2 transition-transform active:scale-95"
+                  >
+                    <ArrowLeftRight size={12} />
+                    สลับน้อง
+                  </button>
                 )}
               </div>
-              {otherPets.length > 0 && (
-                <button
-                  type="button"
-                  onClick={() => setSwitcherOpen(true)}
-                  className="mt-2 flex items-center gap-1.5 rounded-lg bg-cream px-2.5 py-1 text-[11px] font-medium text-brown-muted"
-                >
-                  <ArrowLeftRight size={12} />
-                  สลับน้อง
-                </button>
-              )}
             </div>
-          </div>
+          </Card>
 
           {/* Stats row */}
           <div className="flex gap-2.5">
@@ -208,25 +199,26 @@ export default function HomePage() {
           {/* Primary CTA */}
           <Link
             href="/app/swipe"
-            className="flex h-[50px] items-center justify-center rounded-2xl bg-coral font-bold text-white shadow-card transition-opacity active:opacity-90"
+            className="cta-sheen flex h-14 animate-cta-pulse items-center justify-center gap-2 rounded-2xl bg-gradient-cta text-[17px] font-bold tracking-tight2 text-white shadow-cta transition-transform active:scale-[.97]"
           >
+            <Shuffle size={20} />
             ปัดการ์ดเลย
           </Link>
         </>
       ) : (
         <>
           {/* Empty pet state */}
-          <div className="rounded-2xl border-2 border-dashed border-black/10 bg-white/60 p-6 text-center">
-            <div className="mx-auto mb-2.5 flex h-[52px] w-[52px] items-center justify-center rounded-full bg-cream">
-              <PawPrint size={24} className="text-brown-muted" />
-            </div>
-            <p className="font-bold text-brown">ยังไม่มีโปรไฟล์น้อง</p>
-            <p className="mt-1 text-xs text-brown-muted">
+          <div className="rounded-card border-2 border-dashed border-black/10 bg-white/70 p-6 text-center">
+            <IconTile tone="coral" size={52} rounded="rounded-full" className="mx-auto mb-2.5">
+              <PawPrint size={24} />
+            </IconTile>
+            <p className="font-bold tracking-tight2 text-ink">ยังไม่มีโปรไฟล์น้อง</p>
+            <p className="mt-1 text-xs text-ink-2">
               เพิ่มน้องของคุณเพื่อเริ่มต้นหาคู่และเพื่อนเล่น
             </p>
             <Link
               href="/onboarding"
-              className="mt-3.5 flex h-11 items-center justify-center rounded-2xl bg-coral text-sm font-bold text-white"
+              className="mt-3.5 flex h-11 items-center justify-center rounded-2xl bg-gradient-cta text-sm font-bold text-white shadow-cta"
             >
               สร้างโปรไฟล์น้อง
             </Link>
@@ -240,7 +232,7 @@ export default function HomePage() {
           </div>
 
           {/* CTA disabled */}
-          <div className="flex h-[50px] items-center justify-center rounded-2xl bg-black/5 font-bold text-brown-muted/50">
+          <div className="flex h-14 items-center justify-center rounded-2xl bg-black/[.04] font-bold text-ink-3">
             ปัดการ์ดเลย
           </div>
         </>
@@ -248,7 +240,7 @@ export default function HomePage() {
 
       {/* เมนูหลัก */}
       <div>
-        <p className="mb-2.5 text-sm font-bold text-brown">เมนูหลัก</p>
+        <p className="mb-2.5 text-[15px] font-bold tracking-tight2 text-ink">เมนูหลัก</p>
         <div className="grid grid-cols-3 gap-2.5">
           {MAIN_MENU.map((tile) => (
             <MenuTileButton key={tile.label} tile={tile} dimmed={!hasPet && !!tile.requiresPet} />
@@ -259,8 +251,8 @@ export default function HomePage() {
       {/* ดูแลน้อง */}
       <div>
         <div className="mb-2.5 flex items-center justify-between">
-          <p className="text-sm font-bold text-brown">ดูแลน้อง</p>
-          <Link href="/app/care" className="flex items-center gap-0.5 text-xs font-medium text-brown-muted">
+          <p className="text-[15px] font-bold tracking-tight2 text-ink">ดูแลน้อง</p>
+          <Link href="/app/care" className="flex items-center gap-0.5 text-xs font-semibold text-coral-ink">
             ดูทั้งหมด
             <ChevronRight size={14} />
           </Link>
@@ -273,51 +265,41 @@ export default function HomePage() {
       </div>
 
       {/* Pet switcher sheet */}
-      {switcherOpen && (
-        <div className="fixed inset-0 z-[60] flex flex-col bg-black/50">
-          <div className="flex-1" onClick={() => setSwitcherOpen(false)} />
-          <div className="mx-auto flex w-full max-w-[480px] flex-col rounded-t-[28px] bg-white p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))]">
-            <p className="mb-3 font-bold text-brown">สลับน้อง</p>
-            <div className="flex flex-col gap-2">
-              {pets.map((pet) => (
-                <button
-                  key={pet.id}
-                  type="button"
-                  onClick={() => handleSwitchPet(pet.id)}
-                  className={`flex items-center gap-3 rounded-2xl p-2.5 text-left transition-colors ${
-                    pet.id === activePet?.id ? "bg-coral/10" : "hover:bg-cream"
-                  }`}
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={pet.photos[0]}
-                    alt={pet.name}
-                    className="h-12 w-12 rounded-xl object-cover"
-                  />
-                  <span className="font-bold text-brown">{pet.name}</span>
-                  {pet.id === activePet?.id && (
-                    <span className="ml-auto rounded-full bg-coral/15 px-2 py-0.5 text-[10px] font-bold text-coral">
-                      กำลังใช้อยู่
-                    </span>
-                  )}
-                </button>
-              ))}
-            </div>
-          </div>
+      <Sheet open={switcherOpen} onClose={() => setSwitcherOpen(false)} title="สลับน้อง">
+        <div className="flex flex-col gap-2">
+          {pets.map((pet) => (
+            <button
+              key={pet.id}
+              type="button"
+              onClick={() => handleSwitchPet(pet.id)}
+              className={cn(
+                "flex items-center gap-3 rounded-2xl p-2.5 text-left transition-colors",
+                pet.id === activePet?.id ? "bg-coral/10" : "hover:bg-fill-1",
+              )}
+            >
+              <Avatar src={pet.photos[0]} name={pet.name} size={48} square />
+              <span className="font-bold tracking-tight2 text-ink">{pet.name}</span>
+              {pet.id === activePet?.id && (
+                <span className="ml-auto rounded-full bg-coral/15 px-2 py-0.5 text-[10px] font-bold text-coral">
+                  กำลังใช้อยู่
+                </span>
+              )}
+            </button>
+          ))}
         </div>
-      )}
+      </Sheet>
     </div>
   );
 }
 
 function StatTile({ value, label, muted }: { value: string | number; label: string; muted?: boolean }) {
   return (
-    <div className="flex-1 rounded-2xl bg-white py-3 text-center shadow-card">
-      <p className={`text-2xl font-bold ${muted ? "text-black/15" : "text-brown"}`}>{value}</p>
-      <p className={`mt-0.5 text-[11px] font-medium ${muted ? "text-black/20" : "text-brown-muted"}`}>
-        {label}
+    <Card className="flex-1 py-3 text-center">
+      <p className={cn("text-2xl font-bold tabular-nums tracking-title", muted ? "text-black/15" : "text-ink")}>
+        {value}
       </p>
-    </div>
+      <p className={cn("mt-0.5 text-[11px] font-medium", muted ? "text-black/20" : "text-ink-2")}>{label}</p>
+    </Card>
   );
 }
 
@@ -326,17 +308,17 @@ function MenuTileButton({ tile, dimmed }: { tile: MenuTile; dimmed: boolean }) {
   const isDisabled = tile.comingSoon || dimmed;
 
   const inner = (
-    <div className={`relative flex flex-col items-center gap-2 rounded-2xl bg-white py-3.5 shadow-card ${isDisabled ? "opacity-45" : ""}`}>
+    <Card interactive={!isDisabled} className={cn("relative flex flex-col items-center gap-2 py-3.5", isDisabled && "opacity-45")}>
       {tile.comingSoon && (
-        <span className="absolute right-1.5 top-1.5 rounded px-1.5 py-0.5 text-[8px] font-bold text-white bg-amber">
+        <span className="absolute right-1.5 top-1.5 rounded-lg bg-amber px-1.5 py-0.5 text-[8px] font-bold text-white">
           เร็วๆ นี้
         </span>
       )}
-      <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-cream">
-        <Icon size={20} className="text-brown-muted" />
-      </div>
-      <span className="text-center text-[11px] font-semibold leading-tight text-brown">{tile.label}</span>
-    </div>
+      <IconTile tone={tile.tone} size={44} className="rounded-xl">
+        <Icon size={20} />
+      </IconTile>
+      <span className="text-center text-[11px] font-semibold leading-tight text-ink">{tile.label}</span>
+    </Card>
   );
 
   if (isDisabled) return inner;
@@ -346,17 +328,17 @@ function MenuTileButton({ tile, dimmed }: { tile: MenuTile; dimmed: boolean }) {
 function CareTileButton({ tile }: { tile: MenuTile }) {
   const Icon = tile.icon;
   const inner = (
-    <div className={`relative flex min-h-16 items-center gap-3 rounded-2xl bg-white p-3.5 shadow-card ${tile.comingSoon ? "opacity-60" : ""}`}>
+    <Card interactive={!tile.comingSoon} className={cn("relative flex min-h-16 items-center gap-3 p-3.5", tile.comingSoon && "opacity-60")}>
       {tile.comingSoon && (
-        <span className="absolute right-2 top-2 rounded px-1.5 py-0.5 text-[8px] font-bold text-white bg-amber">
+        <span className="absolute right-2 top-2 rounded-lg bg-amber px-1.5 py-0.5 text-[8px] font-bold text-white">
           เร็วๆ นี้
         </span>
       )}
-      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-cream">
-        <Icon size={19} className="text-brown-muted" />
-      </div>
-      <p className="text-xs font-bold leading-tight text-brown">{tile.label}</p>
-    </div>
+      <IconTile tone={tile.tone} size={40} className="rounded-xl">
+        <Icon size={19} />
+      </IconTile>
+      <p className="text-xs font-bold leading-tight text-ink">{tile.label}</p>
+    </Card>
   );
 
   if (tile.comingSoon) return inner;
@@ -367,36 +349,29 @@ function HomeSkeleton() {
   return (
     <div className="flex flex-col gap-5 px-5 pb-8 pt-5">
       <div>
-        <div className="mb-1.5 h-3.5 w-10 animate-pulse rounded bg-black/10" />
-        <div className="h-5 w-36 animate-pulse rounded bg-black/10" />
+        <Skeleton rounded="rounded" className="mb-1.5 h-3.5 w-10" />
+        <Skeleton rounded="rounded" className="h-6 w-36" />
       </div>
-      <div className="flex gap-3.5 rounded-2xl bg-white p-3.5 shadow-card">
-        <div className="h-[72px] w-[72px] shrink-0 animate-pulse rounded-2xl bg-black/10" />
-        <div className="flex flex-1 flex-col gap-2 pt-1">
-          <div className="h-4 w-24 animate-pulse rounded bg-black/10" />
-          <div className="h-3 w-20 animate-pulse rounded bg-black/5" />
-          <div className="h-6 w-32 animate-pulse rounded bg-black/5" />
-        </div>
-      </div>
+      <Skeleton rounded="rounded-card" className="h-[104px]" />
       <div className="flex gap-2.5">
         {[0, 1, 2].map((i) => (
-          <div key={i} className="h-[62px] flex-1 animate-pulse rounded-2xl bg-black/10" />
+          <Skeleton key={i} className="h-[62px] flex-1" />
         ))}
       </div>
-      <div className="h-[50px] animate-pulse rounded-2xl bg-black/10" />
+      <Skeleton rounded="rounded-2xl" className="h-14" />
       <div>
-        <div className="mb-3 h-3.5 w-20 animate-pulse rounded bg-black/10" />
+        <Skeleton rounded="rounded" className="mb-3 h-3.5 w-20" />
         <div className="grid grid-cols-3 gap-2.5">
           {[0, 1, 2, 3, 4, 5].map((i) => (
-            <div key={i} className="h-[82px] animate-pulse rounded-2xl bg-black/5" />
+            <Skeleton key={i} className="h-[82px]" />
           ))}
         </div>
       </div>
       <div>
-        <div className="mb-3 h-3.5 w-20 animate-pulse rounded bg-black/10" />
+        <Skeleton rounded="rounded" className="mb-3 h-3.5 w-20" />
         <div className="grid grid-cols-2 gap-2.5">
           {[0, 1, 2, 3].map((i) => (
-            <div key={i} className="h-16 animate-pulse rounded-2xl bg-black/5" />
+            <Skeleton key={i} className="h-16" />
           ))}
         </div>
       </div>

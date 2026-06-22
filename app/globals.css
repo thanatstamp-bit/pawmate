@@ -2,8 +2,111 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+  CSS custom properties mirror the Tailwind color tokens (tailwind.config.ts).
+  Tailwind classes (bg-coral, text-ink-2, …) remain the primary way to apply
+  color so alpha modifiers keep working; these vars exist for raw CSS and the
+  Care Hub inline-style sweep, where hardcoded hex is being moved onto tokens.
+  Keep the two in sync.
+*/
+:root {
+  --cream: #fff8f0;
+  --bg-top: #fff4ee;
+  --bg-bot: #fffbf8;
+  --surface: #ffffff;
+  --line: #f1ece7;
+
+  --coral: #ff6b5b;
+  --coral-deep: #ef4e3c;
+  --coral-soft: #ffe9e4;
+  --coral-ink: #c13b2c;
+
+  --teal: #2ec4b6;
+  --teal-soft: #dcf5f2;
+  --teal-ink: #137f75;
+
+  --amber: #ffb84c;
+  --amber-deep: #c49010;
+  --amber-soft: #fff1da;
+
+  --rose: #e0445a;
+  --rose-soft: #fbe2e6;
+  --rose-ink: #b12c3f;
+
+  --blue: #5b8def;
+  --blue-soft: #e5edfc;
+  --blue-ink: #2f5fbf;
+
+  --ink: #2d2a26;
+  --ink-2: #6b655e;
+  --ink-3: #a39d95;
+
+  /* warm neutral fills surfaced from Care inline styles */
+  --fill-1: #f7f3ef;
+  --fill-2: #f4eee9;
+  --fill-3: #e5dcd3;
+
+  --shadow-card: 0 10px 30px -12px rgba(120, 72, 60, 0.18),
+    0 2px 6px -2px rgba(120, 72, 60, 0.08);
+  --shadow-cta: 0 12px 24px -8px rgba(239, 78, 60, 0.55);
+}
+
 @layer base {
   body {
-    @apply bg-cream text-brown antialiased;
+    /* warm coral-tinted cream gradient (replaces flat bg-cream) */
+    @apply bg-gradient-app text-ink antialiased;
+    min-height: 100vh;
+  }
+}
+
+@layer utilities {
+  /* shimmer skeleton — pair with `animate-shimmer` */
+  .skeleton {
+    background-image: linear-gradient(
+      90deg,
+      #f1eae3 0%,
+      #f9f4ef 50%,
+      #f1eae3 100%
+    );
+    background-size: 200% 100%;
+  }
+
+  /* diagonal sheen sweep for primary CTAs */
+  .cta-sheen {
+    position: relative;
+    overflow: hidden;
+  }
+  .cta-sheen::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      120deg,
+      transparent 30%,
+      rgba(255, 255, 255, 0.35) 50%,
+      transparent 70%
+    );
+    transform: translateX(-100%);
+    animation: cta-sheen 3.2s ease-in-out infinite;
+  }
+  @keyframes cta-sheen {
+    0%,
+    60% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+}
+
+/* Respect reduced-motion: disable all decorative animation */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
   }
 }

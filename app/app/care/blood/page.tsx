@@ -1,14 +1,28 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { ChevronLeft, Droplet, MapPin, ChevronDown, Check, X, AlertCircle } from "lucide-react";
+import {
+  ChevronLeft,
+  Droplet,
+  MapPin,
+  ChevronDown,
+  Check,
+  X,
+  Info,
+  Dog,
+  Cat,
+  Weight,
+  CalendarDays,
+  ShieldCheck,
+  PauseCircle,
+} from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { PROVINCES } from "@/lib/data/provinces";
+import { Skeleton } from "@/components/ui";
 import {
   evaluateEligibility,
   monthsSinceLastDonation,
-  type DonorRow,
 } from "@/lib/blood-matching";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -83,29 +97,43 @@ function addMonths(dateStr: string, months: number): string {
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
 function RequestCard({ req }: { req: BloodRequest }) {
-  const speciesIcon = req.species === "dog" ? "🐕" : "🐈";
+  const SpeciesIcon = req.species === "dog" ? Dog : Cat;
   return (
     <Link
       href={`/app/care/blood/${req.id}`}
-      className="flex items-start gap-3.5 rounded-2xl bg-white p-4 shadow-card"
+      className="block rounded-panel bg-white p-4 shadow-card transition-transform active:scale-[.985]"
     >
-      <div className="mt-0.5 text-2xl">{speciesIcon}</div>
-      <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-2">
-          <span className="text-lg font-bold text-brown">{bloodTypeLabel(req.blood_type_needed)}</span>
-          {req.urgency === "urgent" && (
-            <span className="rounded-full bg-rose/10 px-2 py-0.5 text-[11px] font-bold text-rose">
-              ด่วนมาก
-            </span>
-          )}
+      <div className="mb-3 flex items-center justify-between">
+        <span className="inline-flex items-center gap-1.5 rounded-[10px] bg-fill-2 px-2.5 py-1 text-[12.5px] font-semibold text-ink-2">
+          <SpeciesIcon size={14} />
+          {req.species === "dog" ? "สุนัข" : "แมว"}
+        </span>
+        {req.urgency === "urgent" ? (
+          <span className="inline-flex items-center rounded-[9px] bg-rose px-2.5 py-1 text-[11.5px] font-bold text-white">
+            ด่วนมาก
+          </span>
+        ) : (
+          <span className="inline-flex items-center rounded-[9px] bg-fill-2 px-2.5 py-1 text-[11.5px] font-semibold text-ink-2">
+            ทั่วไป
+          </span>
+        )}
+      </div>
+      <div className="flex items-center gap-3">
+        <div className="flex h-[50px] w-[50px] shrink-0 items-center justify-center rounded-[15px] bg-rose-soft">
+          <Droplet size={22} className="text-rose" />
         </div>
-        <p className="mt-0.5 text-sm font-medium text-brown">{req.hospital_name}</p>
-        <div className="mt-1 flex items-center gap-1 text-[12px] text-brown-muted">
-          <MapPin size={11} />
-          <span>{req.province}</span>
-          <span className="mx-1">·</span>
-          <span>{timeAgo(req.created_at)}</span>
+        <div className="min-w-0 flex-1">
+          <p className="text-[11.5px] font-semibold text-ink-3">ต้องการหมู่เลือด</p>
+          <p className="text-[26px] font-bold leading-[1.05] tracking-title text-ink">
+            {bloodTypeLabel(req.blood_type_needed)}
+          </p>
         </div>
+        <span className="shrink-0 self-start text-[12px] font-medium text-ink-3">{timeAgo(req.created_at)}</span>
+      </div>
+      <div className="mt-3 flex items-center gap-1.5 border-t border-[#F4EDE7] pt-3">
+        <MapPin size={13} className="shrink-0 text-ink-3" />
+        <span className="truncate text-[13.5px] font-semibold text-ink">{req.hospital_name}</span>
+        <span className="shrink-0 text-[13px] text-ink-3">· {req.province}</span>
       </div>
     </Link>
   );
@@ -295,96 +323,111 @@ export default function BloodPage() {
   const bloodTypes = activePet?.species === "cat" ? CAT_BLOOD_TYPES : DOG_BLOOD_TYPES;
   const reqBloodTypes = reqSpecies === "cat" ? CAT_BLOOD_TYPES : DOG_BLOOD_TYPES;
 
-  const donorStatusLabel = (() => {
+  // Donor status — drives the status card at the bottom of the donor tab
+  const donorStatus = (() => {
     if (!donorRecord) return null;
-    if (!donorRecord.eligible) return { text: "ไม่ผ่านเกณฑ์บางข้อ", color: "text-brown-muted" };
-    if (!donorRecord.available && donorRecord.last_donation_date) {
-      return { text: `พักการบริจาคถึง ${addMonths(donorRecord.last_donation_date, 3)}`, color: "text-amber-dark" };
+    if (!donorRecord.eligible) {
+      return { ready: false, title: "ไม่ผ่านเกณฑ์บางข้อ", sub: "ตรวจสอบเกณฑ์การบริจาคด้านบน" };
     }
-    if (!donorRecord.available) return { text: "หยุดพักชั่วคราว", color: "text-amber-dark" };
-    return { text: "พร้อมบริจาค", color: "text-teal-dark" };
+    if (!donorRecord.available && donorRecord.last_donation_date) {
+      return { ready: false, title: `พักการบริจาคถึง ${addMonths(donorRecord.last_donation_date, 3)}`, sub: "เว้นระยะอย่างน้อย 3 เดือนระหว่างการบริจาค" };
+    }
+    if (!donorRecord.available) {
+      return { ready: false, title: "พร้อม แต่ปิดรับการติดต่อ", sub: 'เปิด "รับการติดต่อ" เพื่อให้เคสด่วนเห็นน้อง' };
+    }
+    return { ready: true, title: "พร้อมบริจาค", sub: "ขอบคุณที่เป็นฮีโร่ให้น้อง ๆ" };
   })();
-
-  if (loading) {
-    return (
-      <div className="flex min-h-screen flex-col">
-        <Header />
-        <div className="flex flex-1 items-center justify-center">
-          <Droplet size={32} className="animate-pulse text-rose/40" />
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="flex min-h-screen flex-col pb-24">
-      <Header />
-
-      {/* Disclaimer */}
-      <div className="border-b border-black/5 bg-amber/10 px-5 py-2.5">
-        <p className="text-[11px] leading-relaxed text-brown-muted">
-          PawMate เป็นสื่อกลางช่วยหาผู้บริจาคเท่านั้น การบริจาคจริงต้องผ่านการตรวจและดูแลโดยสัตวแพทย์
-        </p>
-      </div>
-
-      {/* Tab bar */}
-      <div className="sticky top-0 z-10 flex border-b border-black/5 bg-white">
-        {(["feed", "donor"] as const).map((t) => (
-          <button
-            key={t}
-            type="button"
-            onClick={() => setTab(t)}
-            className={`flex-1 py-3 text-[13px] font-semibold transition-colors ${
-              tab === t ? "border-b-2 border-rose text-rose" : "text-brown-muted"
-            }`}
+      {/* Header */}
+      <div className="shrink-0 px-[22px] pb-3 pt-1">
+        <div className="mb-2.5 flex items-center gap-3">
+          <Link
+            href="/app/care"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[13px] border-[1.5px] border-line bg-white text-ink shadow-[0_6px_16px_-10px_rgba(120,72,60,.3)] transition-transform active:scale-95"
           >
-            {t === "feed" ? "ประกาศขอรับบริจาค" : "เป็นผู้บริจาค"}
-          </button>
-        ))}
+            <ChevronLeft size={20} />
+          </Link>
+          <div className="min-w-0 flex-1">
+            <h1 className="text-[21px] font-bold leading-[1.1] tracking-title text-ink">ศูนย์บริจาคเลือด</h1>
+            <p className="mt-px text-[12.5px] text-ink-2">เชื่อมผู้บริจาคกับน้อง ๆ ที่ต้องการเลือดด่วน</p>
+          </div>
+        </div>
+
+        {/* Disclaimer */}
+        <div className="mb-3 flex items-start gap-2 rounded-[12px] bg-fill-2 px-3 py-2.5">
+          <Info size={15} className="mt-px shrink-0 text-ink-3" />
+          <span className="text-[11.5px] leading-relaxed text-ink-3">
+            PawMate เป็นสื่อกลางช่วยหาผู้บริจาคเท่านั้น ไม่ได้ให้บริการทางการแพทย์ กรุณาปรึกษาสัตวแพทย์ก่อนบริจาคทุกครั้ง
+          </span>
+        </div>
+
+        {/* Tabs */}
+        <div className="flex gap-[5px] rounded-chip bg-fill-2 p-[5px]">
+          {(["feed", "donor"] as const).map((t) => {
+            const active = tab === t;
+            return (
+              <button
+                key={t}
+                type="button"
+                onClick={() => setTab(t)}
+                className={`flex-1 rounded-[10px] py-[11px] text-center text-[14px] tracking-tight2 transition-all ${
+                  active ? "bg-white font-bold text-ink shadow-card" : "font-semibold text-ink-3"
+                }`}
+              >
+                {t === "feed" ? "ขอรับบริจาค" : "เป็นผู้บริจาค"}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* ─── Tab 1: Feed ─── */}
       {tab === "feed" && (
-        <div className="flex flex-col gap-3 px-5 pt-4">
+        <div className="flex flex-col gap-3 px-[22px] pt-1">
           {/* Filters */}
-          <div className="flex gap-2">
+          <div className="flex gap-2.5">
             <div className="relative flex-1">
               <select
                 value={filterProvince}
                 onChange={(e) => setFilterProvince(e.target.value)}
-                className="w-full appearance-none rounded-xl border border-black/10 bg-white py-2 pl-3 pr-7 text-[13px] text-brown"
+                className="h-10 w-full appearance-none rounded-[12px] border-[1.5px] border-line bg-white pl-3 pr-8 text-[13px] font-semibold text-ink"
               >
                 <option value="">ทุกจังหวัด</option>
                 {PROVINCES.map((p) => <option key={p} value={p}>{p}</option>)}
               </select>
-              <ChevronDown size={14} className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-brown-muted" />
+              <ChevronDown size={15} className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-ink-3" />
             </div>
-            <div className="relative w-[110px]">
+            <div className="relative w-[120px]">
               <select
                 value={filterSpecies}
                 onChange={(e) => setFilterSpecies(e.target.value)}
-                className="w-full appearance-none rounded-xl border border-black/10 bg-white py-2 pl-3 pr-7 text-[13px] text-brown"
+                className="h-10 w-full appearance-none rounded-[12px] border-[1.5px] border-line bg-white pl-3 pr-8 text-[13px] font-semibold text-ink"
               >
                 <option value="">ทุกชนิด</option>
                 <option value="dog">สุนัข</option>
                 <option value="cat">แมว</option>
               </select>
-              <ChevronDown size={14} className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-brown-muted" />
+              <ChevronDown size={15} className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-ink-3" />
             </div>
           </div>
 
-          {filteredRequests.length === 0 ? (
-            <div className="flex flex-col items-center gap-3 rounded-2xl border-2 border-dashed border-black/10 bg-white/60 py-12 text-center">
-              <Droplet size={32} className="text-brown-muted/40" />
-              <p className="font-bold text-brown">ยังไม่มีประกาศ</p>
-              <p className="text-sm text-brown-muted">เป็นคนแรกที่ขอรับบริจาค</p>
-              <button
-                type="button"
-                onClick={() => setShowRequestForm(true)}
-                className="mt-1 rounded-xl bg-rose px-5 py-2.5 text-sm font-bold text-white"
-              >
-                ขอรับบริจาค
-              </button>
+          {loading ? (
+            <div className="flex flex-col gap-3">
+              {[0, 1, 2, 3].map((k) => (
+                <Skeleton key={k} className="h-[128px] rounded-panel" />
+              ))}
+            </div>
+          ) : filteredRequests.length === 0 ? (
+            <div className="mt-2 flex animate-fade-up flex-col items-center gap-3 py-12 text-center">
+              <div className="flex h-[84px] w-[84px] items-center justify-center rounded-[26px] bg-teal-soft">
+                <Droplet size={34} className="text-teal-ink" />
+              </div>
+              <p className="mt-1 text-[18px] font-bold text-ink">ไม่มีคำขอตอนนี้</p>
+              <p className="max-w-[240px] text-[14px] leading-relaxed text-ink-2">
+                ตอนนี้ยังไม่มีคำขอรับบริจาคตามตัวกรองนี้ — ข่าวดีสำหรับน้อง ๆ ทุกตัว
+              </p>
             </div>
           ) : (
             <div className="flex flex-col gap-3">
@@ -396,169 +439,182 @@ export default function BloodPage() {
 
       {/* ─── Tab 2: Donor ─── */}
       {tab === "donor" && (
-        <div className="px-5 pt-4">
-          {!activePet ? (
-            <div className="rounded-2xl bg-white p-6 text-center shadow-card">
-              <p className="text-brown-muted">ต้องสร้างโปรไฟล์น้องก่อน</p>
-              <Link href="/onboarding" className="mt-3 inline-block rounded-xl bg-coral px-5 py-2.5 text-sm font-bold text-white">
+        <div className="px-[22px] pt-1">
+          {loading ? (
+            <div className="flex flex-col gap-4">
+              <Skeleton className="h-[52px] rounded-[14px]" />
+              <Skeleton className="h-[52px] rounded-[14px]" />
+              <Skeleton className="h-[180px] rounded-panel" />
+            </div>
+          ) : !activePet ? (
+            <div className="rounded-panel bg-white p-6 text-center shadow-card">
+              <p className="text-ink-2">ต้องสร้างโปรไฟล์น้องก่อน</p>
+              <Link href="/onboarding" className="mt-3 inline-block rounded-[12px] bg-gradient-cta px-5 py-2.5 text-sm font-bold text-white shadow-cta">
                 สร้างโปรไฟล์
               </Link>
             </div>
           ) : (
             <div className="flex flex-col gap-5">
-              {/* Pet header */}
-              <div className="flex items-center gap-3 rounded-2xl bg-white p-4 shadow-card">
-                <div className="h-12 w-12 overflow-hidden rounded-2xl bg-cream">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={activePet.photos[0]} alt={activePet.name} className="h-full w-full object-cover" />
+              {/* Blood type */}
+              <div>
+                <label className="mb-[7px] block text-[13px] font-semibold text-ink">หมู่เลือดของน้อง</label>
+                <div className="relative">
+                  <select
+                    value={bloodType}
+                    onChange={(e) => setBloodType(e.target.value)}
+                    className="h-[52px] w-full appearance-none rounded-[14px] border-[1.5px] border-line bg-white pl-4 pr-10 text-[16px] font-semibold text-ink"
+                  >
+                    <option value="">เลือกหมู่เลือด</option>
+                    {bloodTypes.map((bt) => <option key={bt.value} value={bt.value}>{bt.label}</option>)}
+                  </select>
+                  <ChevronDown size={16} className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-ink-3" />
                 </div>
-                <div>
-                  <p className="font-bold text-brown">{activePet.name}</p>
-                  <p className="text-[12px] text-brown-muted">{activePet.species === "dog" ? "สุนัข" : "แมว"}</p>
-                </div>
-                {donorStatusLabel && (
-                  <span className={`ml-auto text-[12px] font-bold ${donorStatusLabel.color}`}>
-                    🩸 {donorStatusLabel.text}
-                  </span>
+                {bloodType === "unknown" && (
+                  <div className="mt-[7px] flex items-center gap-1.5">
+                    <Info size={14} className="shrink-0 text-blue-ink" />
+                    <span className="text-[12px] font-medium text-blue-ink">
+                      ไม่เป็นไร สัตวแพทย์จะตรวจหมู่เลือดให้ในวันบริจาค
+                    </span>
+                  </div>
                 )}
               </div>
 
-              {/* Donor status card (when registered) */}
-              {donorRecord && (
-                <div className="rounded-2xl border border-black/8 bg-white p-4">
-                  <p className="mb-3 text-[11px] font-bold uppercase tracking-wide text-brown-muted/70">ข้อมูลผู้บริจาค</p>
-                  <div className="mb-3 flex gap-4">
-                    <div>
-                      <p className="text-[11px] text-brown-muted">กรุ๊ปเลือด</p>
-                      <p className="font-bold text-brown">{bloodTypeLabel(donorRecord.blood_type)}</p>
-                    </div>
-                    <div>
-                      <p className="text-[11px] text-brown-muted">น้ำหนัก</p>
-                      <p className="font-bold text-brown">{donorRecord.weight_kg} กก.</p>
-                    </div>
-                    {donorRecord.last_donation_date && (
-                      <div>
-                        <p className="text-[11px] text-brown-muted">บริจาคล่าสุด</p>
-                        <p className="font-bold text-brown">
-                          {new Date(donorRecord.last_donation_date + "T00:00:00").toLocaleDateString("th-TH", { day: "numeric", month: "short" })}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                  <button
-                    type="button"
-                    onClick={toggleAvailable}
-                    className={`w-full rounded-xl py-2.5 text-sm font-bold transition-colors ${
-                      donorRecord.available
-                        ? "bg-teal/10 text-teal-dark"
-                        : "bg-cream text-brown-muted"
-                    }`}
-                  >
-                    {donorRecord.available ? "✓ ว่างให้บริจาค" : "พักการบริจาคชั่วคราว"}
-                  </button>
-                </div>
-              )}
-
-              {/* Registration / Edit form */}
-              <div className="rounded-2xl border border-black/8 bg-white p-4">
-                <p className="mb-4 text-[13px] font-bold text-brown">
-                  {donorRecord ? "แก้ไขข้อมูลผู้บริจาค" : "ลงทะเบียนเป็นผู้บริจาค"}
-                </p>
-
-                <div className="flex flex-col gap-4">
-                  {/* Blood type */}
-                  <div>
-                    <label className="mb-1.5 block text-[12px] font-semibold text-brown-muted">กรุ๊ปเลือด *</label>
-                    <div className="relative">
-                      <select
-                        value={bloodType}
-                        onChange={(e) => setBloodType(e.target.value)}
-                        className="w-full appearance-none rounded-xl border border-black/10 bg-cream py-3 pl-4 pr-8 text-sm text-brown"
-                      >
-                        <option value="">เลือกกรุ๊ปเลือด</option>
-                        {bloodTypes.map((bt) => <option key={bt.value} value={bt.value}>{bt.label}</option>)}
-                      </select>
-                      <ChevronDown size={14} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-brown-muted" />
-                    </div>
-                    {bloodType === "unknown" && (
-                      <p className="mt-1 text-[11px] text-brown-muted">ตรวจกรุ๊ปเลือดได้ที่โรงพยาบาลสัตว์ใกล้บ้าน</p>
-                    )}
-                  </div>
-
-                  {/* Weight */}
-                  <div>
-                    <label className="mb-1.5 block text-[12px] font-semibold text-brown-muted">น้ำหนัก (กก.) *</label>
-                    <input
-                      type="number"
-                      min="0.1"
-                      step="0.1"
-                      value={weightKg}
-                      onChange={(e) => setWeightKg(e.target.value)}
-                      placeholder="เช่น 25.5"
-                      className="w-full rounded-xl border border-black/10 bg-cream px-4 py-3 text-sm text-brown placeholder:text-brown-muted/50"
-                    />
-                  </div>
-
-                  {/* Indoor-only (cats only) */}
-                  {activePet.species === "cat" && (
-                    <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-black/10 bg-cream px-4 py-3">
-                      <div className={`flex h-5 w-5 items-center justify-center rounded-md border-2 transition-colors ${indoorOnly ? "border-teal bg-teal" : "border-black/20"}`}>
-                        {indoorOnly && <Check size={12} className="text-white" />}
-                      </div>
-                      <input type="checkbox" checked={indoorOnly} onChange={(e) => setIndoorOnly(e.target.checked)} className="sr-only" />
-                      <span className="text-sm text-brown">น้องอยู่ในบ้านเท่านั้น (indoor-only)</span>
-                    </label>
-                  )}
-
-                  {/* Last donation date */}
-                  <div>
-                    <label className="mb-1.5 block text-[12px] font-semibold text-brown-muted">วันที่บริจาคล่าสุด (ถ้ามี)</label>
-                    <input
-                      type="date"
-                      value={lastDonationDate}
-                      max={new Date().toISOString().split("T")[0]}
-                      onChange={(e) => setLastDonationDate(e.target.value)}
-                      className="w-full rounded-xl border border-black/10 bg-cream px-4 py-3 text-sm text-brown"
-                    />
-                  </div>
-
-                  {/* Eligibility checklist */}
-                  {eligibility && (
-                    <div className={`rounded-xl p-3.5 ${eligibility.allPass ? "bg-teal/8" : "bg-cream"}`}>
-                      <p className="mb-2.5 text-[11px] font-bold uppercase tracking-wide text-brown-muted/70">เกณฑ์การบริจาค</p>
-                      <div className="flex flex-col gap-2">
-                        {eligibility.criteria.map((c, i) => (
-                          <div key={i} className="flex items-start gap-2">
-                            <div className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full ${c.pass ? "bg-teal" : "bg-rose/20"}`}>
-                              {c.pass
-                                ? <Check size={10} className="text-white" />
-                                : <X size={10} className="text-rose" />}
-                            </div>
-                            <p className={`text-[12px] ${c.pass ? "text-brown" : "text-rose"}`}>{c.label}</p>
-                          </div>
-                        ))}
-                      </div>
-                      {eligibility.allPass && (
-                        <p className="mt-2.5 text-[11px] font-bold text-teal-dark">✓ ผ่านเกณฑ์ทุกข้อ</p>
-                      )}
-                    </div>
-                  )}
-
-                  <button
-                    type="button"
-                    onClick={saveDonorRecord}
-                    disabled={saving || !bloodType || !weightKg}
-                    className="h-12 rounded-xl bg-rose font-bold text-white transition-opacity disabled:opacity-40"
-                  >
-                    {saving ? "กำลังบันทึก..." : donorRecord ? "บันทึกการเปลี่ยนแปลง" : "ลงทะเบียนผู้บริจาค"}
-                  </button>
+              {/* Weight */}
+              <div>
+                <label className="mb-[7px] block text-[13px] font-semibold text-ink">น้ำหนัก (กก.)</label>
+                <div className="flex h-[52px] items-center gap-2.5 rounded-[14px] border-[1.5px] border-line bg-white px-3.5">
+                  <Weight size={18} className="shrink-0 text-ink-3" />
+                  <input
+                    type="number"
+                    min="0.1"
+                    step="0.1"
+                    value={weightKg}
+                    onChange={(e) => setWeightKg(e.target.value)}
+                    placeholder="เช่น 28"
+                    className="min-w-0 flex-1 border-none bg-transparent text-[16px] font-medium text-ink outline-none placeholder:text-ink-3/60"
+                  />
+                  <span className="shrink-0 text-[14px] font-medium text-ink-3">กก.</span>
                 </div>
               </div>
 
+              {/* Indoor-only (cats only) */}
+              {activePet.species === "cat" && (
+                <label className="flex cursor-pointer items-center gap-3 rounded-[14px] border-[1.5px] border-line bg-white px-4 py-3">
+                  <div className={`flex h-5 w-5 items-center justify-center rounded-md border-2 transition-colors ${indoorOnly ? "border-teal bg-teal" : "border-line"}`}>
+                    {indoorOnly && <Check size={12} className="text-white" />}
+                  </div>
+                  <input type="checkbox" checked={indoorOnly} onChange={(e) => setIndoorOnly(e.target.checked)} className="sr-only" />
+                  <span className="text-sm text-ink">น้องอยู่ในบ้านเท่านั้น (indoor-only)</span>
+                </label>
+              )}
+
+              {/* Eligibility checklist */}
+              {eligibility && (
+                <div>
+                  <p className="mb-[11px] text-[13px] font-bold text-ink">คุณสมบัติผู้บริจาค</p>
+                  <div className="rounded-[16px] bg-white px-4 py-[6px] shadow-card">
+                    {eligibility.criteria.map((c, i) => (
+                      <div
+                        key={i}
+                        className={`flex items-start gap-[11px] py-3 ${i < eligibility.criteria.length - 1 ? "border-b border-[#F4EDE7]" : ""}`}
+                      >
+                        <div className={`mt-px flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${c.pass ? "bg-teal" : "bg-rose"}`}>
+                          {c.pass ? <Check size={14} className="text-white" /> : <X size={14} className="text-white" />}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-[14px] font-semibold leading-snug text-ink">{c.label}</p>
+                          {!c.pass && (
+                            <p className="mt-0.5 text-[12px] font-medium text-rose-ink">ยังไม่ผ่านเกณฑ์นี้</p>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Availability toggle (only meaningful once registered) */}
+              {donorRecord && (
+                <button
+                  type="button"
+                  onClick={toggleAvailable}
+                  className="flex items-center justify-between rounded-[15px] border-[1.5px] border-line bg-white px-4 py-3.5 text-left shadow-[0_6px_18px_-14px_rgba(120,72,60,.2)]"
+                >
+                  <div className="min-w-0 flex-1 pr-3">
+                    <p className="text-[14.5px] font-semibold text-ink">รับการติดต่อเมื่อมีเคสด่วน</p>
+                    <p className="mt-px text-[12px] text-ink-2">เราจะแจ้งเมื่อมีน้องใกล้คุณต้องการเลือด</p>
+                  </div>
+                  <span
+                    className={`flex h-[27px] w-[46px] shrink-0 items-center rounded-full p-[3px] transition-all ${
+                      donorRecord.available ? "justify-end bg-teal" : "justify-start bg-fill-3"
+                    }`}
+                  >
+                    <span className="h-[21px] w-[21px] rounded-full bg-white shadow-[0_2px_5px_rgba(0,0,0,.2)]" />
+                  </span>
+                </button>
+              )}
+
+              {/* Last donation date */}
+              <div>
+                <label className="mb-[7px] block text-[13px] font-semibold text-ink">วันที่บริจาคล่าสุด</label>
+                <div className="flex h-[52px] items-center gap-2.5 rounded-[14px] border-[1.5px] border-line bg-white px-3.5">
+                  <CalendarDays size={18} className="shrink-0 text-ink-3" />
+                  <input
+                    type="date"
+                    value={lastDonationDate}
+                    max={new Date().toISOString().split("T")[0]}
+                    onChange={(e) => setLastDonationDate(e.target.value)}
+                    className="min-w-0 flex-1 border-none bg-transparent text-[16px] font-medium text-ink outline-none"
+                  />
+                  <span className="shrink-0 text-[12.5px] font-medium text-ink-3">ถ้ามี</span>
+                </div>
+              </div>
+
+              {/* Donor status card */}
+              {donorStatus && (
+                <div
+                  className={`flex items-center gap-3.5 rounded-panel p-4 ${
+                    donorStatus.ready ? "border border-teal/45 bg-teal-soft" : "border border-line bg-fill-2"
+                  }`}
+                >
+                  <div
+                    className={`flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-[16px] ${
+                      donorStatus.ready
+                        ? "bg-teal shadow-[0_8px_18px_-8px_rgba(46,196,182,.6)]"
+                        : "bg-ink-3 shadow-[0_8px_18px_-8px_rgba(120,72,60,.3)]"
+                    }`}
+                  >
+                    {donorStatus.ready ? (
+                      <ShieldCheck size={26} className="text-white" />
+                    ) : (
+                      <PauseCircle size={26} className="text-white" />
+                    )}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className={`text-[16.5px] font-bold tracking-tight2 ${donorStatus.ready ? "text-teal-ink" : "text-ink"}`}>
+                      {donorStatus.title}
+                    </p>
+                    <p className={`mt-0.5 text-[12.5px] ${donorStatus.ready ? "text-teal-ink" : "text-ink-2"}`}>
+                      {donorStatus.sub}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Save / register CTA */}
+              <button
+                type="button"
+                onClick={saveDonorRecord}
+                disabled={saving || !bloodType || !weightKg}
+                className="h-14 rounded-2xl bg-gradient-cta font-bold tracking-tight2 text-white shadow-cta transition-transform active:scale-[.98] disabled:opacity-40"
+              >
+                {saving ? "กำลังบันทึก..." : donorRecord ? "บันทึกการเปลี่ยนแปลง" : "ลงทะเบียนผู้บริจาค"}
+              </button>
+
               {/* Donor info note */}
-              <div className="flex gap-2 rounded-xl bg-amber/10 p-3.5">
-                <AlertCircle size={14} className="mt-0.5 shrink-0 text-amber-dark" />
-                <p className="text-[11px] leading-relaxed text-brown-muted">
+              <div className="flex gap-2 rounded-[14px] bg-amber-soft p-3.5">
+                <Info size={15} className="mt-px shrink-0 text-amber-deep" />
+                <p className="text-[11.5px] leading-relaxed text-ink-2">
                   ข้อมูลของน้องจะแสดงต่อเจ้าของประกาศที่ขอรับบริจาคเท่านั้น ไม่เปิดเผยต่อสาธารณะ
                 </p>
               </div>
@@ -572,133 +628,141 @@ export default function BloodPage() {
         <button
           type="button"
           onClick={() => setShowRequestForm(true)}
-          className="fixed bottom-[76px] right-4 z-[60] flex h-[52px] items-center gap-2 rounded-[18px] bg-rose px-5 shadow-[0_4px_20px_rgba(224,68,90,0.38)]"
+          className="fixed bottom-[76px] right-5 z-[60] flex h-[54px] items-center gap-2 rounded-[27px] bg-gradient-cta px-5 shadow-cta transition-transform active:scale-95"
         >
           <Droplet size={18} className="text-white" />
-          <span className="text-[14px] font-bold text-white">ขอรับบริจาค</span>
+          <span className="text-[15.5px] font-bold text-white">ขอรับบริจาค</span>
         </button>
       )}
 
       {/* ─── Create Request Overlay ─── */}
       {showRequestForm && (
         <>
-          <div className="fixed inset-0 z-[60] bg-black/50" onClick={() => setShowRequestForm(false)} />
+          <div className="fixed inset-0 z-[60] bg-[rgba(35,24,20,.45)] backdrop-blur-[2px]" onClick={() => setShowRequestForm(false)} />
           <div
-            className="fixed inset-x-0 bottom-0 z-[70] mx-auto max-w-[480px] overflow-y-auto rounded-t-[28px] bg-white pb-[env(safe-area-inset-bottom)]"
+            className="fixed inset-x-0 bottom-0 z-[70] mx-auto max-w-[480px] animate-fade-up overflow-y-auto rounded-t-card bg-white pb-[env(safe-area-inset-bottom)] shadow-sheet"
             style={{ maxHeight: "88vh" }}
           >
-            <div className="sticky top-0 bg-white px-5 pb-3 pt-5">
-              <div className="mx-auto mb-4 h-1 w-9 rounded-full bg-black/10" />
-              <p className="text-base font-bold text-brown">ขอรับบริจาคเลือด</p>
-              <p className="mt-0.5 text-[12px] text-brown-muted">กรอกข้อมูลให้ครบเพื่อให้ผู้บริจาคติดต่อได้</p>
+            <div className="sticky top-0 bg-white px-6 pb-3 pt-3">
+              <div className="mx-auto mb-4 h-[5px] w-10 rounded-full bg-fill-3" />
+              <p className="text-lg font-bold tracking-tight2 text-ink">ขอรับบริจาคเลือด</p>
+              <p className="mt-0.5 text-[12.5px] text-ink-2">กรอกข้อมูลให้ครบเพื่อให้ผู้บริจาคติดต่อได้</p>
             </div>
 
-            <div className="flex flex-col gap-4 px-5 pb-6">
+            <div className="flex flex-col gap-4 px-6 pb-6">
               {/* Species */}
               <div>
-                <label className="mb-2 block text-[12px] font-semibold text-brown-muted">ชนิดสัตว์ *</label>
-                <div className="flex gap-2">
-                  {(["dog", "cat"] as const).map((s) => (
-                    <button
-                      key={s}
-                      type="button"
-                      onClick={() => { setReqSpecies(s); setReqBloodType(""); }}
-                      className={`flex-1 rounded-xl border-2 py-2.5 text-sm font-semibold transition-colors ${
-                        reqSpecies === s ? "border-rose bg-rose/8 text-rose" : "border-black/10 text-brown-muted"
-                      }`}
-                    >
-                      {s === "dog" ? "🐕 สุนัข" : "🐈 แมว"}
-                    </button>
-                  ))}
+                <label className="mb-2 block text-[12.5px] font-semibold text-ink-2">ชนิดสัตว์ *</label>
+                <div className="flex gap-2.5">
+                  {(["dog", "cat"] as const).map((s) => {
+                    const Icon = s === "dog" ? Dog : Cat;
+                    const active = reqSpecies === s;
+                    return (
+                      <button
+                        key={s}
+                        type="button"
+                        onClick={() => { setReqSpecies(s); setReqBloodType(""); }}
+                        className={`flex flex-1 items-center justify-center gap-2 rounded-[14px] border-[1.5px] py-2.5 text-sm font-semibold transition-colors ${
+                          active ? "border-coral/40 bg-coral-soft text-coral-ink" : "border-line bg-[#FBF7F3] text-ink-3"
+                        }`}
+                      >
+                        <Icon size={16} />
+                        {s === "dog" ? "สุนัข" : "แมว"}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 
               {/* Blood type needed */}
               <div>
-                <label className="mb-1.5 block text-[12px] font-semibold text-brown-muted">กรุ๊ปเลือดที่ต้องการ *</label>
+                <label className="mb-1.5 block text-[12.5px] font-semibold text-ink-2">หมู่เลือดที่ต้องการ *</label>
                 <div className="relative">
                   <select
                     value={reqBloodType}
                     onChange={(e) => setReqBloodType(e.target.value)}
-                    className="w-full appearance-none rounded-xl border border-black/10 bg-cream py-3 pl-4 pr-8 text-sm text-brown"
+                    className="w-full appearance-none rounded-[14px] border-[1.5px] border-line bg-[#FBF7F3] py-3 pl-4 pr-9 text-sm font-medium text-ink"
                   >
-                    <option value="">เลือกกรุ๊ปเลือด</option>
+                    <option value="">เลือกหมู่เลือด</option>
                     {reqBloodTypes.map((bt) => <option key={bt.value} value={bt.value}>{bt.label}</option>)}
                   </select>
-                  <ChevronDown size={14} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-brown-muted" />
+                  <ChevronDown size={15} className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-ink-3" />
                 </div>
               </div>
 
               {/* Urgency */}
               <div>
-                <label className="mb-2 block text-[12px] font-semibold text-brown-muted">ความเร่งด่วน *</label>
-                <div className="flex gap-2">
-                  {([["normal", "ทั่วไป"], ["urgent", "ด่วนมาก"]] as const).map(([v, label]) => (
-                    <button
-                      key={v}
-                      type="button"
-                      onClick={() => setReqUrgency(v)}
-                      className={`flex-1 rounded-xl border-2 py-2.5 text-sm font-semibold transition-colors ${
-                        reqUrgency === v
-                          ? v === "urgent" ? "border-rose bg-rose/8 text-rose" : "border-teal bg-teal/8 text-teal-dark"
-                          : "border-black/10 text-brown-muted"
-                      }`}
-                    >
-                      {label}
-                    </button>
-                  ))}
+                <label className="mb-2 block text-[12.5px] font-semibold text-ink-2">ความเร่งด่วน *</label>
+                <div className="flex gap-2.5">
+                  {([["normal", "ทั่วไป"], ["urgent", "ด่วนมาก"]] as const).map(([v, label]) => {
+                    const active = reqUrgency === v;
+                    return (
+                      <button
+                        key={v}
+                        type="button"
+                        onClick={() => setReqUrgency(v)}
+                        className={`flex-1 rounded-[14px] border-[1.5px] py-2.5 text-sm font-semibold transition-colors ${
+                          active
+                            ? v === "urgent" ? "border-rose/40 bg-rose-soft text-rose-ink" : "border-teal/40 bg-teal-soft text-teal-ink"
+                            : "border-line bg-[#FBF7F3] text-ink-3"
+                        }`}
+                      >
+                        {label}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 
               {/* Hospital */}
               <div>
-                <label className="mb-1.5 block text-[12px] font-semibold text-brown-muted">โรงพยาบาลสัตว์ *</label>
+                <label className="mb-1.5 block text-[12.5px] font-semibold text-ink-2">โรงพยาบาลสัตว์ *</label>
                 <input
                   type="text"
                   value={reqHospital}
                   onChange={(e) => setReqHospital(e.target.value)}
                   placeholder="เช่น โรงพยาบาลสัตว์กรุงเทพ"
-                  className="w-full rounded-xl border border-black/10 bg-cream px-4 py-3 text-sm text-brown placeholder:text-brown-muted/50"
+                  className="w-full rounded-[14px] border-[1.5px] border-line bg-[#FBF7F3] px-4 py-3 text-sm text-ink placeholder:text-ink-3/60"
                 />
               </div>
 
               {/* Province */}
               <div>
-                <label className="mb-1.5 block text-[12px] font-semibold text-brown-muted">จังหวัด *</label>
+                <label className="mb-1.5 block text-[12.5px] font-semibold text-ink-2">จังหวัด *</label>
                 <div className="relative">
                   <select
                     value={reqProvince}
                     onChange={(e) => setReqProvince(e.target.value)}
-                    className="w-full appearance-none rounded-xl border border-black/10 bg-cream py-3 pl-4 pr-8 text-sm text-brown"
+                    className="w-full appearance-none rounded-[14px] border-[1.5px] border-line bg-[#FBF7F3] py-3 pl-4 pr-9 text-sm font-medium text-ink"
                   >
                     <option value="">เลือกจังหวัด</option>
                     {PROVINCES.map((p) => <option key={p} value={p}>{p}</option>)}
                   </select>
-                  <ChevronDown size={14} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-brown-muted" />
+                  <ChevronDown size={15} className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-ink-3" />
                 </div>
               </div>
 
               {/* Details */}
               <div>
-                <label className="mb-1.5 block text-[12px] font-semibold text-brown-muted">รายละเอียดเพิ่มเติม</label>
+                <label className="mb-1.5 block text-[12.5px] font-semibold text-ink-2">รายละเอียดเพิ่มเติม</label>
                 <textarea
                   value={reqDetails}
                   onChange={(e) => setReqDetails(e.target.value)}
                   rows={3}
                   placeholder="เช่น สายพันธุ์น้อง น้ำหนัก สถานการณ์"
-                  className="w-full resize-none rounded-xl border border-black/10 bg-cream px-4 py-3 text-sm text-brown placeholder:text-brown-muted/50"
+                  className="w-full resize-none rounded-[14px] border-[1.5px] border-line bg-[#FBF7F3] px-4 py-3 text-sm text-ink placeholder:text-ink-3/60"
                 />
               </div>
 
               {/* Contact */}
               <div>
-                <label className="mb-1.5 block text-[12px] font-semibold text-brown-muted">เบอร์ติดต่อ *</label>
+                <label className="mb-1.5 block text-[12.5px] font-semibold text-ink-2">เบอร์ติดต่อ *</label>
                 <input
                   type="text"
                   value={reqContact}
                   onChange={(e) => setReqContact(e.target.value)}
                   placeholder="08x-xxx-xxxx"
-                  className="w-full rounded-xl border border-black/10 bg-cream px-4 py-3 text-sm text-brown placeholder:text-brown-muted/50"
+                  className="w-full rounded-[14px] border-[1.5px] border-line bg-[#FBF7F3] px-4 py-3 text-sm text-ink placeholder:text-ink-3/60"
                 />
               </div>
 
@@ -706,7 +770,7 @@ export default function BloodPage() {
                 type="button"
                 onClick={submitRequest}
                 disabled={submittingReq || !reqBloodType || !reqHospital || !reqProvince || !reqContact}
-                className="h-[52px] rounded-2xl bg-rose font-bold text-white transition-opacity disabled:opacity-40"
+                className="h-14 rounded-2xl bg-gradient-cta font-bold tracking-tight2 text-white shadow-cta transition-transform active:scale-[.98] disabled:opacity-40"
               >
                 {submittingReq ? "กำลังโพสต์..." : "โพสต์ประกาศ"}
               </button>
@@ -714,17 +778,6 @@ export default function BloodPage() {
           </div>
         </>
       )}
-    </div>
-  );
-}
-
-function Header() {
-  return (
-    <div className="flex h-14 shrink-0 items-center gap-1 border-b border-black/5 px-1">
-      <Link href="/app/care" className="flex h-11 w-11 shrink-0 items-center justify-center text-brown">
-        <ChevronLeft size={20} />
-      </Link>
-      <p className="font-bold text-brown">ศูนย์บริจาคเลือดสัตว์</p>
     </div>
   );
 }

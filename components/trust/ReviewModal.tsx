@@ -98,16 +98,16 @@ export default function ReviewModal({
 
   return (
     <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/50 p-6">
-      <div className="w-full max-w-[380px] rounded-card bg-white p-6">
+      <div className="w-full max-w-[380px] animate-pop rounded-card bg-white p-6 shadow-popup">
         <div className="mb-1 flex items-center justify-between">
-          <h3 className="text-lg font-bold text-brown">
+          <h3 className="text-lg font-bold tracking-tight2 text-ink">
             {existingId ? "แก้ไขรีวิว" : "ให้คะแนนหลังนัดเจอ"}
           </h3>
           <button type="button" onClick={onClose} className="rounded-full p-1 hover:bg-cream">
-            <X size={18} className="text-brown-muted" />
+            <X size={18} className="text-ink-2" />
           </button>
         </div>
-        {petName && <p className="text-sm text-brown-muted">{petName}</p>}
+        {petName && <p className="text-sm text-ink-2">{petName}</p>}
 
         {loading ? (
           <div className="mt-3 h-40 animate-pulse rounded-card bg-black/5" />
@@ -120,20 +120,20 @@ export default function ReviewModal({
                   <Star
                     size={36}
                     className={
-                      n <= rating ? "fill-amber text-amber" : "fill-transparent text-[#D5D1CC]"
+                      n <= rating ? "fill-amber text-amber" : "fill-transparent text-fill-3"
                     }
                   />
                 </button>
               ))}
             </div>
             {rating > 0 && (
-              <p className="mt-1.5 text-center text-xs text-[#B5B0AA]">
+              <p className="mt-1.5 text-center text-xs text-ink-3">
                 {RATING_LABELS[rating]}
               </p>
             )}
 
             {/* Quick tags */}
-            <p className="mb-2.5 mt-4 text-xs font-semibold text-brown">
+            <p className="mb-2.5 mt-4 text-xs font-semibold text-ink">
               เลือกคำอธิบาย (ไม่บังคับ)
             </p>
             <div className="flex flex-wrap justify-center gap-2">
@@ -144,10 +144,10 @@ export default function ReviewModal({
                     key={tag}
                     type="button"
                     onClick={() => toggleTag(tag)}
-                    className={`flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-bold transition-colors ${
+                    className={`flex items-center gap-1 rounded-chip px-3 py-1.5 text-xs font-bold transition-colors ${
                       active
                         ? "bg-teal text-white"
-                        : "border-[1.5px] border-[#EDEAE6] bg-[#F0EEEB] text-[#5A5650]"
+                        : "border-[1.5px] border-line bg-fill-2 text-ink-2"
                     }`}
                   >
                     {active && <Check size={11} />}
@@ -158,7 +158,7 @@ export default function ReviewModal({
             </div>
 
             {/* Comment */}
-            <p className="mb-2 mt-4 text-xs font-semibold text-brown">
+            <p className="mb-2 mt-4 text-xs font-semibold text-ink">
               ความคิดเห็น (ไม่บังคับ)
             </p>
             <textarea
@@ -167,14 +167,14 @@ export default function ReviewModal({
               placeholder="เล่าประสบการณ์การนัดเจอ (ไม่บังคับ)"
               maxLength={500}
               rows={3}
-              className="w-full resize-none rounded-xl border-[1.5px] border-black/10 bg-cream px-4 py-3 text-sm focus:border-teal focus:outline-none focus:ring-2 focus:ring-teal/20"
+              className="w-full resize-none rounded-2xl border-[1.5px] border-black/10 bg-cream px-4 py-3 text-sm text-ink focus:border-teal focus:outline-none focus:ring-2 focus:ring-teal/20"
             />
 
             <button
               type="button"
               onClick={save}
               disabled={rating < 1 || saving}
-              className="mt-4 w-full rounded-full bg-coral py-3 font-bold text-white transition-colors disabled:opacity-40 hover:bg-coral-dark"
+              className="mt-4 h-12 w-full rounded-2xl bg-gradient-cta font-bold tracking-tight2 text-white shadow-cta transition-transform active:scale-[.98] disabled:opacity-40 disabled:active:scale-100"
             >
               {saving ? "กำลังบันทึก..." : existingId ? "แก้ไขรีวิว" : "บันทึกรีวิว"}
             </button>
@@ -195,16 +195,16 @@ export default function ReviewModal({
       {/* Delete confirm */}
       {confirmDeleteOpen && (
         <div className="fixed inset-0 z-[71] flex items-center justify-center bg-black/50 p-6">
-          <div className="w-full max-w-[320px] rounded-card bg-white p-6 text-center shadow-2xl">
-            <h3 className="text-lg font-bold text-brown">ลบรีวิวนี้?</h3>
-            <p className="mt-2 text-sm text-brown-muted">
+          <div className="w-full max-w-[320px] animate-pop rounded-card bg-white p-6 text-center shadow-popup">
+            <h3 className="text-lg font-bold tracking-tight2 text-ink">ลบรีวิวนี้?</h3>
+            <p className="mt-2 text-sm text-ink-2">
               การลบรีวิวจะไม่สามารถย้อนกลับได้
             </p>
             <div className="mt-5 flex gap-3">
               <button
                 type="button"
                 onClick={() => setConfirmDeleteOpen(false)}
-                className="flex-1 rounded-full border-2 border-black/10 py-2.5 font-bold text-brown-muted"
+                className="flex-1 rounded-2xl border-2 border-black/10 py-2.5 font-bold text-ink-2"
               >
                 ยกเลิก
               </button>
@@ -212,7 +212,7 @@ export default function ReviewModal({
                 type="button"
                 onClick={deleteReview}
                 disabled={deleting}
-                className="flex-1 rounded-full bg-rose py-2.5 font-bold text-white disabled:opacity-60"
+                className="flex-1 rounded-2xl bg-rose py-2.5 font-bold text-white transition-transform active:scale-[.98] disabled:opacity-60"
               >
                 {deleting ? "กำลังลบ..." : "ลบ"}
               </button>

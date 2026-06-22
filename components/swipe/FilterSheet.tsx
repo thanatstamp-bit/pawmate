@@ -49,7 +49,7 @@ interface Props {
 }
 
 const SELECT_CLS =
-  "w-full rounded-xl border border-black/10 bg-white px-4 py-3 text-sm " +
+  "w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm text-ink " +
   "focus:border-coral focus:outline-none focus:ring-2 focus:ring-coral/30 appearance-none";
 
 const SIZE_OPTIONS = [
@@ -90,12 +90,12 @@ export default function FilterSheet({ filters, onChange, onClose, mode, species 
           >
             <X size={20} />
           </button>
-          <h2 className="text-base font-bold text-brown">ตัวกรอง</h2>
+          <h2 className="text-base font-bold text-ink">ตัวกรอง</h2>
           <button
             type="button"
             onClick={() => setDraft(DEFAULT_FILTERS)}
             className={`text-sm font-semibold transition-colors ${
-              hasActive ? "text-coral" : "text-brown-muted"
+              hasActive ? "text-coral" : "text-ink-2"
             }`}
           >
             รีเซ็ต
@@ -108,7 +108,7 @@ export default function FilterSheet({ filters, onChange, onClose, mode, species 
 
             {/* ── Province ── */}
             <div>
-              <p className="mb-2 text-sm font-bold text-brown">จังหวัด</p>
+              <p className="mb-2 text-sm font-bold text-ink">จังหวัด</p>
               <div className="relative">
                 <select
                   value={draft.province}
@@ -122,7 +122,7 @@ export default function FilterSheet({ filters, onChange, onClose, mode, species 
                 </select>
                 <ChevronDown
                   size={18}
-                  className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-brown-muted"
+                  className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-ink-2"
                 />
               </div>
             </div>
@@ -130,7 +130,7 @@ export default function FilterSheet({ filters, onChange, onClose, mode, species 
             {/* ── Breed (hidden in breeding mode — already fixed by own pet's breed) ── */}
             {mode !== "breeding" && (
               <div>
-                <p className="mb-2 text-sm font-bold text-brown">สายพันธุ์</p>
+                <p className="mb-2 text-sm font-bold text-ink">สายพันธุ์</p>
                 <div className="relative">
                   <select
                     value={draft.breed}
@@ -144,7 +144,7 @@ export default function FilterSheet({ filters, onChange, onClose, mode, species 
                   </select>
                   <ChevronDown
                     size={18}
-                    className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-brown-muted"
+                    className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-ink-2"
                   />
                 </div>
               </div>
@@ -152,7 +152,7 @@ export default function FilterSheet({ filters, onChange, onClose, mode, species 
 
             {/* ── Size ── */}
             <div>
-              <p className="mb-2 text-sm font-bold text-brown">ขนาด</p>
+              <p className="mb-2 text-sm font-bold text-ink">ขนาด</p>
               <div className="flex gap-2">
                 {SIZE_OPTIONS.map((opt) => (
                   <button
@@ -167,7 +167,7 @@ export default function FilterSheet({ filters, onChange, onClose, mode, species 
                     className={`flex-1 rounded-full border-2 py-2.5 text-sm font-bold transition-all ${
                       draft.size === opt.value
                         ? "border-coral bg-coral text-white"
-                        : "border-black/10 text-brown-muted hover:border-coral/40"
+                        : "border-black/10 text-ink-2 hover:border-coral/40"
                     }`}
                   >
                     {opt.label}
@@ -178,7 +178,7 @@ export default function FilterSheet({ filters, onChange, onClose, mode, species 
 
             {/* ── Age range ── */}
             <div>
-              <p className="mb-2 text-sm font-bold text-brown">อายุ (ปี)</p>
+              <p className="mb-2 text-sm font-bold text-ink">อายุ (ปี)</p>
               <div className="flex items-center gap-3">
                 <div className="relative flex-1">
                   <select
@@ -195,10 +195,10 @@ export default function FilterSheet({ filters, onChange, onClose, mode, species 
                   </select>
                   <ChevronDown
                     size={16}
-                    className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-brown-muted"
+                    className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-ink-2"
                   />
                 </div>
-                <span className="text-sm font-medium text-brown-muted">–</span>
+                <span className="text-sm font-medium text-ink-2">–</span>
                 <div className="relative flex-1">
                   <select
                     value={draft.ageMax}
@@ -214,7 +214,7 @@ export default function FilterSheet({ filters, onChange, onClose, mode, species 
                   </select>
                   <ChevronDown
                     size={16}
-                    className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-brown-muted"
+                    className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-ink-2"
                   />
                 </div>
               </div>
@@ -222,7 +222,7 @@ export default function FilterSheet({ filters, onChange, onClose, mode, species 
 
             {/* ── Personality tags ── */}
             <div>
-              <p className="mb-2 text-sm font-bold text-brown">นิสัย</p>
+              <p className="mb-2 text-sm font-bold text-ink">นิสัย</p>
               <div className="flex flex-wrap gap-2">
                 {PERSONALITY_TAGS.map((tag) => {
                   const active = draft.tags.includes(tag);
@@ -234,7 +234,7 @@ export default function FilterSheet({ filters, onChange, onClose, mode, species 
                       className={`rounded-full border-2 px-3 py-1.5 text-xs font-bold transition-all ${
                         active
                           ? "border-teal bg-teal text-white"
-                          : "border-black/10 text-brown-muted hover:border-teal/40"
+                          : "border-black/10 text-ink-2 hover:border-teal/40"
                       }`}
                     >
                       {tag}
@@ -246,7 +246,7 @@ export default function FilterSheet({ filters, onChange, onClose, mode, species 
 
             {/* ── Health certificates ── */}
             <div className="pb-2">
-              <p className="mb-2 text-sm font-bold text-brown">ใบรับรองสุขภาพ</p>
+              <p className="mb-2 text-sm font-bold text-ink">ใบรับรองสุขภาพ</p>
               <div className="flex flex-col gap-2">
                 {(
                   [
@@ -261,7 +261,7 @@ export default function FilterSheet({ filters, onChange, onClose, mode, species 
                     className={`flex items-center gap-3 rounded-xl border-2 px-4 py-3 text-sm font-medium transition-all ${
                       draft[key]
                         ? "border-teal bg-teal/10 text-teal-dark"
-                        : "border-black/10 text-brown-muted hover:border-teal/40"
+                        : "border-black/10 text-ink-2 hover:border-teal/40"
                     }`}
                   >
                     <div
@@ -285,7 +285,7 @@ export default function FilterSheet({ filters, onChange, onClose, mode, species 
           <button
             type="button"
             onClick={() => onChange(draft)}
-            className="w-full rounded-full bg-coral py-3 font-bold text-white hover:bg-coral-dark"
+            className="h-12 w-full rounded-2xl bg-gradient-cta font-bold tracking-tight2 text-white shadow-cta transition-transform active:scale-[.98]"
           >
             ดูผลลัพธ์
           </button>

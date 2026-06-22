@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, Loader2 } from "lucide-react";
+import { ChevronLeft, Loader2, Check, PawPrint, Sparkles } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import Step1Photos from "@/components/onboarding/Step1Photos";
 import Step2Basic from "@/components/onboarding/Step2Basic";
@@ -64,6 +64,7 @@ export default function OnboardingPage() {
   const [step, setStep] = useState(1);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [done, setDone] = useState<string | null>(null); // success screen: holds pet name
 
   const [data, setData] = useState<WizardData>({
     photos: [],
@@ -128,16 +129,53 @@ export default function OnboardingPage() {
       if (insertError) throw insertError;
       // Set the new pet as active so the swipe/profile pages pick it up
       if (newPet?.id) localStorage.setItem("pawmate_active_pet_id", newPet.id);
-      router.push("/app/profile");
-      router.refresh();
+      // Show the success screen; the CTA there routes into the app.
+      setDone(data.name.trim());
+      setSubmitting(false);
     } catch {
       setError("บันทึกข้อมูลไม่สำเร็จ ลองใหม่อีกครั้งนะ");
       setSubmitting(false);
     }
   }
 
+  function enterApp() {
+    router.push("/app/profile");
+    router.refresh();
+  }
+
+  // Success screen — shown after the pet profile is created.
+  if (done) {
+    return (
+      <main className="mx-auto flex min-h-screen w-full max-w-[480px] flex-col items-center justify-center bg-gradient-app px-8 text-center">
+        <div className="relative animate-pop">
+          <div className="flex h-28 w-28 items-center justify-center rounded-full bg-gradient-cta shadow-cta">
+            <Check size={56} className="text-white" strokeWidth={3} />
+          </div>
+          <Sparkles size={24} className="absolute -right-1 -top-1 text-amber" fill="currentColor" />
+          <Sparkles size={16} className="absolute -bottom-1 -left-2 text-teal" fill="currentColor" />
+        </div>
+        <h1 className="mt-7 text-2xl font-bold tracking-title text-ink">
+          ยินดีต้อนรับ {done}! 🐾
+        </h1>
+        <p className="mt-2 text-ink-2">
+          โปรไฟล์ของน้องพร้อมแล้ว
+          <br />
+          มาเริ่มหาเพื่อนและดูแลน้องไปด้วยกันเลย
+        </p>
+        <button
+          type="button"
+          onClick={enterApp}
+          className="mt-8 flex h-[52px] w-full items-center justify-center gap-2 rounded-2xl bg-gradient-cta font-bold tracking-tight2 text-white shadow-cta transition-transform active:scale-[.98]"
+        >
+          <PawPrint size={18} fill="currentColor" />
+          เข้าสู่ PawMate
+        </button>
+      </main>
+    );
+  }
+
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-[480px] flex-col bg-cream">
+    <main className="mx-auto flex min-h-screen w-full max-w-[480px] flex-col bg-gradient-app">
       {/* Header */}
       <div className="flex items-center gap-3 px-6 pb-2 pt-6">
         <button
@@ -150,13 +188,13 @@ export default function OnboardingPage() {
               router.back();
             }
           }}
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white shadow-card"
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-ink shadow-card transition-transform active:scale-95"
         >
           <ChevronLeft size={20} />
         </button>
         <div className="flex-1">
-          <p className="text-xs text-brown-muted">ขั้นตอน {step}/{TOTAL}</p>
-          <h1 className="text-lg font-bold text-brown">{STEP_TITLES[step - 1]}</h1>
+          <p className="text-xs text-ink-3">ขั้นตอน {step}/{TOTAL}</p>
+          <h1 className="text-lg font-bold tracking-tight2 text-ink">{STEP_TITLES[step - 1]}</h1>
         </div>
       </div>
 
@@ -166,7 +204,7 @@ export default function OnboardingPage() {
           <div
             key={i}
             className={`h-1.5 flex-1 rounded-full transition-all ${
-              i < step ? "bg-coral" : "bg-black/10"
+              i < step ? "bg-gradient-cta" : "bg-black/10"
             }`}
           />
         ))}
@@ -210,19 +248,19 @@ export default function OnboardingPage() {
         )}
 
         {error && (
-          <p className="mt-4 rounded-xl bg-coral/10 px-4 py-2 text-sm text-coral-dark">
+          <p className="mt-4 rounded-2xl bg-coral-soft px-4 py-2.5 text-sm text-coral-ink">
             {error}
           </p>
         )}
       </div>
 
       {/* Bottom action button */}
-      <div className="border-t border-black/5 bg-white px-6 py-4">
+      <div className="border-t border-line bg-white/90 px-6 py-4 backdrop-blur-xl">
         <button
           type="button"
           onClick={handleNext}
           disabled={submitting}
-          className="flex w-full items-center justify-center gap-2 rounded-full bg-coral py-3.5 font-bold text-white transition-colors hover:bg-coral-dark disabled:opacity-60"
+          className="flex h-[52px] w-full items-center justify-center gap-2 rounded-2xl bg-gradient-cta font-bold tracking-tight2 text-white shadow-cta transition-transform active:scale-[.98] disabled:opacity-60 disabled:active:scale-100"
         >
           {submitting && <Loader2 size={18} className="animate-spin" />}
           {step < TOTAL ? "ถัดไป" : "สร้างโปรไฟล์น้อง"}

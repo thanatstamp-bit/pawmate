@@ -13,6 +13,9 @@ import ReportSheet from "@/components/trust/ReportSheet";
 import BlockConfirm from "@/components/trust/BlockConfirm";
 import Toast from "@/components/trust/Toast";
 import type { PetCardData } from "@/components/swipe/PetCard";
+import { Avatar } from "@/components/ui";
+
+const OPENERS = ["สวัสดีครับ/ค่ะ 🐾", "น้องน่ารักมากเลย!", "ว่างไปเดินเล่นด้วยกันไหม?"];
 
 type Message = {
   id: string;
@@ -206,7 +209,7 @@ export default function ChatPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-cream">
+      <div className="flex min-h-screen items-center justify-center bg-gradient-app">
         <div className="h-8 w-8 animate-spin rounded-full border-4 border-coral border-t-transparent" />
       </div>
     );
@@ -222,25 +225,20 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="flex h-screen flex-col bg-cream">
+    <div className="flex h-screen flex-col bg-gradient-app">
       {/* Header */}
-      <div className="flex items-center gap-3 border-b border-black/5 bg-white px-4 py-3">
+      <div className="flex items-center gap-3 border-b border-line bg-white/90 px-4 py-3 backdrop-blur-xl">
         <button
           type="button"
           onClick={() => router.push("/app/matches")}
-          className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-cream"
+          className="flex h-9 w-9 items-center justify-center rounded-full text-ink hover:bg-cream"
         >
           <ChevronLeft size={22} />
         </button>
         {otherPet && (
           <>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={otherPet.photos[0]}
-              alt={otherPet.name}
-              className="h-10 w-10 rounded-full object-cover"
-            />
-            <span className="flex-1 font-bold text-brown">{otherPet.name}</span>
+            <Avatar src={otherPet.photos[0]} name={otherPet.name} size={40} online />
+            <span className="flex-1 font-bold tracking-tight2 text-ink">{otherPet.name}</span>
           </>
         )}
         {/* Calendar button — available for both playdate and breeding matches */}
@@ -248,7 +246,7 @@ export default function ChatPage() {
           <button
             type="button"
             onClick={() => setScheduleOpen(true)}
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-teal/10 text-teal hover:bg-teal/20"
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-teal-soft text-teal-ink transition-colors hover:bg-teal/20"
             title="นัดหมาย"
           >
             <CalendarDays size={18} />
@@ -274,23 +272,23 @@ export default function ChatPage() {
                   <button
                     type="button"
                     onClick={() => { setMenuOpen(false); setProfileOpen(true); }}
-                    className="flex w-full items-center gap-2.5 px-4 py-3 text-left text-sm font-semibold text-brown hover:bg-cream"
+                    className="flex w-full items-center gap-2.5 px-4 py-3 text-left text-sm font-semibold text-ink hover:bg-cream"
                   >
-                    <User size={16} className="text-brown-muted" /> ดูโปรไฟล์
+                    <User size={16} className="text-ink-3" /> ดูโปรไฟล์
                   </button>
                   <button
                     type="button"
                     onClick={() => { setMenuOpen(false); setReviewOpen(true); }}
-                    className="flex w-full items-center gap-2.5 px-4 py-3 text-left text-sm font-semibold text-brown hover:bg-cream"
+                    className="flex w-full items-center gap-2.5 px-4 py-3 text-left text-sm font-semibold text-ink hover:bg-cream"
                   >
                     <Star size={16} className="text-amber" /> ให้คะแนนหลังนัดเจอ
                   </button>
                   <button
                     type="button"
                     onClick={() => { setMenuOpen(false); setReportOpen(true); }}
-                    className="flex w-full items-center gap-2.5 px-4 py-3 text-left text-sm font-semibold text-brown hover:bg-cream"
+                    className="flex w-full items-center gap-2.5 px-4 py-3 text-left text-sm font-semibold text-ink hover:bg-cream"
                   >
-                    <Flag size={16} className="text-brown-muted" /> รายงาน
+                    <Flag size={16} className="text-ink-3" /> รายงาน
                   </button>
                   <button
                     type="button"
@@ -320,19 +318,27 @@ export default function ChatPage() {
       <div className="flex-1 overflow-y-auto px-4 py-4">
         {messages.length === 0 && otherPet && (
           <div className="flex flex-col items-center gap-3 py-8 text-center">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={otherPet.photos[0]}
-              alt=""
-              className="h-20 w-20 rounded-full object-cover"
-            />
-            <p className="text-sm text-brown-muted">
-              ลองชวนนัดเดทที่สวนใกล้ๆ ดูสิ 🐾
+            <Avatar src={otherPet.photos[0]} name={otherPet.name} size={80} />
+            <p className="text-sm text-ink-2">
+              ทักทาย {otherPet.name} ด้วยข้อความแรกกันเลย 🐾
             </p>
+            {/* Opener suggestion chips — fill the input */}
+            <div className="flex flex-wrap justify-center gap-2">
+              {OPENERS.map((o) => (
+                <button
+                  key={o}
+                  type="button"
+                  onClick={() => setInput(o)}
+                  className="rounded-chip border border-line bg-white px-3.5 py-2 text-sm font-medium text-ink-2 shadow-card transition-transform active:scale-95"
+                >
+                  {o}
+                </button>
+              ))}
+            </div>
             <button
               type="button"
               onClick={() => setScheduleOpen(true)}
-              className="flex items-center gap-1.5 rounded-full bg-teal/10 px-4 py-2 text-sm font-bold text-teal"
+              className="mt-1 flex items-center gap-1.5 rounded-full bg-teal-soft px-4 py-2 text-sm font-bold text-teal-ink transition-transform active:scale-95"
             >
               <CalendarDays size={15} />
               นัดหมาย
@@ -343,9 +349,9 @@ export default function ChatPage() {
         {grouped.map(({ dayLabel, msgs }) => (
           <div key={dayLabel}>
             <div className="my-4 flex items-center gap-3">
-              <div className="h-px flex-1 bg-black/8" />
-              <span className="text-xs text-brown-muted">{dayLabel}</span>
-              <div className="h-px flex-1 bg-black/8" />
+              <div className="h-px flex-1 bg-line" />
+              <span className="text-xs text-ink-3">{dayLabel}</span>
+              <div className="h-px flex-1 bg-line" />
             </div>
 
             {msgs.map((msg) => {
@@ -356,14 +362,14 @@ export default function ChatPage() {
                   className={`mb-2 flex ${isMine ? "justify-end" : "justify-start"}`}
                 >
                   <div
-                    className={`max-w-[72%] rounded-2xl px-4 py-2.5 ${
+                    className={`max-w-[72%] px-4 py-2.5 ${
                       isMine
-                        ? "rounded-tr-sm bg-coral text-white"
-                        : "rounded-tl-sm bg-white shadow-card text-brown"
+                        ? "rounded-[18px_18px_4px_18px] bg-gradient-cta text-white shadow-cta"
+                        : "rounded-[18px_18px_18px_4px] border border-line bg-white text-ink shadow-card"
                     }`}
                   >
                     <p className="text-sm leading-relaxed">{msg.content}</p>
-                    <p className={`mt-1 text-right text-[10px] ${isMine ? "text-white/70" : "text-brown-muted"}`}>
+                    <p className={`mt-1 text-right text-[10px] ${isMine ? "text-white/70" : "text-ink-3"}`}>
                       {formatTime(msg.created_at)}
                     </p>
                   </div>
@@ -376,7 +382,7 @@ export default function ChatPage() {
       </div>
 
       {/* Input bar */}
-      <div className="border-t border-black/5 bg-white px-4 py-3">
+      <div className="border-t border-line bg-white/90 px-4 py-3 backdrop-blur-xl">
         <div className="flex items-center gap-2">
           <input
             type="text"
@@ -385,13 +391,13 @@ export default function ChatPage() {
             onKeyDown={handleKeyDown}
             placeholder="พิมพ์ข้อความ..."
             maxLength={2000}
-            className="flex-1 rounded-full border border-black/10 bg-cream px-4 py-2.5 text-sm focus:border-coral focus:outline-none focus:ring-2 focus:ring-coral/20"
+            className="flex-1 rounded-full border-[1.5px] border-line bg-cream px-4 py-2.5 text-sm text-ink focus:border-coral focus:outline-none focus:ring-2 focus:ring-coral/20"
           />
           <button
             type="button"
             onClick={sendMessage}
             disabled={!input.trim() || sending}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-coral text-white transition-colors disabled:opacity-40 hover:bg-coral-dark"
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-cta text-white shadow-cta transition-transform active:scale-95 disabled:opacity-40 disabled:active:scale-100"
           >
             <Send size={18} />
           </button>

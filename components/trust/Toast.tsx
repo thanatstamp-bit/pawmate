@@ -20,7 +20,7 @@ export default function Toast({ title, subtitle, icon, onDone, duration = 4000 }
 
   return (
     <div className="pointer-events-none fixed bottom-20 left-4 right-4 z-[80] flex">
-      <div className="flex items-center gap-3 rounded-[14px] bg-brown px-4 py-3.5 shadow-[0_8px_24px_rgba(0,0,0,0.28)]">
+      <div className="flex items-center gap-3 rounded-chip bg-ink px-4 py-3.5 shadow-popup">
         {icon && (
           <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-teal/15">
             {icon}

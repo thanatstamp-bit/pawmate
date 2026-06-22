@@ -4,16 +4,19 @@ import {
   MapPin,
   Calendar,
   Eye,
-  DollarSign,
-  User,
+  Gift,
   Clock,
-  CheckCircle,
+  Check,
+  CheckCircle2,
+  Search,
   Phone,
   LogIn,
-  Share2,
+  ChevronRight,
+  ShieldCheck,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { PublicShareButton } from "@/components/lost/PublicShareButton";
+import { Avatar, IconTile } from "@/components/ui";
 
 type Props = { params: { id: string } };
 
@@ -108,10 +111,44 @@ function timeAgo(iso: string): string {
   return `${days} วันที่แล้ว`;
 }
 
-const factRowClass =
-  "flex items-start gap-2.5 px-3.5 py-2.5 border-b border-[#F0EFEC] last:border-0";
-const factLabelClass =
-  "text-[10px] font-semibold uppercase tracking-wide text-[#AAA]";
+function FactRow({
+  tone,
+  icon,
+  label,
+  value,
+  valueClass = "text-ink",
+  align = "row",
+}: {
+  tone: "rose" | "amber" | "blue";
+  icon: React.ReactNode;
+  label: string;
+  value: React.ReactNode;
+  valueClass?: string;
+  align?: "row" | "stacked";
+}) {
+  return (
+    <div
+      className={`flex gap-[13px] border-b border-[#F4EDE7] py-[13px] last:border-0 ${
+        align === "stacked" ? "items-start" : "items-center"
+      }`}
+    >
+      <IconTile tone={tone} size={38} rounded="rounded-xl">
+        {icon}
+      </IconTile>
+      {align === "stacked" ? (
+        <div className="min-w-0 flex-1">
+          <p className="mb-0.5 text-[13px] font-medium text-ink-3">{label}</p>
+          <p className={`text-[14px] font-medium leading-relaxed ${valueClass}`}>{value}</p>
+        </div>
+      ) : (
+        <>
+          <span className="min-w-0 flex-1 text-[13px] font-medium text-ink-3">{label}</span>
+          <span className={`text-right text-[14px] font-semibold ${valueClass}`}>{value}</span>
+        </>
+      )}
+    </div>
+  );
+}
 
 export default async function PublicLostPetPage({ params }: Props) {
   const supabase = createClient();
@@ -138,274 +175,260 @@ export default async function PublicLostPetPage({ params }: Props) {
   };
   const sightings = (sightingsRes.data as unknown as Sighting[]) ?? [];
   const days = daysLost(post.lost_date);
+  const found = post.status === "found";
+  const provinceLabel =
+    post.last_seen_province === "กรุงเทพมหานคร" ? "กรุงเทพฯ" : post.last_seen_province;
 
   return (
-    <div className="mx-auto min-h-screen w-full max-w-[480px] bg-[#F8F7F5]">
+    <div className="relative mx-auto min-h-screen w-full max-w-[480px] bg-gradient-app">
       {/* Logo bar */}
-      <div className="flex h-[52px] items-center border-b border-[#ECEAE7] bg-white px-5">
-        <span className="text-[18px] font-bold tracking-tight">
-          <span style={{ color: "#E8724A" }}>Paw</span>
-          <span className="text-brown">Mate</span>
-        </span>
+      <div className="flex h-[54px] items-center justify-center gap-2.5 border-b border-line bg-bg-bot/85 backdrop-blur">
+        <div className="flex h-[30px] w-[30px] items-center justify-center rounded-[10px] bg-gradient-logo shadow-[0_6px_14px_-6px_rgba(239,78,60,.6)]">
+          <span className="text-[15px]">🐾</span>
+        </div>
+        <span className="text-[17px] font-bold tracking-tight2 text-ink">PawMate</span>
       </div>
 
-      {/* Photo */}
-      <div className="relative h-[240px] overflow-hidden bg-[#CCCAC7]">
-        {post.photos[0] ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={post.photos[0]}
-            alt={post.pet_name}
-            className="h-full w-full object-cover"
-          />
-        ) : (
-          <div className="flex h-full items-center justify-center">
-            <span className="text-sm text-[#AAA]">ไม่มีรูปภาพ</span>
-          </div>
-        )}
-        {/* Status badge */}
-        <span
-          className="absolute left-3 top-3 rounded-full px-3 py-1 text-[12px] font-semibold text-white"
-          style={{ background: post.status === "found" ? "#2A9D8F" : "#E0445A" }}
-        >
-          {post.status === "found" ? "พบแล้ว" : "ยังตามหา"}
-        </span>
-        {/* Dot indicators for multiple photos */}
-        {post.photos.length > 1 && (
-          <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-1.5">
-            {post.photos.map((_, i) => (
-              <div
-                key={i}
-                className={`h-1.5 rounded-full ${
-                  i === 0 ? "w-4 bg-white" : "w-1.5 bg-white/50"
-                }`}
-              />
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Found celebration strip */}
-      {post.status === "found" && (
-        <div className="flex items-center gap-3 border-b border-[#BEE6E2] bg-[#EDF7F6] px-4 py-3.5">
-          <CheckCircle size={18} className="shrink-0 text-teal" strokeWidth={2.5} />
-          <div>
-            <p className="text-[15px] font-bold text-teal">น้องกลับบ้านแล้ว!</p>
-            <p className="mt-0.5 text-[12px] font-medium text-teal/70">
-              ขอบคุณทุกเบาะแสจากชุมชน PawMate
-            </p>
-          </div>
-        </div>
-      )}
-
-      <div className="px-4 pt-4">
-        {/* Pet name */}
-        <div className="mb-3.5">
-          <h1 className="text-[22px] font-bold text-brown">{post.pet_name}</h1>
-          <p className="mt-0.5 text-[13px] font-medium text-[#888]">
-            {SPECIES_LABEL[post.species] ?? post.species}
-            {post.breed ? ` · ${post.breed}` : ""}
-          </p>
-        </div>
-
-        {/* Facts card */}
-        <div className="mb-3.5 overflow-hidden rounded-2xl border border-[#E4E3DF] bg-white">
-          <div className={factRowClass}>
-            <MapPin size={16} className="mt-0.5 shrink-0 text-[#888]" />
-            <div>
-              <p className={factLabelClass}>หายแถว</p>
-              <p className="mt-0.5 text-[14px] font-medium text-brown">
-                {post.last_seen_district} {post.last_seen_province}
-              </p>
-            </div>
-          </div>
-          <div className={factRowClass}>
-            <Calendar size={16} className="mt-0.5 shrink-0 text-[#888]" />
-            <div>
-              <p className={factLabelClass}>วันที่หาย</p>
-              <p className="mt-0.5 text-[14px] font-medium text-brown">
-                {thaiDate(post.lost_date)}
-              </p>
-            </div>
-          </div>
-          {post.status === "lost" && (
-            <div className={factRowClass}>
-              <Clock size={16} className="mt-0.5 shrink-0 text-[#E0445A]" />
-              <div>
-                <p className={factLabelClass}>หายมาแล้ว</p>
-                <p className="mt-0.5 text-[14px] font-bold text-[#E0445A]">{days} วัน</p>
-              </div>
-            </div>
-          )}
-          {post.status === "found" && (
-            <div className={factRowClass}>
-              <CheckCircle size={16} className="mt-0.5 shrink-0 text-teal" />
-              <div>
-                <p className={factLabelClass}>สถานะ</p>
-                <p className="mt-0.5 text-[14px] font-bold text-teal">กลับบ้านแล้ว</p>
-              </div>
-            </div>
-          )}
-          {post.distinguishing_marks && (
-            <div className={factRowClass}>
-              <Eye size={16} className="mt-0.5 shrink-0 text-[#888]" />
-              <div>
-                <p className={factLabelClass}>ลักษณะเด่น</p>
-                <p className="mt-0.5 text-[14px] font-medium leading-snug text-brown">
-                  {post.distinguishing_marks}
-                </p>
-              </div>
-            </div>
-          )}
-          {post.reward && (
-            <div className={factRowClass}>
-              <DollarSign size={16} className="mt-0.5 shrink-0 text-[#888]" />
-              <div>
-                <p className={factLabelClass}>ของรางวัล</p>
-                <p className="mt-0.5 text-[14px] font-bold text-brown">{post.reward}</p>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Owner row */}
-        <div className="mb-4 flex items-center gap-3 rounded-[14px] border border-[#E4E3DF] bg-white px-3.5 py-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#D8D7D3]">
-            <User size={17} className="text-[#AAA]" />
-          </div>
-          <div className="flex-1">
-            <p className="text-[11px] font-medium text-[#AAA]">เจ้าของ</p>
-            <p className="text-[15px] font-semibold text-brown">
-              {post.profiles?.display_name ?? "ผู้ใช้งาน"}
-            </p>
-          </div>
-          {post.status === "lost" && (
-            <a
-              href={`tel:${post.contact}`}
-              className="flex h-9 items-center gap-1.5 rounded-full border border-[#CCCCC8] px-3.5"
-            >
-              <Phone size={13} className="text-[#555]" />
-              <span className="text-[13px] font-semibold text-[#555]">โทร</span>
-            </a>
-          )}
-        </div>
-
-        {/* Social proof strip */}
-        {post.status === "lost" && (
-          <div className="mb-4 flex items-center justify-center gap-4 border-y border-[#F0EFEC] py-2.5">
-            <div className="flex items-center gap-1.5">
-              <MapPin size={13} className="text-[#AAA]" />
-              <span className="text-[12px] font-medium text-[#AAA]">
-                {sightings.length} เบาะแสแล้ว
-              </span>
-            </div>
-            <div className="h-3.5 w-px bg-[#E0DFDC]" />
-            <div className="flex items-center gap-1.5">
-              <Share2 size={13} className="text-[#AAA]" />
-              <span className="text-[12px] font-medium text-[#AAA]">ช่วยกันแชร์</span>
-            </div>
-          </div>
-        )}
-
-        {/* CTA Banner (lost only) */}
-        {post.status === "lost" && (
-          <div className="mb-4 rounded-2xl border-[1.5px] border-[#F2BFA8] bg-[#FFF3F0] p-4">
-            <div className="mb-4 flex items-start gap-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-[#FDDDD4]">
-                <MapPin size={20} className="text-[#E8724A]" />
-              </div>
-              <div>
-                <p className="text-[15px] font-bold text-brown">พบเห็นน้องตัวนี้?</p>
-                <p className="mt-1 text-[13px] leading-[1.55] text-[#888]">
-                  เข้าสู่ระบบเพื่อแจ้งเบาะแสและช่วยน้องกลับบ้าน
-                </p>
-              </div>
-            </div>
-            <a
-              href={`/login?redirect=/lost/${params.id}`}
-              className="flex h-[50px] items-center justify-center gap-2 rounded-[12px] bg-[#E8724A] font-bold text-white"
-            >
-              <LogIn size={16} />
-              เข้าสู่ระบบเพื่อแจ้งเบาะแส
-            </a>
-            <p className="mt-2.5 text-center text-[12px] text-[#BBB]">
-              ยังไม่มีบัญชี?{" "}
-              <a href="/login" className="font-semibold text-[#E8724A]">
-                สมัครสมาชิกฟรี
-              </a>
-            </p>
-          </div>
-        )}
-
-        {/* Share button */}
-        <PublicShareButton
-          petName={post.pet_name}
-          variant={post.status === "found" ? "found" : "lost"}
-        />
-
-        {/* Sightings timeline */}
-        <div className="mb-6">
-          <div className="mb-3 flex items-baseline gap-2">
-            <h2 className="text-[15px] font-bold text-brown">
-              {post.status === "found" ? "เบาะแสที่ช่วยพบ" : "เบาะแสที่ได้รับ"}
-            </h2>
-            <span className="text-[13px] text-[#888]">({sightings.length} รายการ)</span>
-          </div>
-
-          {sightings.length === 0 ? (
-            <div className="flex flex-col items-center gap-2 rounded-2xl border-2 border-dashed border-[#D8D7D3] px-5 py-8 text-center">
-              <p className="text-[15px] font-semibold text-[#888]">ยังไม่มีเบาะแส</p>
-              <p className="text-[13px] text-[#AAA]">
-                ช่วยแชร์โพสต์นี้เพื่อให้คนอื่นๆ ช่วยตามหา
-              </p>
-            </div>
+      <div className={post.status === "lost" ? "pb-[140px]" : "pb-10"}>
+        {/* Photo */}
+        <div className="relative h-[340px] overflow-hidden bg-[#EFE7E0]">
+          {post.photos[0] ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={post.photos[0]}
+              alt={post.pet_name}
+              className="h-full w-full object-cover"
+            />
           ) : (
-            <div>
-              {sightings.map((s, i) => (
-                <div key={s.id} className="flex gap-2.5">
-                  <div className="flex w-9 flex-col items-center">
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#D8D7D3]">
-                      <User size={15} className="text-[#AAA]" />
-                    </div>
-                    {i < sightings.length - 1 && (
-                      <div
-                        className="mt-1 w-px flex-1 bg-[#E4E3DF]"
-                        style={{ minHeight: 24 }}
-                      />
-                    )}
-                  </div>
-                  <div className="flex-1 pb-4">
-                    <div className="mb-1 flex items-center justify-between">
-                      <span className="text-[14px] font-semibold text-brown">
-                        {s.profiles?.display_name ?? "ผู้ใช้งาน"}
-                      </span>
-                      <span className="text-[11px] text-[#AAA]">{timeAgo(s.created_at)}</span>
-                    </div>
-                    <p className="mb-2 text-[13px] leading-snug text-[#555]">{s.detail}</p>
-                    <span className="inline-flex items-center gap-1 rounded-full bg-[#F0EFE9] px-2.5 py-1 text-[11px] font-medium text-[#666]">
-                      <MapPin size={11} className="text-[#888]" />
-                      {s.seen_at_location}
-                    </span>
-                  </div>
-                </div>
+            <div className="flex h-full items-center justify-center">
+              <span className="text-sm text-ink-3">ไม่มีรูปภาพ</span>
+            </div>
+          )}
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/30" />
+          {/* Status badge */}
+          <span
+            className={`absolute right-4 top-3.5 inline-flex items-center gap-1.5 rounded-[11px] px-3.5 py-[7px] text-[12.5px] font-bold text-white ${
+              found
+                ? "bg-teal shadow-[0_6px_14px_-6px_rgba(46,196,182,.6)]"
+                : "bg-rose shadow-[0_6px_14px_-6px_rgba(224,68,90,.6)]"
+            }`}
+          >
+            {found ? <CheckCircle2 size={14} strokeWidth={2.5} /> : <Search size={14} strokeWidth={2.5} />}
+            {found ? "พบแล้ว" : "ยังตามหา"}
+          </span>
+          {/* Dot indicators for multiple photos */}
+          {post.photos.length > 1 && (
+            <div className="absolute bottom-3.5 left-0 right-0 flex justify-center gap-1.5">
+              {post.photos.map((_, i) => (
+                <div
+                  key={i}
+                  className="h-[7px] rounded-full"
+                  style={{
+                    width: i === 0 ? 20 : 7,
+                    background: i === 0 ? "#fff" : "rgba(255,255,255,.55)",
+                  }}
+                />
               ))}
             </div>
           )}
         </div>
 
-        {/* Footer */}
-        <div className="mb-8 border-t border-[#ECEAE7] py-5 text-center">
-          <p className="text-[14px] font-bold">
-            <span style={{ color: "#E8724A" }}>Paw</span>
-            <span className="text-brown">Mate</span>
+        <div className="px-[22px] pt-[18px]">
+          {/* Found celebration strip */}
+          {found && (
+            <div className="mb-[18px] flex items-center gap-[13px] rounded-[18px] border border-teal/40 bg-teal-soft p-[15px]">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[15px] bg-teal shadow-[0_8px_18px_-8px_rgba(46,196,182,.6)]">
+                <Check size={24} strokeWidth={2.5} className="text-white" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-[16px] font-bold tracking-tight2 text-teal-ink">
+                  น้องกลับบ้านแล้ว 🎉
+                </p>
+                <p className="mt-0.5 text-[13px] text-teal-ink">
+                  ขอบคุณทุกเบาะแสจากชุมชน PawMate
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Pet name */}
+          <h1 className="text-[24px] font-bold tracking-title text-ink">{post.pet_name}</h1>
+          <p className="mt-0.5 text-[14.5px] font-medium text-ink-2">
+            {SPECIES_LABEL[post.species] ?? post.species}
+            {post.breed ? ` · ${post.breed}` : ""}
           </p>
-          <p className="mt-1 text-[11px] leading-[1.6] text-[#CCC]">
-            แอปตามหาสัตว์เลี้ยงในชุมชนไทย
-            <br />
-            สมัครฟรี · ช่วยน้องกลับบ้านด้วยกัน
-          </p>
+
+          {/* Facts card */}
+          <div className="mt-4 rounded-[20px] bg-white px-4 py-[6px] shadow-card">
+            <FactRow
+              tone="rose"
+              icon={<MapPin size={18} />}
+              label="หายแถว"
+              value={`${post.last_seen_district}, ${provinceLabel}`}
+            />
+            <FactRow
+              tone="amber"
+              icon={<Calendar size={18} />}
+              label="วันที่หาย"
+              value={thaiDate(post.lost_date)}
+            />
+            <FactRow
+              tone="rose"
+              icon={<Clock size={18} />}
+              label="ระยะเวลา"
+              value={found ? "พบแล้ว" : `หายมาแล้ว ${days} วัน`}
+              valueClass={found ? "text-teal-ink" : "text-coral-ink"}
+            />
+            {post.distinguishing_marks && (
+              <FactRow
+                tone="blue"
+                icon={<Eye size={18} />}
+                label="ลักษณะเด่น"
+                value={post.distinguishing_marks}
+                align="stacked"
+              />
+            )}
+            {post.reward && (
+              <FactRow
+                tone="amber"
+                icon={<Gift size={18} />}
+                label="ของรางวัล"
+                value={post.reward}
+                valueClass="text-amber-deep"
+              />
+            )}
+          </div>
+
+          {/* Owner row */}
+          <div className="mt-[13px] flex items-center gap-3 rounded-[18px] bg-white px-[15px] py-[13px] shadow-card">
+            <Avatar name={post.profiles?.display_name ?? "ผู้ใช้งาน"} size={44} />
+            <div className="min-w-0 flex-1">
+              <p className="text-[15px] font-bold text-ink">
+                {post.profiles?.display_name ?? "ผู้ใช้งาน"}
+              </p>
+              <p className="mt-px text-[12.5px] text-ink-2">เจ้าของน้อง</p>
+            </div>
+            {post.status === "lost" ? (
+              <a
+                href={`tel:${post.contact}`}
+                className="inline-flex items-center gap-1.5 rounded-[10px] bg-teal-soft px-3 py-2"
+              >
+                <Phone size={13} className="text-teal-ink" />
+                <span className="text-[12.5px] font-bold text-teal-ink">โทร</span>
+              </a>
+            ) : (
+              <span className="inline-flex items-center gap-1.5 rounded-[10px] bg-fill-2 px-3 py-2">
+                <Eye size={13} className="text-ink-3" />
+                <span className="text-[12px] font-semibold text-ink-3">ซ่อนเบอร์</span>
+              </span>
+            )}
+          </div>
+
+          {/* Verified line */}
+          <div className="mt-[18px] flex items-center justify-center gap-1.5 text-ink-3">
+            <ShieldCheck size={14} />
+            <span className="text-[12px] font-medium">ประกาศที่ยืนยันโดย PawMate</span>
+          </div>
+
+          {/* Share button */}
+          <div className="mt-[18px]">
+            <PublicShareButton
+              petName={post.pet_name}
+              variant={found ? "found" : "lost"}
+            />
+          </div>
+
+          {/* Sightings timeline */}
+          <div className="mb-6">
+            <div className="mb-3.5 flex items-center justify-between">
+              <h2 className="text-[16px] font-bold tracking-tight2 text-ink">
+                {found ? "เบาะแสที่ช่วยพบ" : "เบาะแสล่าสุด"}
+              </h2>
+              {sightings.length > 0 && (
+                <span className="text-[12.5px] font-semibold text-ink-3">
+                  {sightings.length} เบาะแส
+                </span>
+              )}
+            </div>
+
+            {sightings.length === 0 ? (
+              <div className="flex flex-col items-center gap-1.5 rounded-[18px] border-[1.5px] border-dashed border-fill-3 bg-[#FBF7F3] px-6 py-8 text-center">
+                <p className="text-[15px] font-bold text-ink">ยังไม่มีเบาะแส</p>
+                <p className="text-[13px] leading-relaxed text-ink-2">
+                  ช่วยแชร์ประกาศนี้เพื่อให้คนอื่นๆ ช่วยตามหา
+                </p>
+              </div>
+            ) : (
+              <div className="relative">
+                {sightings.map((s, i) => (
+                  <div key={s.id} className="flex gap-[13px]">
+                    <div className="flex shrink-0 flex-col items-center">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-coral-soft">
+                        <MapPin size={14} className="text-coral-ink" />
+                      </div>
+                      {i < sightings.length - 1 && (
+                        <div className="mt-1 w-0.5 flex-1 bg-line" style={{ minHeight: 24 }} />
+                      )}
+                    </div>
+                    <div className="min-w-0 flex-1 pb-[18px]">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[14px] font-bold text-ink">
+                          {s.profiles?.display_name ?? "ผู้ใช้งาน"}
+                        </span>
+                        <span className="text-[11.5px] font-medium text-ink-3">
+                          {timeAgo(s.created_at)}
+                        </span>
+                      </div>
+                      <p className="mt-1 text-[13.5px] leading-relaxed text-ink">{s.detail}</p>
+                      <span className="mt-[7px] inline-flex items-center gap-1.5 rounded-[9px] bg-fill-2 px-2.5 py-1 text-[12px] font-semibold text-ink-2">
+                        <MapPin size={11} className="text-ink-3" />
+                        {s.seen_at_location}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Footer */}
+          <div className="mb-8 border-t border-line py-5 text-center">
+            <p className="text-[14px] font-bold tracking-tight2 text-ink">PawMate</p>
+            <p className="mt-1 text-[11px] leading-relaxed text-ink-3">
+              แอปตามหาสัตว์เลี้ยงในชุมชนไทย
+              <br />
+              สมัครฟรี · ช่วยน้องกลับบ้านด้วยกัน
+            </p>
+          </div>
         </div>
       </div>
+
+      {/* Fixed login CTA banner (lost only) */}
+      {post.status === "lost" && (
+        <div className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-[480px] bg-gradient-to-t from-bg-bot from-24% to-transparent px-5 pb-6 pt-4">
+          <a
+            href={`/login?redirect=/lost/${params.id}`}
+            className="flex items-center gap-[13px] rounded-[18px] bg-gradient-cta px-[18px] py-[15px] shadow-cta transition-transform active:scale-[.98]"
+          >
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px] bg-white/20 backdrop-blur-sm">
+              <LogIn size={20} className="text-white" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-[16px] font-bold leading-tight tracking-tight2 text-white">
+                พบเห็นน้องตัวนี้?
+              </p>
+              <p className="mt-px text-[12.5px] text-white/90">เข้าสู่ระบบเพื่อแจ้งเบาะแส</p>
+            </div>
+            <ChevronRight size={20} className="shrink-0 text-white" />
+          </a>
+          <p className="mt-[11px] text-center text-[11.5px] text-ink-3">
+            ยังไม่มีบัญชี?{" "}
+            <a href="/login" className="font-semibold text-coral-ink">
+              สมัครสมาชิกฟรี
+            </a>
+          </p>
+        </div>
+      )}
     </div>
   );
 }

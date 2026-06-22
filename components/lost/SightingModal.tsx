@@ -40,43 +40,39 @@ export default function SightingModal({ lostPetId, petName, onClose, onSubmitted
     onClose();
   }
 
-  const fieldClass =
-    "w-full rounded-xl border border-black/10 bg-cream px-4 py-3 text-sm " +
-    "focus:border-coral focus:outline-none focus:ring-2 focus:ring-coral/20";
-
   return (
-    <div className="fixed inset-0 z-[70] flex flex-col bg-black/50">
+    <div className="fixed inset-0 z-[70] flex flex-col bg-[rgba(35,24,20,.45)] backdrop-blur-[2px]">
       <div className="flex-1" onClick={onClose} />
       <div
-        className="mx-auto w-full max-w-[480px] rounded-t-[28px] bg-white px-5 pt-4 pb-[calc(1.25rem+env(safe-area-inset-bottom))]"
+        className="mx-auto w-full max-w-[480px] rounded-t-[24px] bg-white px-6 pb-[calc(1.875rem+env(safe-area-inset-bottom))] pt-3 shadow-sheet animate-fade-up"
         style={{ maxHeight: "88vh" }}
       >
-        <div className="mx-auto mb-4 h-1 w-9 rounded-full bg-black/10" />
-        <h2 className="mb-4 text-[18px] font-bold text-brown">แจ้งเบาะแส — {petName}</h2>
+        <div className="mx-auto mb-4 h-[5px] w-10 rounded-full bg-fill-3" />
+        <h2 className="text-[18px] font-bold tracking-tight2 text-ink">แจ้งเบาะแส — {petName}</h2>
+        <p className="mb-[18px] mt-1 text-[13px] text-ink-2">
+          เห็นน้องตัวนี้ที่ไหน ช่วยบอกหน่อยนะ ทุกเบาะแสมีค่า
+        </p>
 
-        <div className="mb-3">
-          <label className="mb-1.5 block text-[13px] font-semibold text-brown">
-            สถานที่พบเห็น <span className="text-coral">*</span>
-          </label>
+        <label className="mb-2 block text-[13px] font-semibold text-ink">รายละเอียด</label>
+        <div className="mb-4 rounded-[14px] border-[1.5px] border-line bg-[#FBF7F3] px-3.5 py-[13px] focus-within:border-coral focus-within:ring-2 focus-within:ring-coral/15">
+          <textarea
+            value={detail}
+            onChange={(e) => setDetail(e.target.value)}
+            placeholder="เช่น เห็นน้องวิ่งแถวปากซอยตอนเช้า"
+            rows={3}
+            className="w-full resize-none bg-transparent text-[15px] leading-relaxed text-ink placeholder:text-ink-3 focus:outline-none"
+          />
+        </div>
+
+        <label className="mb-2 block text-[13px] font-semibold text-ink">สถานที่ที่พบ</label>
+        <div className="mb-[22px] flex h-[52px] items-center gap-2.5 rounded-[14px] border-[1.5px] border-line bg-[#FBF7F3] px-3.5 focus-within:border-coral focus-within:ring-2 focus-within:ring-coral/15">
+          <MapPin size={18} className="shrink-0 text-ink-3" />
           <input
             type="text"
             value={location}
             onChange={(e) => setLocation(e.target.value)}
-            placeholder="เช่น หน้าตลาดนนทบุรี, สวนลุมพินี กรุงเทพฯ"
-            className={fieldClass}
-          />
-        </div>
-
-        <div className="mb-5">
-          <label className="mb-1.5 block text-[13px] font-semibold text-brown">
-            รายละเอียด <span className="text-coral">*</span>
-          </label>
-          <textarea
-            value={detail}
-            onChange={(e) => setDetail(e.target.value)}
-            placeholder="เล่าให้ฟังว่าพบเห็นอะไรบ้าง เช่น สีขน ลักษณะ พฤติกรรม..."
-            rows={3}
-            className={`${fieldClass} resize-none`}
+            placeholder="เช่น ซ.ลาดพร้าว 71"
+            className="min-w-0 flex-1 bg-transparent text-[16px] font-medium text-ink placeholder:text-ink-3 focus:outline-none"
           />
         </div>
 
@@ -84,7 +80,7 @@ export default function SightingModal({ lostPetId, petName, onClose, onSubmitted
           type="button"
           onClick={submit}
           disabled={!canSubmit}
-          className="flex w-full items-center justify-center gap-2 rounded-xl bg-coral py-3.5 font-bold text-white transition-colors disabled:opacity-40 hover:bg-coral-dark"
+          className="flex h-14 w-full items-center justify-center gap-2 rounded-[16px] bg-gradient-cta text-[17px] font-bold text-white shadow-cta transition-transform active:scale-[.97] disabled:opacity-40"
         >
           <MapPin size={16} />
           {saving ? "กำลังส่ง..." : "ส่งเบาะแส"}

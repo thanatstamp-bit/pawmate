@@ -27,62 +27,52 @@ export default function MatchPopup({
   }
 
   return (
-    <div className="fixed inset-0 z-[70] flex flex-col items-center justify-center bg-black/60 p-6">
-      <div
-        className="w-full max-w-[360px] animate-[popIn_0.4s_cubic-bezier(0.34,1.56,0.64,1)] rounded-[28px] bg-white p-7 text-center shadow-2xl"
-        style={{
-          ["--tw-shadow" as string]:
-            "0 25px 50px -12px rgba(0,0,0,0.25)",
-        }}
-      >
+    <div className="fixed inset-0 z-[70] flex flex-col items-center justify-center bg-[rgba(35,24,20,.55)] p-6 backdrop-blur-sm">
+      <div className="relative w-full max-w-[360px] animate-pop overflow-hidden rounded-[30px] bg-white p-7 text-center shadow-popup">
+        {/* Radial coral bloom behind the photos */}
+        <div className="pointer-events-none absolute left-1/2 top-12 h-56 w-56 -translate-x-1/2 animate-bloom rounded-full bg-[radial-gradient(circle,rgba(255,107,91,.35)_0%,rgba(255,107,91,0)_70%)]" />
+
         {/* Pet photos */}
-        <div className="mb-5 flex items-center justify-center gap-0">
+        <div className="relative mb-5 flex items-center justify-center">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={myPhoto}
             alt="my pet"
-            className="h-24 w-24 rounded-full border-4 border-white object-cover shadow-card"
+            className="h-24 w-24 -rotate-6 rounded-full border-4 border-white object-cover shadow-card"
           />
-          <div className="-mx-3 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-coral text-xl shadow-card">
+          <div className="-mx-4 z-10 flex h-[52px] w-[52px] items-center justify-center rounded-full bg-gradient-cta text-2xl shadow-cta">
             {emoji}
           </div>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={theirPhoto}
             alt="their pet"
-            className="h-24 w-24 rounded-full border-4 border-white object-cover shadow-card"
+            className="h-24 w-24 rotate-6 rounded-full border-4 border-white object-cover shadow-card"
           />
         </div>
 
-        <h2 className="text-2xl font-bold text-brown">{headline}</h2>
-        <p className="mt-1 text-brown-muted">
-          น้องกับ <strong>{theirName}</strong> ชอบกันแล้ว
+        <h2 className="relative text-[30px] font-bold tracking-title text-coral-deep">{headline}</h2>
+        <p className="relative mt-1 text-ink-2">
+          น้องกับ <strong className="text-ink">{theirName}</strong> ชอบกันแล้ว
         </p>
 
-        <div className="mt-6 flex flex-col gap-3">
+        <div className="relative mt-6 flex flex-col gap-3">
           <button
             type="button"
             onClick={goToChat}
-            className="rounded-full bg-coral py-3 font-bold text-white hover:bg-coral-dark"
+            className="h-12 rounded-2xl bg-gradient-cta font-bold tracking-tight2 text-white shadow-cta transition-transform active:scale-[.98]"
           >
             ทักเลย
           </button>
           <button
             type="button"
             onClick={onClose}
-            className="rounded-full border-2 border-black/10 py-3 font-bold text-brown-muted hover:border-coral/40"
+            className="h-12 rounded-2xl border-2 border-black/10 font-bold text-ink-2 transition-colors hover:border-coral/40"
           >
             ปัดต่อ
           </button>
         </div>
       </div>
-
-      <style>{`
-        @keyframes popIn {
-          from { opacity: 0; transform: scale(0.7); }
-          to   { opacity: 1; transform: scale(1); }
-        }
-      `}</style>
     </div>
   );
 }

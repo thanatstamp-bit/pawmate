@@ -35,19 +35,19 @@ export default function BlockConfirm({
 
   return (
     <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/50 p-6">
-      <div className="w-full max-w-[320px] rounded-card bg-white p-6 text-center shadow-2xl">
-        <div className="mx-auto mb-3.5 flex h-[52px] w-[52px] items-center justify-center rounded-full bg-rose/10">
+      <div className="w-full max-w-[320px] animate-pop rounded-card bg-white p-6 text-center shadow-popup">
+        <div className="mx-auto mb-3.5 flex h-[52px] w-[52px] items-center justify-center rounded-full bg-rose-soft">
           <Ban size={24} className="text-rose" />
         </div>
-        <h3 className="text-lg font-bold text-brown">บล็อกน้องนี้?</h3>
-        <p className="mt-2 text-sm text-brown-muted">
+        <h3 className="text-lg font-bold tracking-tight2 text-ink">บล็อกน้องนี้?</h3>
+        <p className="mt-2 text-sm text-ink-2">
           ทั้งสองฝ่ายจะไม่เห็นกันอีก และการสนทนาจะถูกซ่อน
         </p>
         <div className="mt-5 flex gap-3">
           <button
             type="button"
             onClick={onClose}
-            className="flex-1 rounded-full border-2 border-black/10 py-2.5 font-bold text-brown-muted"
+            className="flex-1 rounded-2xl border-2 border-black/10 py-2.5 font-bold text-ink-2"
           >
             ยกเลิก
           </button>
@@ -55,7 +55,7 @@ export default function BlockConfirm({
             type="button"
             onClick={block}
             disabled={saving}
-            className="flex-1 rounded-full bg-rose py-2.5 font-bold text-white disabled:opacity-60"
+            className="flex-1 rounded-2xl bg-rose py-2.5 font-bold text-white transition-transform active:scale-[.98] disabled:opacity-60"
           >
             {saving ? "กำลังบล็อก..." : "บล็อก"}
           </button>

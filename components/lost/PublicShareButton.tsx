@@ -28,7 +28,7 @@ export function PublicShareButton({ petName, variant = "lost" }: Props) {
     return (
       <button
         onClick={handleShare}
-        className="mb-5 flex h-[52px] w-full items-center justify-center gap-2 rounded-2xl bg-teal font-bold text-white"
+        className="flex h-[54px] w-full items-center justify-center gap-2 rounded-[16px] bg-teal font-bold text-white shadow-[0_12px_24px_-10px_rgba(46,196,182,.55)] transition-transform active:scale-[.98]"
       >
         <Share2 size={16} />
         แชร์ข่าวดีนี้
@@ -39,10 +39,10 @@ export function PublicShareButton({ petName, variant = "lost" }: Props) {
   return (
     <button
       onClick={handleShare}
-      className="mb-5 flex h-[52px] w-full items-center justify-center gap-2 rounded-2xl border-2 border-[#D0CFCB] bg-white font-bold text-[#555]"
+      className="flex h-[54px] w-full items-center justify-center gap-2 rounded-[16px] border-[1.5px] border-line bg-white font-bold text-ink-2 shadow-[0_6px_16px_-10px_rgba(120,72,60,.25)] transition-transform active:scale-[.98]"
     >
       <Share2 size={16} />
-      แชร์โพสต์นี้
+      แชร์ประกาศนี้
     </button>
   );
 }

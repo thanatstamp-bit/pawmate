@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { PlusCircle, X, Loader2 } from "lucide-react";
+import { PlusCircle, X, Loader2, Camera, PawPrint } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
 interface Props {
@@ -11,8 +11,8 @@ interface Props {
 }
 
 const inputClass =
-  "w-full rounded-xl border border-black/10 bg-white px-4 py-3 text-sm " +
-  "placeholder:text-brown-muted/60 focus:border-coral focus:outline-none " +
+  "w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm text-ink " +
+  "placeholder:text-ink-3 focus:border-coral focus:outline-none " +
   "focus:ring-2 focus:ring-coral/30";
 
 export default function Step1Photos({ photos, name, onChange }: Props) {
@@ -71,9 +71,51 @@ export default function Step1Photos({ photos, name, onChange }: Props) {
     );
   }
 
+  const initial = name.trim()?.[0]?.toUpperCase();
+
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-6">
+      {/* Big cover avatar — shows the cover photo, or the live name initial.
+          The camera badge opens the uploader (same input as the grid). */}
+      <div className="flex flex-col items-center gap-4">
+        <div className="relative">
+          <div className="flex h-28 w-28 items-center justify-center overflow-hidden rounded-full bg-gradient-avatar shadow-cta">
+            {photos[0] ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={photos[0]} alt="cover" className="h-full w-full object-cover" />
+            ) : initial ? (
+              <span className="text-5xl font-bold text-white">{initial}</span>
+            ) : (
+              <PawPrint size={44} className="text-white/90" fill="currentColor" />
+            )}
+          </div>
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploading}
+            aria-label="เพิ่มรูปน้อง"
+            className="absolute bottom-0 right-0 flex h-10 w-10 items-center justify-center rounded-full border-[3px] border-bg-bot bg-white text-coral shadow-card transition-transform active:scale-95"
+          >
+            {uploading ? <Loader2 size={16} className="animate-spin" /> : <Camera size={18} />}
+          </button>
+        </div>
+
+        {/* Name */}
+        <div className="w-full">
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => onChange(photos, e.target.value)}
+            placeholder="เช่น น้องลาเต้, เจ้าถุงเงิน, มะลิ"
+            maxLength={50}
+            className={inputClass + " text-center"}
+          />
+        </div>
+      </div>
+
       {/* 2×2 photo grid */}
+      <div>
+        <p className="mb-2 text-sm font-bold text-ink">รูปน้อง ({photos.length}/4)</p>
       <div className="grid grid-cols-2 gap-3">
         {Array.from({ length: 4 }).map((_, idx) => {
           const url = photos[idx];
@@ -93,7 +135,7 @@ export default function Step1Photos({ photos, name, onChange }: Props) {
                     className="h-full w-full object-cover"
                   />
                   {idx === 0 && (
-                    <span className="absolute bottom-2 left-2 rounded-full bg-coral px-2 py-0.5 text-xs font-bold text-white">
+                    <span className="absolute bottom-2 left-2 rounded-lg bg-gradient-cta px-2 py-0.5 text-xs font-bold text-white shadow-cta">
                       รูปหลัก
                     </span>
                   )}
@@ -110,7 +152,7 @@ export default function Step1Photos({ photos, name, onChange }: Props) {
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
                   disabled={uploading}
-                  className="flex h-full w-full flex-col items-center justify-center gap-1 text-brown-muted transition-colors hover:text-brown"
+                  className="flex h-full w-full flex-col items-center justify-center gap-1 text-ink-3 transition-colors hover:text-coral"
                 >
                   {uploading ? (
                     <Loader2 size={24} className="animate-spin" />
@@ -126,6 +168,7 @@ export default function Step1Photos({ photos, name, onChange }: Props) {
           );
         })}
       </div>
+      </div>
 
       <input
         ref={fileInputRef}
@@ -137,24 +180,10 @@ export default function Step1Photos({ photos, name, onChange }: Props) {
       />
 
       {uploadError && (
-        <p className="rounded-xl bg-coral/10 px-4 py-2 text-sm text-coral-dark">
+        <p className="rounded-2xl bg-coral-soft px-4 py-2.5 text-sm text-coral-ink">
           {uploadError}
         </p>
       )}
-
-      <div>
-        <label className="mb-2 block text-sm font-bold text-brown">
-          ชื่อน้อง
-        </label>
-        <input
-          type="text"
-          value={name}
-          onChange={(e) => onChange(photos, e.target.value)}
-          placeholder="เช่น น้องลาเต้, เจ้าถุงเงิน, มะลิ"
-          maxLength={50}
-          className={inputClass}
-        />
-      </div>
     </div>
   );
 }

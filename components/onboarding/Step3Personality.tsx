@@ -18,12 +18,12 @@ interface Props {
 }
 
 const inputClass =
-  "w-full rounded-xl border border-black/10 bg-white px-4 py-3 text-sm " +
-  "placeholder:text-brown-muted/60 focus:border-coral focus:outline-none " +
+  "w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm text-ink " +
+  "placeholder:text-ink-3 focus:border-coral focus:outline-none " +
   "focus:ring-2 focus:ring-coral/30";
 
 const selectClass =
-  "w-full rounded-xl border border-black/10 bg-white px-4 py-3 text-sm " +
+  "w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm text-ink " +
   "focus:border-coral focus:outline-none focus:ring-2 focus:ring-coral/30 appearance-none";
 
 export default function Step3Personality({
@@ -50,10 +50,10 @@ export default function Step3Personality({
                 key={tag}
                 type="button"
                 onClick={() => toggleTag(tag)}
-                className={`rounded-full border-2 px-3 py-1 text-sm font-bold transition-all ${
+                className={`rounded-chip border-[1.5px] px-3.5 py-1.5 text-sm font-semibold transition-all ${
                   selected
-                    ? "border-coral bg-coral text-white"
-                    : "border-black/10 bg-white text-brown-muted hover:border-coral/40"
+                    ? "border-coral/40 bg-coral text-white"
+                    : "border-line bg-[#FBF7F3] text-ink-2 hover:border-coral/40"
                 }`}
               >
                 {tag}

@@ -24,38 +24,42 @@ export default function HospitalCard({ hospital, onClick }: Props) {
     <button
       type="button"
       onClick={onClick}
-      className="flex flex-col gap-2 rounded-2xl border border-black/5 bg-white p-4 text-left shadow-card"
+      className="flex flex-col gap-2.5 rounded-panel bg-white p-[15px] text-left shadow-card transition-transform active:scale-[.985]"
     >
-      <div className="flex items-start gap-2">
-        <span className="flex-1 text-[15px] font-bold leading-tight text-brown">
-          {hospital.name}
-        </span>
-        {hospital.open_24h && (
-          <span className="shrink-0 rounded-lg bg-coral/10 px-2 py-0.5 text-[11px] font-bold text-coral">
-            24 ชม.
-          </span>
-        )}
-      </div>
-
-      <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-1 text-xs text-brown-muted">
-          <MapPin size={12} className="text-brown-muted/60" />
-          <span>
-            {hospital.district ? `${hospital.district} · ` : ""}
-            {hospital.province}
-          </span>
+      <div className="flex items-start gap-2.5">
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className="text-[15.5px] font-bold leading-tight tracking-tight2 text-ink">
+              {hospital.name}
+            </span>
+            {hospital.open_24h && (
+              <span className="inline-flex shrink-0 items-center rounded-lg bg-coral-soft px-2 py-[3px] text-[10.5px] font-bold text-coral-ink">
+                24 ชม.
+              </span>
+            )}
+          </div>
+          <div className="mt-1 flex items-center gap-1 text-[13px] font-medium text-ink-2">
+            <MapPin size={13} className="shrink-0 text-ink-3" />
+            <span>
+              {hospital.district ? `${hospital.district} · ` : ""}
+              {hospital.province}
+            </span>
+          </div>
         </div>
         {hospital.distanceKm !== undefined && (
-          <span className="shrink-0 text-xs text-brown-muted/70">
-            {hospital.distanceKm.toFixed(1)} กม.
-          </span>
+          <div className="shrink-0 text-right leading-none">
+            <div className="text-base font-bold tabular-nums text-coral-ink">
+              {hospital.distanceKm.toFixed(1)}
+            </div>
+            <div className="mt-0.5 text-[10.5px] text-ink-3">กม.</div>
+          </div>
         )}
       </div>
 
       {hospital.services.length > 0 && (
         <div className="flex flex-wrap gap-1.5">
           {hospital.services.map((s) => (
-            <span key={s} className="rounded-lg bg-cream px-2.5 py-0.5 text-[11px] text-brown-muted">
+            <span key={s} className="rounded-lg bg-teal-soft px-[9px] py-1 text-[11px] font-semibold text-teal-ink">
               {s}
             </span>
           ))}

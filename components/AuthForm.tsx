@@ -2,11 +2,12 @@
 
 import { useState, useTransition, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Loader2 } from "lucide-react";
+import { Loader2, Mail, Lock, User, Eye, EyeOff } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { demoLogin } from "@/app/login/actions";
 import GoogleLogo from "@/components/icons/GoogleLogo";
 import FacebookLogo from "@/components/icons/FacebookLogo";
+import { SegmentedControl } from "@/components/ui";
 
 type Tab = "login" | "signup";
 
@@ -30,10 +31,23 @@ function thaiAuthError(message: string): string {
 // pre-fills on return visits without storing a credential in the browser.
 const REMEMBER_EMAIL_KEY = "pawmate_remembered_email";
 
-const inputClass =
-  "w-full rounded-xl border border-black/10 bg-white px-4 py-3 text-sm " +
-  "placeholder:text-brown-muted/60 focus:border-coral focus:outline-none " +
-  "focus:ring-2 focus:ring-coral/30";
+// Icon-prefixed input. Children (e.g. a password reveal toggle) render on the right.
+function Field({
+  icon: Icon,
+  children,
+  ...props
+}: { icon: typeof Mail } & React.InputHTMLAttributes<HTMLInputElement> & { children?: React.ReactNode }) {
+  return (
+    <div className="relative">
+      <Icon size={18} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-3" />
+      <input
+        {...props}
+        className="w-full rounded-2xl border border-black/10 bg-white py-3 pl-11 pr-11 text-sm text-ink placeholder:text-ink-3 focus:border-coral focus:outline-none focus:ring-2 focus:ring-coral/30"
+      />
+      {children}
+    </div>
+  );
+}
 
 export default function AuthForm() {
   const router = useRouter();
@@ -49,6 +63,7 @@ export default function AuthForm() {
   const [notice, setNotice] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [remember, setRemember] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
   const [demoPending, startDemo] = useTransition();
 
   // Pre-fill the email field from a previous "remember email" choice.
@@ -166,59 +181,58 @@ export default function AuthForm() {
   return (
     <div className="rounded-card bg-white p-6 shadow-card">
       {/* Tab switcher */}
-      <div className="mb-6 flex rounded-full bg-cream p-1">
-        {(
-          [
-            { key: "login", label: "เข้าสู่ระบบ" },
-            { key: "signup", label: "สมัครสมาชิก" },
-          ] as const
-        ).map(({ key, label }) => (
-          <button
-            key={key}
-            type="button"
-            onClick={() => switchTab(key)}
-            className={`flex-1 rounded-full py-2 text-sm font-bold transition-colors ${
-              tab === key
-                ? "bg-coral text-white"
-                : "text-brown-muted hover:text-brown"
-            }`}
-          >
-            {label}
-          </button>
-        ))}
+      <div className="mb-6">
+        <SegmentedControl
+          tone="coral"
+          value={tab}
+          onChange={(next) => switchTab(next)}
+          segments={[
+            { value: "login", label: "เข้าสู่ระบบ" },
+            { value: "signup", label: "สมัครสมาชิก" },
+          ]}
+        />
       </div>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-3">
         {tab === "signup" && (
-          <input
+          <Field
+            icon={User}
             type="text"
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
             placeholder="ชื่อที่ใช้แสดง เช่น แม่น้องลาเต้"
-            className={inputClass}
             maxLength={50}
           />
         )}
-        <input
+        <Field
+          icon={Mail}
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="อีเมล"
           required
-          className={inputClass}
         />
-        <input
-          type="password"
+        <Field
+          icon={Lock}
+          type={showPassword ? "text" : "password"}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="รหัสผ่าน (อย่างน้อย 6 ตัวอักษร)"
           required
           minLength={6}
-          className={inputClass}
-        />
+        >
+          <button
+            type="button"
+            onClick={() => setShowPassword((v) => !v)}
+            aria-label={showPassword ? "ซ่อนรหัสผ่าน" : "แสดงรหัสผ่าน"}
+            className="absolute right-3.5 top-1/2 -translate-y-1/2 text-ink-3 transition-colors hover:text-ink-2"
+          >
+            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+          </button>
+        </Field>
 
         {tab === "login" && (
-          <label className="flex cursor-pointer select-none items-center gap-2 px-1 text-sm text-brown-muted">
+          <label className="flex cursor-pointer select-none items-center gap-2 px-1 text-sm text-ink-2">
             <input
               type="checkbox"
               checked={remember}
@@ -230,12 +244,12 @@ export default function AuthForm() {
         )}
 
         {error && (
-          <p className="rounded-xl bg-coral/10 px-4 py-2 text-sm text-coral-dark">
+          <p className="rounded-2xl bg-coral-soft px-4 py-2.5 text-sm text-coral-ink">
             {error}
           </p>
         )}
         {notice && (
-          <p className="rounded-xl bg-teal/10 px-4 py-2 text-sm text-teal-dark">
+          <p className="rounded-2xl bg-teal-soft px-4 py-2.5 text-sm text-teal-ink">
             {notice}
           </p>
         )}
@@ -243,17 +257,17 @@ export default function AuthForm() {
         <button
           type="submit"
           disabled={busy}
-          className="mt-1 flex items-center justify-center gap-2 rounded-full bg-coral py-3 font-bold text-white transition-colors hover:bg-coral-dark disabled:opacity-60"
+          className="mt-1 flex h-12 items-center justify-center gap-2 rounded-2xl bg-gradient-cta font-bold tracking-tight2 text-white shadow-cta transition-transform active:scale-[.98] disabled:opacity-60 disabled:active:scale-100"
         >
           {loading && <Loader2 size={18} className="animate-spin" />}
           {tab === "login" ? "เข้าสู่ระบบ" : "สมัครสมาชิก"}
         </button>
       </form>
 
-      <div className="my-4 flex items-center gap-3 text-xs text-brown-muted">
-        <div className="h-px flex-1 bg-black/10" />
+      <div className="my-4 flex items-center gap-3 text-xs text-ink-3">
+        <div className="h-px flex-1 bg-line" />
         หรือ
-        <div className="h-px flex-1 bg-black/10" />
+        <div className="h-px flex-1 bg-line" />
       </div>
 
       {/* Social login — Google + Facebook */}
@@ -261,7 +275,7 @@ export default function AuthForm() {
         type="button"
         onClick={() => handleOAuth("google")}
         disabled={busy}
-        className="mb-3 flex w-full items-center justify-center gap-2.5 rounded-full border border-black/10 bg-white py-3 font-bold text-brown transition-colors hover:bg-cream disabled:opacity-60"
+        className="mb-3 flex h-12 w-full items-center justify-center gap-2.5 rounded-2xl border border-black/10 bg-white font-bold text-ink transition-colors hover:bg-fill-1 disabled:opacity-60"
       >
         <GoogleLogo size={18} />
         เข้าสู่ระบบด้วย Google
@@ -270,7 +284,7 @@ export default function AuthForm() {
         type="button"
         onClick={() => handleOAuth("facebook")}
         disabled={busy}
-        className="mb-3 flex w-full items-center justify-center gap-2.5 rounded-full border border-black/10 bg-white py-3 font-bold text-brown transition-colors hover:bg-cream disabled:opacity-60"
+        className="mb-3 flex h-12 w-full items-center justify-center gap-2.5 rounded-2xl border border-black/10 bg-white font-bold text-ink transition-colors hover:bg-fill-1 disabled:opacity-60"
       >
         <FacebookLogo size={18} />
         เข้าสู่ระบบด้วย Facebook
@@ -281,12 +295,12 @@ export default function AuthForm() {
         type="button"
         onClick={handleDemo}
         disabled={busy}
-        className="flex w-full items-center justify-center gap-2 rounded-full bg-teal py-3 font-bold text-white transition-colors hover:bg-teal-dark disabled:opacity-60"
+        className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-teal font-bold text-white shadow-card transition-colors hover:bg-teal-dark disabled:opacity-60"
       >
         {demoPending && <Loader2 size={18} className="animate-spin" />}
         🐾 ลองเล่นโหมด Demo
       </button>
-      <p className="mt-2 text-center text-xs text-brown-muted">
+      <p className="mt-2 text-center text-xs text-ink-2">
         ไม่ต้องสมัคร เข้าไปลองปัดการ์ดได้เลย
       </p>
     </div>

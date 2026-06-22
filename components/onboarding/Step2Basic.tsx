@@ -41,7 +41,7 @@ interface Props {
 }
 
 const selectClass =
-  "w-full rounded-xl border border-black/10 bg-white px-4 py-3 text-sm " +
+  "w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm text-ink " +
   "focus:border-coral focus:outline-none focus:ring-2 focus:ring-coral/30 appearance-none";
 
 export default function Step2Basic({
@@ -51,9 +51,13 @@ export default function Step2Basic({
   const [breedOpen, setBreedOpen] = useState(false);
 
   const breedList = species === "dog" ? DOG_BREEDS : species === "cat" ? CAT_BREEDS : [];
-  const filtered = breedList.filter((b) =>
-    b.toLowerCase().includes(breedQuery.toLowerCase())
-  );
+  // When the query still equals the already-committed breed (i.e. the user just
+  // reopened the dropdown without typing), show the full list so they can pick a
+  // different breed. Only filter once they actually start typing a new query.
+  const filtered =
+    breed && breedQuery === breed
+      ? breedList
+      : breedList.filter((b) => b.toLowerCase().includes(breedQuery.toLowerCase()));
 
   function selectSpecies(s: "dog" | "cat") {
     // Reset breed when species changes
@@ -106,7 +110,7 @@ export default function Step2Basic({
             <input
               type="text"
               value={breedQuery}
-              onFocus={() => setBreedOpen(true)}
+              onFocus={(e) => { setBreedOpen(true); e.target.select(); }}
               onChange={(e) => {
                 setBreedQuery(e.target.value);
                 onChange({ breed: "" });
@@ -159,10 +163,10 @@ export default function Step2Basic({
               key={value}
               type="button"
               onClick={() => onChange({ sex: value })}
-              className={`rounded-full border-2 py-3 font-bold transition-all ${
+              className={`rounded-2xl border-2 py-3 font-bold transition-all ${
                 sex === value
                   ? "border-coral bg-coral text-white"
-                  : "border-black/10 bg-white text-brown-muted hover:border-coral/40"
+                  : "border-black/10 bg-white text-ink-2 hover:border-coral/40"
               }`}
             >
               {label}

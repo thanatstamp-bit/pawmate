@@ -122,23 +122,23 @@ export default function HealthRecordForm({ petId, record, onClose, onSave }: Pro
 
         {/* Bottom Sheet */}
         <div
-          className="mx-auto flex w-full max-w-[480px] flex-col rounded-t-[20px] bg-white"
+          className="mx-auto flex w-full max-w-[480px] flex-col rounded-t-card bg-white"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Drag handle */}
-          <div className="mx-auto mt-2.5 h-1 w-9 rounded-full bg-[#D5D1CC]" />
+          <div className="mx-auto mt-2.5 h-1 w-9 rounded-full bg-[#E5DCD3]" />
 
           {/* Sheet header */}
           <div className="flex items-center justify-between px-5 pb-0 pt-3.5">
-            <span className="text-[15px] font-bold text-brown">
+            <span className="text-[15px] font-bold text-ink">
               {isEdit ? "แก้ไขบันทึก" : "เพิ่มบันทึกสุขภาพ"}
             </span>
             <button
               type="button"
               onClick={onClose}
-              className="flex h-[30px] w-[30px] items-center justify-center rounded-full bg-[#F5F3F0]"
+              className="flex h-[30px] w-[30px] items-center justify-center rounded-full bg-[#F7F3EF]"
             >
-              <X size={14} className="text-brown-muted" strokeWidth={2.5} />
+              <X size={14} className="text-ink-2" strokeWidth={2.5} />
             </button>
           </div>
 
@@ -147,7 +147,7 @@ export default function HealthRecordForm({ petId, record, onClose, onSave }: Pro
 
             {/* Type selector */}
             <div className="mt-4 mb-3.5">
-              <span className="mb-1.5 block text-[11px] font-semibold tracking-[0.02em] text-brown-muted">
+              <span className="mb-1.5 block text-[11px] font-semibold tracking-[0.02em] text-ink-2">
                 ประเภท
               </span>
               <div className="flex gap-1.5">
@@ -162,7 +162,7 @@ export default function HealthRecordForm({ petId, record, onClose, onSave }: Pro
                       style={
                         active
                           ? { background: "#FF6B5B", color: "#fff" }
-                          : { border: "1.5px solid #EDEAE6", color: "#8A8580" }
+                          : { border: "1.5px solid #F1ECE7", color: "#6B655E" }
                       }
                     >
                       {active && <Icon size={11} strokeWidth={2.5} />}
@@ -175,23 +175,23 @@ export default function HealthRecordForm({ petId, record, onClose, onSave }: Pro
 
             {/* ชื่อรายการ */}
             <div className="mb-1.5">
-              <span className="mb-1.5 block text-[11px] font-semibold tracking-[0.02em] text-brown-muted">
+              <span className="mb-1.5 block text-[11px] font-semibold tracking-[0.02em] text-ink-2">
                 ชื่อรายการ
               </span>
               <div
                 className="flex h-11 items-center rounded-[11px] px-3.5"
-                style={{ border: `1.5px solid ${title ? "#FF6B5B" : "#EDEAE6"}` }}
+                style={{ border: `1.5px solid ${title ? "#FF6B5B" : "#F1ECE7"}` }}
               >
                 <input
                   type="text"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="ระบุชื่อวัคซีน/รายการ"
-                  className="flex-1 bg-transparent text-sm text-brown placeholder:text-[#C5C1BC] focus:outline-none"
+                  className="flex-1 bg-transparent text-sm text-ink placeholder:text-[#A39D95] focus:outline-none"
                 />
                 {title && (
                   <button type="button" onClick={() => setTitle("")}>
-                    <X size={14} className="text-[#D5D1CC]" />
+                    <X size={14} className="text-[#E5DCD3]" />
                   </button>
                 )}
               </div>
@@ -211,7 +211,7 @@ export default function HealthRecordForm({ petId, record, onClose, onSave }: Pro
                       style={
                         selected
                           ? { background: "rgba(255,107,91,0.07)", border: "1px solid rgba(255,107,91,0.28)", color: "#FF6B5B" }
-                          : { background: "#F5F3F0", border: "1px solid #EDEAE6", color: "#5A5650" }
+                          : { background: "#F7F3EF", border: "1px solid #F1ECE7", color: "#6B655E" }
                       }
                     >
                       {s}
@@ -223,19 +223,19 @@ export default function HealthRecordForm({ petId, record, onClose, onSave }: Pro
 
             {/* วันที่บันทึก */}
             <div className="mb-2.5">
-              <span className="mb-1.5 block text-[11px] font-semibold tracking-[0.02em] text-brown-muted">
+              <span className="mb-1.5 block text-[11px] font-semibold tracking-[0.02em] text-ink-2">
                 วันที่บันทึก
               </span>
               <div
                 className="flex h-11 items-center rounded-[11px] px-3.5"
-                style={{ border: "1.5px solid #EDEAE6" }}
+                style={{ border: "1.5px solid #F1ECE7" }}
               >
                 <input
                   type="date"
                   value={recordDate}
                   max={today}
                   onChange={(e) => setRecordDate(e.target.value)}
-                  className="flex-1 bg-transparent text-sm text-brown focus:outline-none"
+                  className="flex-1 bg-transparent text-sm text-ink focus:outline-none"
                 />
               </div>
             </div>
@@ -243,7 +243,7 @@ export default function HealthRecordForm({ petId, record, onClose, onSave }: Pro
             {/* วันนัดครั้งต่อไป — collapsible */}
             <div
               className="mb-2.5"
-              style={{ borderTop: "1px solid #F5F3F0", borderBottom: showNextDue ? "none" : "1px solid #F5F3F0" }}
+              style={{ borderTop: "1px solid #F7F3EF", borderBottom: showNextDue ? "none" : "1px solid #F7F3EF" }}
             >
               <button
                 type="button"
@@ -251,33 +251,33 @@ export default function HealthRecordForm({ petId, record, onClose, onSave }: Pro
                 className="flex w-full items-center justify-between py-2.5"
               >
                 <div>
-                  <p className="text-[13px] font-medium text-brown">วันนัดครั้งต่อไป</p>
+                  <p className="text-[13px] font-medium text-ink">วันนัดครั้งต่อไป</p>
                   {showNextDue && nextDueDate ? (
-                    <p className="mt-px text-[12px] font-semibold" style={{ color: "#1A8A6A" }}>
+                    <p className="mt-px text-[12px] font-semibold" style={{ color: "#137F75" }}>
                       {formatNextDueThai(nextDueDate)}
                     </p>
                   ) : (
-                    <p className="mt-px text-[11px] text-brown-muted">สร้างการแจ้งเตือนอัตโนมัติ</p>
+                    <p className="mt-px text-[11px] text-ink-2">สร้างการแจ้งเตือนอัตโนมัติ</p>
                   )}
                 </div>
                 {!showNextDue ? (
                   <span className="text-[13px] font-bold text-coral">+ เพิ่ม</span>
                 ) : (
-                  <ChevronDown size={14} className="text-brown-muted" />
+                  <ChevronDown size={14} className="text-ink-2" />
                 )}
               </button>
               {showNextDue && (
                 <div
                   className="pb-2.5"
-                  style={{ borderBottom: "1px solid #F5F3F0" }}
+                  style={{ borderBottom: "1px solid #F7F3EF" }}
                 >
                   <input
                     type="date"
                     value={nextDueDate}
                     min={recordDate}
                     onChange={(e) => setNextDueDate(e.target.value)}
-                    className="w-full rounded-[11px] px-3.5 py-3 text-sm text-brown focus:outline-none"
-                    style={{ border: "1.5px solid #EDEAE6" }}
+                    className="w-full rounded-[11px] px-3.5 py-3 text-sm text-ink focus:outline-none"
+                    style={{ border: "1.5px solid #F1ECE7" }}
                   />
                 </div>
               )}
@@ -285,7 +285,7 @@ export default function HealthRecordForm({ petId, record, onClose, onSave }: Pro
 
             {/* หมายเหตุ */}
             <div className="mb-3.5">
-              <span className="mb-1.5 block text-[11px] font-semibold tracking-[0.02em] text-brown-muted">
+              <span className="mb-1.5 block text-[11px] font-semibold tracking-[0.02em] text-ink-2">
                 หมายเหตุ (ไม่บังคับ)
               </span>
               <textarea
@@ -293,8 +293,8 @@ export default function HealthRecordForm({ petId, record, onClose, onSave }: Pro
                 onChange={(e) => setNotes(e.target.value)}
                 rows={3}
                 placeholder="โรงพยาบาล, ยี่ห้อยา, อาการ…"
-                className="w-full resize-none rounded-[11px] px-3.5 py-3 text-[13px] text-brown placeholder:italic placeholder:text-[#C5C1BC] focus:outline-none"
-                style={{ border: "1.5px solid #EDEAE6" }}
+                className="w-full resize-none rounded-[11px] px-3.5 py-3 text-[13px] text-ink placeholder:italic placeholder:text-[#A39D95] focus:outline-none"
+                style={{ border: "1.5px solid #F1ECE7" }}
               />
             </div>
 
@@ -304,8 +304,7 @@ export default function HealthRecordForm({ petId, record, onClose, onSave }: Pro
                 type="button"
                 onClick={handleSave}
                 disabled={saving || !title.trim() || !recordDate}
-                className="flex h-12 flex-1 items-center justify-center rounded-[14px] bg-coral text-[14px] font-bold text-white disabled:opacity-50"
-                style={{ boxShadow: "0 4px 12px rgba(255,107,91,0.26)" }}
+                className="flex h-12 flex-1 items-center justify-center rounded-2xl bg-gradient-cta text-[14px] font-bold tracking-tight2 text-white shadow-cta transition-transform active:scale-[.98] disabled:opacity-50 disabled:active:scale-100"
               >
                 {saving ? "กำลังบันทึก..." : "บันทึก"}
               </button>
@@ -313,10 +312,10 @@ export default function HealthRecordForm({ petId, record, onClose, onSave }: Pro
                 <button
                   type="button"
                   onClick={() => setShowDeleteBanner((v) => !v)}
-                  className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[14px]"
-                  style={{ border: "1.5px solid rgba(155,34,34,0.28)", background: "rgba(155,34,34,0.05)" }}
+                  className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl"
+                  style={{ border: "1.5px solid rgba(224,68,90,0.28)", background: "rgba(224,68,90,0.05)" }}
                 >
-                  <Trash2 size={16} style={{ color: "#8B1A1A" }} strokeWidth={2.2} />
+                  <Trash2 size={16} style={{ color: "#B12C3F" }} strokeWidth={2.2} />
                 </button>
               )}
             </div>
@@ -325,10 +324,10 @@ export default function HealthRecordForm({ petId, record, onClose, onSave }: Pro
             {showDeleteBanner && (
               <div
                 className="mt-3 flex items-center gap-2.5 rounded-xl px-3.5 py-3"
-                style={{ background: "rgba(155,34,34,0.06)", border: "1.5px solid rgba(155,34,34,0.20)" }}
+                style={{ background: "rgba(224,68,90,0.06)", border: "1.5px solid rgba(224,68,90,0.20)" }}
               >
-                <AlertTriangle size={14} style={{ color: "#8B1A1A", flexShrink: 0 }} strokeWidth={2.2} />
-                <span className="flex-1 text-xs leading-[1.4]" style={{ color: "#8B1A1A" }}>
+                <AlertTriangle size={14} style={{ color: "#B12C3F", flexShrink: 0 }} strokeWidth={2.2} />
+                <span className="flex-1 text-xs leading-[1.4]" style={{ color: "#B12C3F" }}>
                   ลบรายการนี้? ข้อมูลจะหายถาวร
                 </span>
                 <button
@@ -336,7 +335,7 @@ export default function HealthRecordForm({ petId, record, onClose, onSave }: Pro
                   onClick={handleDelete}
                   disabled={saving}
                   className="shrink-0 text-xs font-bold whitespace-nowrap"
-                  style={{ color: "#8B1A1A" }}
+                  style={{ color: "#B12C3F" }}
                 >
                   {saving ? "กำลังลบ..." : "ยืนยันลบ"}
                 </button>
@@ -352,7 +351,7 @@ export default function HealthRecordForm({ petId, record, onClose, onSave }: Pro
         <Toast
           title={toast}
           subtitle="วัคซีนพิษสุนัขบ้าภายใน 12 เดือน"
-          icon={<Check size={9} className="text-[#1A8A6A]" strokeWidth={3.5} />}
+          icon={<Check size={9} className="text-[#137F75]" strokeWidth={3.5} />}
           onDone={clearToast}
         />
       )}

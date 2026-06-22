@@ -53,13 +53,13 @@ export default function ReportSheet({
         style={{ maxHeight: "88vh" }}
       >
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-[17px] font-bold text-brown">รายงานน้องนี้</h2>
+          <h2 className="text-[17px] font-bold tracking-tight2 text-ink">รายงานน้องนี้</h2>
           <button type="button" onClick={onClose} className="rounded-full p-1 hover:bg-cream">
-            <X size={20} className="text-brown-muted" />
+            <X size={20} className="text-ink-2" />
           </button>
         </div>
 
-        <div className="overflow-hidden rounded-[14px] bg-[#F5F3F0]">
+        <div className="overflow-hidden rounded-chip bg-fill-1">
           {REASONS.map((r, i) => {
             const active = reason === r;
             return (
@@ -69,16 +69,16 @@ export default function ReportSheet({
                 onClick={() => setReason(r)}
                 className={`flex w-full items-center gap-3 px-4 py-[13px] text-left transition-colors ${
                   active ? "bg-coral/[0.04]" : ""
-                } ${i !== REASONS.length - 1 ? "border-b border-[#EDEAE6]" : ""}`}
+                } ${i !== REASONS.length - 1 ? "border-b border-line" : ""}`}
               >
                 <div
                   className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 ${
-                    active ? "border-coral" : "border-[#D5D1CC]"
+                    active ? "border-coral" : "border-fill-3"
                   }`}
                 >
                   {active && <div className="h-2.5 w-2.5 rounded-full bg-coral" />}
                 </div>
-                <span className={`flex-1 text-sm ${active ? "font-semibold text-brown" : "text-[#5A5650]"}`}>
+                <span className={`flex-1 text-sm ${active ? "font-semibold text-ink" : "text-ink-2"}`}>
                   {r}
                 </span>
               </button>
@@ -86,7 +86,7 @@ export default function ReportSheet({
           })}
         </div>
 
-        <label className="mb-2 mt-4 block text-sm font-semibold text-brown">
+        <label className="mb-2 mt-4 block text-sm font-semibold text-ink">
           รายละเอียดเพิ่มเติม (ไม่บังคับ)
         </label>
         <textarea
@@ -95,14 +95,14 @@ export default function ReportSheet({
           placeholder="อธิบายเพิ่มเติม..."
           maxLength={500}
           rows={3}
-          className="w-full resize-none rounded-xl border border-black/10 bg-cream px-4 py-3 text-sm focus:border-coral focus:outline-none focus:ring-2 focus:ring-coral/20"
+          className="w-full resize-none rounded-2xl border border-black/10 bg-cream px-4 py-3 text-sm text-ink focus:border-coral focus:outline-none focus:ring-2 focus:ring-coral/20"
         />
 
         <button
           type="button"
           onClick={submit}
           disabled={!reason || saving}
-          className="mt-4 w-full rounded-full bg-coral py-3 font-bold text-white transition-colors disabled:opacity-40 hover:bg-coral-dark"
+          className="mt-4 h-12 w-full rounded-2xl bg-gradient-cta font-bold tracking-tight2 text-white shadow-cta transition-transform active:scale-[.98] disabled:opacity-40 disabled:active:scale-100"
         >
           {saving ? "กำลังส่ง..." : "ส่งรายงาน"}
         </button>
