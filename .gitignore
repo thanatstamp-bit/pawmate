@@ -26,6 +26,9 @@ PawMate app design system Stanealone/
 .env*.local
 .env
 
+# demo account credentials — never commit passwords
+DEMO_ACCOUNTS.md
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
