@@ -1,7 +1,8 @@
 "use client";
 
-import { use, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 import {
   ChevronLeft,
   MapPin,
@@ -205,8 +206,8 @@ function ResponseRow({ resp }: { resp: ResponseRecord & { pets: { name: string; 
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
-export default function BloodDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = use(params);
+export default function BloodDetailPage() {
+  const { id } = useParams<{ id: string }>();
   const supabase = createClient();
 
   const [loading, setLoading] = useState(true);
@@ -237,9 +238,12 @@ export default function BloodDetailPage({ params }: { params: Promise<{ id: stri
       if (!req) { setLoading(false); return; }
 
       // Load matching donors
+      // pets!inner → filtering on the embedded resource actually drops donor
+      // rows of the wrong species. Without !inner, Supabase keeps the parent
+      // row with pets=null, which then crashes matchDonors/DonorCard.
       const { data: donorRows } = await supabase
         .from("blood_donors")
-        .select("*, pets(id, name, photos, species, birth_month, province, vaccinated, owner_id, profiles(display_name))")
+        .select("*, pets!inner(id, name, photos, species, birth_month, province, vaccinated, owner_id, profiles(display_name))")
         .eq("pets.species", req.species);
       setDonors((donorRows ?? []) as DonorRow[]);
 

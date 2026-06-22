@@ -42,7 +42,10 @@ export function matchDonors(
   requestProvince: string,
   bloodTypeNeeded: string,
 ): MatchResult {
-  const eligible = donors.filter((d) => d.eligible && d.available);
+  // Guard against a null embedded pet (e.g. a non-inner join leaking rows of
+  // the wrong species) so the byProvince sort below never reads pets.province
+  // off null.
+  const eligible = donors.filter((d) => d.pets && d.eligible && d.available);
 
   const exact: DonorRow[] = [];
   const crossmatch: DonorRow[] = [];
