@@ -34,6 +34,15 @@ type MatchResult = {
 // Demo match counter helpers (module-level to avoid recreating on every render)
 function randomThreshold() { return 3 + Math.floor(Math.random() * 5); } // 3–7
 
+// Demo accounts get an unlimited swipe deck: once exhausted it recycles the full
+// pool — including already-liked cards — so testers sharing the demo login never
+// hit an empty deck. Override the list via NEXT_PUBLIC_DEMO_EMAIL (comma-separated);
+// falls back to the known demo logins so it works without extra env setup.
+const DEMO_EMAILS = (process.env.NEXT_PUBLIC_DEMO_EMAIL ?? "demo@pawmate.app,demo-full@pawmate.app")
+  .split(",")
+  .map((e) => e.trim().toLowerCase())
+  .filter(Boolean);
+
 export default function SwipePage() {
   const supabase = createClient();
 
@@ -52,6 +61,8 @@ export default function SwipePage() {
   const likedIds       = useRef<Set<string>>(new Set());
   // Guard against repeated auto-recycle when cards are empty due to filter constraints
   const deckExhausted  = useRef(false);
+  // True when signed in as a demo account → recycle the deck forever (see fetchCards)
+  const isDemo         = useRef(false);
 
   // Demo match counter — guarantees at least 1 match within every 10 swipes
   const swipeCount  = useRef(0);
@@ -72,6 +83,8 @@ export default function SwipePage() {
     async function load() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
+
+      isDemo.current = !!user.email && DEMO_EMAILS.includes(user.email.toLowerCase());
 
       const storedId = localStorage.getItem("pawmate_active_pet_id");
       let petData = null;
@@ -114,7 +127,8 @@ export default function SwipePage() {
     if (!myPet) return;
     setLoading(true);
 
-    // Always exclude DB-liked pets — liked cards must never reappear
+    // Liked pets are excluded so they don't reappear — except demo accounts when
+    // recycling (see the `seen` set below), which loop the full pool forever.
     const { data: prevLikes } = await supabase
       .from("likes")
       .select("to_pet_id")
@@ -156,8 +170,14 @@ export default function SwipePage() {
     const blockedIds = await getBlockedPetIds(supabase, myPet.id);
 
     const seen = recycle
-      // recycle: allow skipped pets back, but never liked or blocked
-      ? new Set<string>([...Array.from(prevLikedIds), ...Array.from(blockedIds)])
+      // recycle: allow skipped pets back, but never blocked. Demo accounts also
+      // recycle liked cards so the deck never empties for testers; real users
+      // keep liked cards excluded so matched/liked pets don't resurface.
+      ? new Set<string>(
+          isDemo.current
+            ? Array.from(blockedIds)
+            : [...Array.from(prevLikedIds), ...Array.from(blockedIds)]
+        )
       : new Set([
           ...Array.from(skippedIds.current),
           ...Array.from(likedIds.current),
@@ -183,6 +203,14 @@ export default function SwipePage() {
       skippedIds.current = new Set();
       fetchCards(true);
       return;
+    }
+
+    // Demo deck loops forever — shuffle on recycle so the repeated pool feels fresh.
+    if (isDemo.current && recycle && result.length > 1) {
+      for (let i = result.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [result[i], result[j]] = [result[j], result[i]];
+      }
     }
 
     setCards(result);
