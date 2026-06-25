@@ -1,7 +1,7 @@
 # PawMate — Developer Log & Handoff Notes (รวมศูนย์)
 
 > บันทึกสิ่งที่ทำไปในแต่ละ session + roadmap + แผนเฟสถัดไป รวมไว้ในไฟล์เดียว
-> อัปเดตล่าสุด: 2026-06-22 (Session 29 — Visual Redesign implementation, Phases 1–3)
+> อัปเดตล่าสุด: 2026-06-26 (Session 31 — บัญชี demo: การ์ดปัดไม่จำกัด)
 >
 > **โครงไฟล์เอกสารโปรเจกต์ตอนนี้มี 2 ไฟล์:**
 > - `CLAUDE.md` — instructions ที่ Claude Code โหลดอัตโนมัติทุก session (architecture, rules, design system) — **แก้ที่นั่นเมื่อ architecture เปลี่ยน**
@@ -488,6 +488,10 @@ Greeting ใช้ `activePet?.name` แทน `profile.display_name` (ลบ ow
 
 **Session 22 (06-19) — Vet-Online Bookings Shortcut**
 เพิ่มทางเข้า "การจองของฉัน" จากหน้ารายชื่อหมอโดยตรง (ก่อนหน้านี้เข้าได้เฉพาะหลังจองสำเร็จ): (1) CalendarDays icon มุมขวา header → `/app/care/vet-online/bookings`; (2) shortcut card (teal icon + "ดูนัดหมายและห้องรอ" + ChevronRight) ใต้ intro card. รัน `016_vet_bookings.sql` ใน Supabase SQL Editor แล้ว. Push ขึ้น GitHub. commit `056b35f`.
+
+**Session 31 (06-26) — บัญชี demo: การ์ดปัดไม่จำกัด (unlimited recycling deck)** — commit `848a354`, push `main`
+ปัญหา: มี testers เข้ามาลองผ่านปุ่ม Demo (แชร์บัญชี `demo@pawmate.app` เดียวกัน) ปัดไลก์รวมกันจนครบ pool → `prevLikedIds` (โหลดจาก DB ทุกครั้งแม้ตอน recycle) ครอบทุกการ์ด → recycle เติมไม่ได้ → deck ตันขึ้น "ดูครบแล้ว!". **แก้ `app/app/swipe/page.tsx`:** เพิ่ม `DEMO_EMAILS` (module-level, อ่าน `NEXT_PUBLIC_DEMO_EMAIL` แบบ comma-separated, fallback `demo@pawmate.app,demo-full@pawmate.app` → ทำงานได้โดยไม่ต้องตั้ง env ใหม่ใน Vercel) + `isDemo` ref (set ตอน load จาก `user.email`). ตอน recycle ถ้า `isDemo` → `seen` ตัดออกแค่ blocked (ไม่ตัด `prevLikedIds`) จึงวน pool เดิมได้ไม่จำกัด + Fisher–Yates shuffle ทุกรอบ recycle กันลำดับซ้ำ. **ผู้ใช้จริงไม่เปลี่ยน** (liked ยังไม่โผล่ซ้ำ). Demo match counter เดิม (force match ทุก 3–7 ปัด) ยังครบ. อัปเดต `.env.local(.example)` + `CLAUDE.md` (Swipe feed logic). `npx tsc --noEmit` ผ่าน 0 error.
+**Deploy:** ใช้ได้ทันทีที่ deploy รอบหน้า — fallback ในโค้ดครอบอีเมล demo ทั้ง 2 บัญชีอยู่แล้ว ไม่ต้องเพิ่ม env ใน Vercel (ถ้าจะใส่ `NEXT_PUBLIC_DEMO_EMAIL` ไว้ override ต้อง redeploy เพราะเป็น build-time public env).
 
 **Session 30 (06-22) — Demo full-option seed + login logo link** — commits `69c87e1` (login), `d5dad23` (seed), push `main`
 สองงาน: **(1) login logo → landing.** ครอบโลโก้+brand บนหน้า `/login` ด้วย `Link href="/"` (hover lift + aria-label + focus ring) — กดโลโก้กลับหน้าแรกได้. แก้แค่ `app/login/page.tsx`.
