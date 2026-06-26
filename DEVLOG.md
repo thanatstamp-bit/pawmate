@@ -1,7 +1,7 @@
 # PawMate — Developer Log & Handoff Notes (รวมศูนย์)
 
 > บันทึกสิ่งที่ทำไปในแต่ละ session + roadmap + แผนเฟสถัดไป รวมไว้ในไฟล์เดียว
-> อัปเดตล่าสุด: 2026-06-26 (Session 32 — ปิดปุ่ม Facebook login + ซ่อนลิงก์ซอร์สโค้ด)
+> อัปเดตล่าสุด: 2026-06-26 (Session 33 — auto-reset บัญชี demo ทุก 24 ชม. ผ่าน pg_cron)
 >
 > **โครงไฟล์เอกสารโปรเจกต์ตอนนี้มี 2 ไฟล์:**
 > - `CLAUDE.md` — instructions ที่ Claude Code โหลดอัตโนมัติทุก session (architecture, rules, design system) — **แก้ที่นั่นเมื่อ architecture เปลี่ยน**
@@ -488,6 +488,12 @@ Greeting ใช้ `activePet?.name` แทน `profile.display_name` (ลบ ow
 
 **Session 22 (06-19) — Vet-Online Bookings Shortcut**
 เพิ่มทางเข้า "การจองของฉัน" จากหน้ารายชื่อหมอโดยตรง (ก่อนหน้านี้เข้าได้เฉพาะหลังจองสำเร็จ): (1) CalendarDays icon มุมขวา header → `/app/care/vet-online/bookings`; (2) shortcut card (teal icon + "ดูนัดหมายและห้องรอ" + ChevronRight) ใต้ intro card. รัน `016_vet_bookings.sql` ใน Supabase SQL Editor แล้ว. Push ขึ้น GitHub. commit `056b35f`.
+
+**Session 33 (06-26) — Auto-reset บัญชี demo ทุก 24 ชม. (pg_cron) — migration `017_demo_reset.sql`**
+ปัญหา: testers กดปุ่ม "ลองเล่นโหมด Demo" เข้าบัญชีแชร์ `demo@pawmate.app` ร่วมกัน → ปัด/แมตช์/แชท/โพสต์ care-hub สะสมจนเละ. เพราะทุก row เป็นของ user เดียว tester data **แยกไม่ออก**จากข้อมูล demo จริง → reset ที่เชื่อถือได้คือ "wipe ทั้งหมดที่บัญชีนี้เป็นเจ้าของ แล้ว seed กลับเป็นชุดโชว์เต็ม". **เลือกผ่าน AskUserQuestion:** กลไก = **Supabase pg_cron** (รัน server-side ไม่พึ่งคอม/CI), สภาพหลัง reset = **โชว์เต็ม** (mirror `demo-full`).
+**`017_demo_reset.sql`:** function `reset_demo_account()` (plpgsql, SECURITY DEFINER, `search_path=public,extensions,auth`) — (1) หา `demo@pawmate.app` ใน auth.users (ถ้าไม่มี → return เฉยๆ ไม่สร้าง เพื่อไม่ทับ DEMO_PASSWORD ที่ทำให้ปุ่ม Demo ใช้ไม่ได้); (2) ensure counterpart bot `demo-deck@pawmate.internal` (สร้างครั้งเดียวด้วย insert ตรงเข้า auth.users + pgcrypto crypt/gen_salt — bot ไม่ล็อกอิน เป็นเจ้าของ pet คู่แมตช์/deck/donor ให้ดูสมจริง + โผล่ในเด็คเพราะคนละ owner); (3) upsert profiles 2 ตัว; (4) **wipe** — `delete pets where owner_id in (demo,bot)` (cascade likes/matches/messages/reviews/reports/blocks/proposals/health/blood) + ลบ lost_pets/blood_requests/vet_bookings ที่ key off profile; (5) **re-seed ชุดโชว์เต็ม** = 2 demo pets (โมจิ/นุ่น) + 7 counterpart + likes/3 matches/15 messages + 2 proposals + 2 reviews + block+report + 6 health (ใช้ `current_date ± N` ให้ "ใกล้ถึงกำหนด"+badge สดเสมอ) + 2 lost+2 sightings + 3 donors/2 requests/2 responses + 4 vet bookings + 2 deck pre-like. matches เรียง uuid ด้วย `least/greatest`. **pg_cron:** `cron.schedule('reset-demo-account-daily','0 19 * * *', …)` = ทุกวัน 19:00 UTC (02:00 ไทย); unschedule ก่อน schedule กัน job ซ้ำ; ท้ายไฟล์ `select reset_demo_account()` รัน reset ทันที 1 ครั้งตอนติดตั้ง.
+**ไม่แตะ** general pool 85 pets (seed-bot) + บัญชีจริงทุกคน — touch แค่ 2 บัญชี demo เท่านั้น. อัปเดต CLAUDE.md (migration table → next = 018).
+**⚠️ ต้องทำเอง (setup ครั้งเดียวใน Supabase SQL Editor):** (1) เปิด extension `pg_cron` (Dashboard → Database → Extensions) ถ้า `create extension` ใน script ไม่ผ่าน; (2) วางรันทั้งไฟล์ `017_demo_reset.sql`. *ยังไม่ได้รันจริง — migration เขียนเสร็จ commit แล้ว รอรันใน dashboard.* ถ้า insert auth.users ล้มเหลวบน Supabase version นั้น fallback = สร้าง `demo-deck@pawmate.internal` มือผ่าน Auth dashboard (Add user + auto-confirm) แล้ว function จะ reuse.
 
 **Session 32 (06-26) — ปิดปุ่ม Facebook login (ชั่วคราว) + ซ่อนลิงก์ซอร์สโค้ดใน footer**
 งานเล็ก 2 อย่างตามคำขอ user (ไม่แตะ logic/DB):

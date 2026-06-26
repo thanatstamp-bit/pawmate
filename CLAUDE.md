@@ -122,8 +122,9 @@ Migrations live in `supabase/migrations/` and must be run manually in the Supaba
 | `014_blood.sql` | `blood_donors`, `blood_requests`, `blood_responses` tables + RLS — `blood_responses` visible only to donor owner or request owner |
 | `015_health.sql` | `health_records` table + RLS — SELECT/INSERT/UPDATE/DELETE เฉพาะเจ้าของ (ผ่าน `owns_pet()`) |
 | `016_vet_bookings.sql` | `vet_bookings` table + owner-only RLS — Phase 11 Tele-vet demo |
+| `017_demo_reset.sql` | `reset_demo_account()` SECURITY DEFINER fn + pg_cron daily job — wipes & re-seeds the shared `demo@pawmate.app` login (and its `demo-deck@pawmate.internal` counterpart bot) to a full showcase state every 24h so testers can't leave it messy. Run-once setup in SQL Editor; runs an immediate reset on install |
 
-Numbers are non-sequential (no `003`–`007`) — they reflect actual build order, not the phase numbering suggested in the roadmap (`DEVLOG.md`). The next new migration would be `017_*.sql`.
+Numbers are non-sequential (no `003`–`007`) — they reflect actual build order, not the phase numbering suggested in the roadmap (`DEVLOG.md`). The next new migration would be `018_*.sql`.
 
 **RLS pattern**: `owns_pet(pet_id)` is a SECURITY DEFINER helper that checks `pets.owner_id = auth.uid()`. Use it in policies instead of inlining the join. `is_in_match(match_id)` checks that the caller's pet is a participant.
 
