@@ -8,10 +8,8 @@ import {
   CheckCircle2,
   MapPin,
   X,
-  Github,
 } from "lucide-react";
 
-const GITHUB_URL = "https://github.com/thanatstamp-bit/pawmate";
 const CONTACT_EMAIL = "thanat.stamp@gmail.com";
 
 const FEATURES = [
@@ -269,15 +267,7 @@ export default function LandingPage() {
           <a href={`mailto:${CONTACT_EMAIL}`} className="text-[15px] text-ink-2 transition-colors hover:text-coral-deep">
             ติดต่อเรา
           </a>
-          <a
-            href={GITHUB_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-1.5 text-[15px] text-ink-2 transition-colors hover:text-coral-deep"
-          >
-            <Github size={16} />
-            ซอร์สโค้ด
-          </a>
+          {/* "ซอร์สโค้ด" link hidden for now (repo kept private from visitors) */}
         </div>
         <p className="mt-2 text-sm text-ink-3">© {year} PawMate · Built with Next.js · Supabase · Tailwind CSS</p>
       </footer>

@@ -1,7 +1,7 @@
 # PawMate — Developer Log & Handoff Notes (รวมศูนย์)
 
 > บันทึกสิ่งที่ทำไปในแต่ละ session + roadmap + แผนเฟสถัดไป รวมไว้ในไฟล์เดียว
-> อัปเดตล่าสุด: 2026-06-26 (Session 31 — บัญชี demo: การ์ดปัดไม่จำกัด)
+> อัปเดตล่าสุด: 2026-06-26 (Session 32 — ปิดปุ่ม Facebook login + ซ่อนลิงก์ซอร์สโค้ด)
 >
 > **โครงไฟล์เอกสารโปรเจกต์ตอนนี้มี 2 ไฟล์:**
 > - `CLAUDE.md` — instructions ที่ Claude Code โหลดอัตโนมัติทุก session (architecture, rules, design system) — **แก้ที่นั่นเมื่อ architecture เปลี่ยน**
@@ -488,6 +488,12 @@ Greeting ใช้ `activePet?.name` แทน `profile.display_name` (ลบ ow
 
 **Session 22 (06-19) — Vet-Online Bookings Shortcut**
 เพิ่มทางเข้า "การจองของฉัน" จากหน้ารายชื่อหมอโดยตรง (ก่อนหน้านี้เข้าได้เฉพาะหลังจองสำเร็จ): (1) CalendarDays icon มุมขวา header → `/app/care/vet-online/bookings`; (2) shortcut card (teal icon + "ดูนัดหมายและห้องรอ" + ChevronRight) ใต้ intro card. รัน `016_vet_bookings.sql` ใน Supabase SQL Editor แล้ว. Push ขึ้น GitHub. commit `056b35f`.
+
+**Session 32 (06-26) — ปิดปุ่ม Facebook login (ชั่วคราว) + ซ่อนลิงก์ซอร์สโค้ดใน footer**
+งานเล็ก 2 อย่างตามคำขอ user (ไม่แตะ logic/DB):
+**(1) ปิดปุ่ม "เข้าสู่ระบบด้วย Facebook"** (`components/AuthForm.tsx`) — provider ยังใช้ไม่ได้จริง (Meta app ยัง Development). เก็บปุ่มไว้ (ไม่ลบ) แต่ทำเป็น disabled ถาวร: ลบ `onClick={handleOAuth("facebook")}`, ตั้ง `disabled`+`aria-disabled`+`title="ยังไม่เปิดให้บริการ"`, สไตล์เทา (`bg-fill-1` / `text-ink-3` / `opacity-60` / `cursor-not-allowed`), โลโก้ใส่ `grayscale`, เพิ่มป้าย `(เร็วๆ นี้)`. แก้ `components/icons/FacebookLogo.tsx` ให้รับ prop `className` (เดิมรับแค่ `size`) เพื่อให้ grayscale ทำงาน. **เปิดคืนง่าย:** คืน `onClick`, เอา `disabled` ถาวรออก, ลบ grayscale/ป้าย — `handleOAuth`/callback route ยัง generic รองรับ facebook อยู่แล้ว.
+**(2) ซ่อนลิงก์ "ซอร์สโค้ด" ใน footer landing** (`app/page.tsx`) — ไม่อยากให้ visitor เข้า repo ตอนนี้. ลบ `<a>` ที่ชี้ GitHub + ลบ import `Github` และ const `GITHUB_URL` ที่ไม่ใช้แล้ว (กัน unused). footer เหลือ นโยบายความเป็นส่วนตัว · ติดต่อเรา (ยัง `justify-center` สมดุล). บรรทัด copyright คงเดิม. *หมายเหตุ:* ลิงก์เดียวกันยังมีใน `html for promote/landing.html` + `PawMate_Keynote.html` (ไฟล์ promote untracked ไม่ใช่หน้าเว็บจริง — ไม่แตะ).
+`npx tsc --noEmit` ผ่าน 0 error.
 
 **Session 31 (06-26) — บัญชี demo: การ์ดปัดไม่จำกัด (unlimited recycling deck)** — commit `848a354`, push `main`
 ปัญหา: มี testers เข้ามาลองผ่านปุ่ม Demo (แชร์บัญชี `demo@pawmate.app` เดียวกัน) ปัดไลก์รวมกันจนครบ pool → `prevLikedIds` (โหลดจาก DB ทุกครั้งแม้ตอน recycle) ครอบทุกการ์ด → recycle เติมไม่ได้ → deck ตันขึ้น "ดูครบแล้ว!". **แก้ `app/app/swipe/page.tsx`:** เพิ่ม `DEMO_EMAILS` (module-level, อ่าน `NEXT_PUBLIC_DEMO_EMAIL` แบบ comma-separated, fallback `demo@pawmate.app,demo-full@pawmate.app` → ทำงานได้โดยไม่ต้องตั้ง env ใหม่ใน Vercel) + `isDemo` ref (set ตอน load จาก `user.email`). ตอน recycle ถ้า `isDemo` → `seen` ตัดออกแค่ blocked (ไม่ตัด `prevLikedIds`) จึงวน pool เดิมได้ไม่จำกัด + Fisher–Yates shuffle ทุกรอบ recycle กันลำดับซ้ำ. **ผู้ใช้จริงไม่เปลี่ยน** (liked ยังไม่โผล่ซ้ำ). Demo match counter เดิม (force match ทุก 3–7 ปัด) ยังครบ. อัปเดต `.env.local(.example)` + `CLAUDE.md` (Swipe feed logic). `npx tsc --noEmit` ผ่าน 0 error.

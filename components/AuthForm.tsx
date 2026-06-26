@@ -280,14 +280,18 @@ export default function AuthForm() {
         <GoogleLogo size={18} />
         เข้าสู่ระบบด้วย Google
       </button>
+      {/* Facebook login is temporarily disabled (provider not yet live) —
+          kept visible but greyed out and non-interactive. */}
       <button
         type="button"
-        onClick={() => handleOAuth("facebook")}
-        disabled={busy}
-        className="mb-3 flex h-12 w-full items-center justify-center gap-2.5 rounded-2xl border border-black/10 bg-white font-bold text-ink transition-colors hover:bg-fill-1 disabled:opacity-60"
+        disabled
+        aria-disabled="true"
+        title="ยังไม่เปิดให้บริการ"
+        className="mb-3 flex h-12 w-full cursor-not-allowed items-center justify-center gap-2.5 rounded-2xl border border-black/10 bg-fill-1 font-bold text-ink-3 opacity-60"
       >
-        <FacebookLogo size={18} />
+        <FacebookLogo size={18} className="grayscale" />
         เข้าสู่ระบบด้วย Facebook
+        <span className="text-xs font-normal text-ink-3">(เร็วๆ นี้)</span>
       </button>
 
       {/* Demo login — the most important button on this page */}
