@@ -10,7 +10,8 @@ npm run build     # production build + type-check
 npx tsc --noEmit  # type-check without building (use this to verify changes)
 # npm run lint  — NOT configured (no .eslintrc / eslint dep); `next lint` prompts interactively. Don't rely on it; tsc is the check.
 
-# Seed fake pets into Supabase (requires .env.local with service role key)
+# Seed fake pets into Supabase (~600 pets, full breed/tag/province filter coverage;
+# auto-removes the previous seed-bot batch first). Requires .env.local w/ service role key
 npx ts-node --project scripts/tsconfig.json scripts/seed.ts
 
 # Seed pet-friendly playdate spots

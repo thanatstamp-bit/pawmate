@@ -1,16 +1,31 @@
 /**
- * Seed script — creates ~100 fake pets and pre-likes pointing at the demo account's pet.
+ * Seed script — creates ~600 fake pets (≈300 dogs + ≈300 cats) with FULL coverage
+ * of every swipe filter dimension, plus breeding-compatible cohorts and pre-likes
+ * pointing at real / demo pets.
  *
  * Usage (run from the project root):
  *   npx ts-node --project scripts/tsconfig.json scripts/seed.ts
  *
  * Requires .env.local with NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY,
  * and DEMO_EMAIL. The service role key bypasses RLS — never commit it to git.
+ *
+ * WHY THE COVERAGE MATTERS: the swipe filter sheet (components/swipe/FilterSheet.tsx)
+ * offers every breed / tag / province from lib/data/*. If the seed pool doesn't span
+ * those same values, stacking filters returns an empty deck. So this script imports
+ * the SAME canonical arrays the UI uses (single source of truth — no drift) and
+ * distributes pets deterministically (round-robin) so every single filter value is
+ * densely covered and reasonable 2–3 filter combos still return results.
+ *
+ * Re-running is safe: it deletes the previous seed-bot pets first (see cleanup pass)
+ * so the deck doesn't accumulate. It NEVER touches real accounts or the demo-deck bot.
  */
 
 import { createClient } from "@supabase/supabase-js";
 import * as dotenv from "dotenv";
 import * as path from "path";
+import { DOG_BREEDS, CAT_BREEDS } from "../lib/data/breeds";
+import { PERSONALITY_TAGS } from "../lib/data/tags";
+import { PROVINCES } from "../lib/data/provinces";
 
 dotenv.config({ path: path.resolve(process.cwd(), ".env.local") });
 
@@ -28,18 +43,8 @@ const supabase = createClient(url, serviceKey, {
 });
 
 // ── Data ──────────────────────────────────────────────────────────────────────
-
-const DOG_BREEDS = [
-  "ชิวาวา", "ปอมเมอเรเนียน", "ชิสุ (Shih Tzu)", "พุดเดิ้ล",
-  "ลาบราดอร์ รีทรีฟเวอร์", "โกลเด้น รีทรีฟเวอร์", "บีเกิ้ล",
-  "ฝรั่งเศส บูลด็อก", "คอร์กี้", "มาลทีส", "มิกซ์ (ลูกผสม)",
-];
-
-const CAT_BREEDS = [
-  "วิเชียรมาศ (Siamese)", "เปอร์เซีย", "บริติช ชอร์ตแฮร์",
-  "สก็อตติช โฟลด์", "รัสเซียน บลู", "เบงกอล",
-  "เรกดอลล์", "มันชกิ้น", "มิกซ์ (ลูกผสม)",
-];
+// Breeds, tags and provinces are imported from lib/data/* so they always match
+// the filter sheet exactly. Only the name pools live here.
 
 const DOG_NAMES = [
   "น้องลาเต้", "เจ้าถุงเงิน", "มะลิ", "น้องโมจิ", "เจ้าปุย",
@@ -66,20 +71,29 @@ const CAT_NAMES = [
   "น้องทิวลิป", "เจ้าลาเวนเดอร์", "น้องดาหลา", "เจ้าชมพู่", "น้องมะปราง",
 ];
 
-const TAGS = [
-  "ขี้เล่น", "ขี้อ้อน", "ใจดี", "ขี้กลัว", "พลังเยอะ",
-  "ชอบนอน", "เข้ากับเด็กได้", "ฉลาด", "ซุกซน", "เชื่อฟัง",
-  "ชอบน้ำ", "กลัวน้ำ", "ชอบเดินเล่น", "ดุกับแปลกหน้า", "เข้ากับแมวได้",
+// Major provinces get extra weight on top of the all-77 baseline so big cities
+// feel realistically dense. The weights below sum to PROVINCES_EXTRA per species.
+const MAJOR_PROVINCE_WEIGHTS: [string, number][] = [
+  ["กรุงเทพมหานคร", 30],
+  ["เชียงใหม่", 16],
+  ["ชลบุรี", 14],
+  ["นนทบุรี", 12],
+  ["ปทุมธานี", 12],
+  ["สมุทรปราการ", 10],
+  ["ภูเก็ต", 10],
+  ["ขอนแก่น", 8],
+  ["นครราชสีมา", 8],
+  ["เชียงราย", 8],
+  ["สงขลา", 6],
+  ["สุราษฎร์ธานี", 6],
+  ["พระนครศรีอยุธยา", 6],
 ];
 
-const PROVINCES_WEIGHTED = [
-  ...Array(12).fill("กรุงเทพมหานคร"),
-  ...Array(8).fill("เชียงใหม่"),
-  "ชลบุรี", "ภูเก็ต", "ขอนแก่น", "นนทบุรี", "ปทุมธานี",
-  "สมุทรปราการ", "นครราชสีมา", "เชียงราย",
-];
+const BASELINE_PER_PROVINCE = 2; // every province → at least this many per species
+const PROVINCES_EXTRA = MAJOR_PROVINCE_WEIGHTS.reduce((s, [, w]) => s + w, 0); // 146
+// Per-species total = 77*2 + 146 = 300.
 
-// Placeholder photo URLs — use placedog / placekitten by varying dimensions
+// Placeholder photo URLs — use placedog / cataas by varying dimensions
 function dogPhoto(seed: number): string {
   return `https://placedog.net/400/500?r=${seed}`;
 }
@@ -87,15 +101,134 @@ function catPhoto(seed: number): string {
   return `https://cataas.com/cat?width=400&height=500&seed=${seed}`;
 }
 
-function pick<T>(arr: T[]): T {
-  return arr[Math.floor(Math.random() * arr.length)];
-}
 function pickN<T>(arr: T[], n: number): T[] {
   const copy = [...arr].sort(() => Math.random() - 0.5);
   return copy.slice(0, n);
 }
+function pick<T>(arr: T[]): T {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
 function randInt(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+// Build the province assignment list: every province BASELINE_PER_PROVINCE times,
+// then the weighted major provinces. Length === per-species total.
+function buildProvinceQueue(): string[] {
+  const queue: string[] = [];
+  for (const p of PROVINCES) {
+    for (let k = 0; k < BASELINE_PER_PROVINCE; k++) queue.push(p);
+  }
+  for (const [p, w] of MAJOR_PROVINCE_WEIGHTS) {
+    for (let k = 0; k < w; k++) queue.push(p);
+  }
+  return queue;
+}
+
+// ── Cohort generation ──────────────────────────────────────────────────────────
+// Round-robin counters (not pure random) guarantee every breed / tag / age is
+// evenly covered no matter how many pets we make.
+
+type PetRow = {
+  owner_id: string;
+  name: string;
+  species: "dog" | "cat";
+  breed: string;
+  sex: "male" | "female";
+  birth_month: string;
+  photos: string[];
+  personality_tags: string[];
+  province: string;
+  district: null;
+  modes: string[];
+  vaccinated: boolean;
+  neutered: boolean;
+  bio: string;
+};
+
+function generateCohort(
+  species: "dog" | "cat",
+  ownerId: string,
+  photoBase: number
+): PetRow[] {
+  const breeds = species === "dog" ? DOG_BREEDS : CAT_BREEDS;
+  const names = species === "dog" ? DOG_NAMES : CAT_NAMES;
+  const photoFn = species === "dog" ? dogPhoto : catPhoto;
+  const speciesWord = species === "dog" ? "น้องหมา" : "แมว";
+  const thisYear = new Date().getFullYear();
+  const provinceQueue = buildProvinceQueue();
+
+  const rows: PetRow[] = [];
+  for (let i = 0; i < provinceQueue.length; i++) {
+    const province = provinceQueue[i];
+    const sex: "male" | "female" = i % 2 === 0 ? "male" : "female";
+    const breed = breeds[i % breeds.length];                  // every breed evenly
+    const primaryTag = PERSONALITY_TAGS[i % PERSONALITY_TAGS.length]; // every tag as primary
+    const extras = pickN(
+      PERSONALITY_TAGS.filter((t) => t !== primaryTag),
+      randInt(1, 3)
+    );
+    const tags = Array.from(new Set([primaryTag, ...extras]));
+
+    const ageYears = (i % 10) + 1;                            // ages 1..10 evenly
+    const birthYear = thisYear - ageYears;
+    const birthMonth = randInt(1, 12);
+
+    const vaccinated = i % 10 < 7;                            // ~70% vaccinated
+    const neutered = i % 4 < 2;                               // ~50%, decorrelated from sex
+
+    // Keep both modes dense; sprinkle in single-mode pets for realism.
+    const modes =
+      i % 7 === 0 ? ["playdate"]
+      : i % 11 === 0 ? ["breeding"]
+      : ["playdate", "breeding"];
+
+    const name = names[i % names.length];
+    rows.push({
+      owner_id: ownerId,
+      name,
+      species,
+      breed,
+      sex,
+      birth_month: `${birthYear}-${String(birthMonth).padStart(2, "0")}-01`,
+      photos: [photoFn(photoBase + i), photoFn(photoBase + 1000 + i)],
+      personality_tags: tags,
+      province,
+      district: null,
+      modes,
+      vaccinated,
+      neutered,
+      bio: `${name} เป็น${speciesWord}สายพันธุ์${breed}ที่${tags.slice(0, 2).join("และ")} อาศัยอยู่แถว${province}`,
+    });
+  }
+  return rows;
+}
+
+// ── Cleanup ──────────────────────────────────────────────────────────────────
+// Delete every previous seed-bot account so the deck doesn't accumulate across
+// runs. FK cascade (auth.users → profiles → pets → likes/matches/messages) wipes
+// each bot's whole footprint. The `seed-bot-` prefix match guarantees we never
+// touch the demo-deck bot (demo-deck@pawmate.internal) or any real account.
+async function cleanupOldSeedBots() {
+  let removed = 0;
+  let page = 1;
+  // listUsers is paginated (default 50/page); loop until a short page.
+  for (;;) {
+    const { data, error } = await supabase.auth.admin.listUsers({ page, perPage: 200 });
+    if (error) { console.error("listUsers error:", error.message); break; }
+    const users = data?.users ?? [];
+    const stale = users.filter((u) =>
+      (u.email ?? "").startsWith("seed-bot-") && (u.email ?? "").endsWith("@pawmate.internal")
+    );
+    for (const u of stale) {
+      const { error: delErr } = await supabase.auth.admin.deleteUser(u.id);
+      if (delErr) console.error(`  failed to delete ${u.email}:`, delErr.message);
+      else removed++;
+    }
+    if (users.length < 200) break;
+    page++;
+  }
+  console.log(`🧹 Removed ${removed} old seed-bot account(s) and their pets.\n`);
 }
 
 // ── Main ─────────────────────────────────────────────────────────────────────
@@ -103,10 +236,12 @@ function randInt(min: number, max: number): number {
 async function main() {
   console.log("🐾 PawMate seed script starting...\n");
 
+  await cleanupOldSeedBots();
+
   // Find demo account's pet (if it exists) for pre-likes.
   // Keep the full user list around — also used below to find every real
   // (non-seed-bot) pet that needs a breeding-compatible cohort.
-  const { data: usersPage } = await supabase.auth.admin.listUsers();
+  const { data: usersPage } = await supabase.auth.admin.listUsers({ perPage: 200 });
   const allUsers = usersPage?.users ?? [];
   const demo = allUsers.find((u) => u.email === demoEmail);
   let demoPetId: string | null = null;
@@ -148,85 +283,26 @@ async function main() {
 
   const createdPetIds: string[] = [];
 
-  // ── Dogs (45) ──────────────────────────────────────────────────────────────
-  console.log("Creating 45 dogs...");
-  for (let i = 0; i < 45; i++) {
-    const sex = i % 2 === 0 ? "male" : "female";
-    const breed = pick(DOG_BREEDS);
-    const province = pick(PROVINCES_WEIGHTED);
-    const birthYear = randInt(2018, 2024);
-    const birthMonth = randInt(1, 12);
-    const modes: string[] = Math.random() > 0.3
-      ? (Math.random() > 0.4 ? ["playdate", "breeding"] : ["playdate"])
-      : ["breeding"];
-    const tags = pickN(TAGS, randInt(2, 5));
+  // ── Generate + insert dogs and cats ─────────────────────────────────────────
+  const cohorts: { species: "dog" | "cat"; rows: PetRow[]; emoji: string }[] = [
+    { species: "dog", rows: generateCohort("dog", seedUserId, 1), emoji: "🐕 " },
+    { species: "cat", rows: generateCohort("cat", seedUserId, 1), emoji: "🐱 " },
+  ];
 
-    const { data: pet, error } = await supabase
-      .from("pets")
-      .insert({
-        owner_id: seedUserId,
-        name: DOG_NAMES[i % DOG_NAMES.length],
-        species: "dog",
-        breed,
-        sex,
-        birth_month: `${birthYear}-${String(birthMonth).padStart(2, "0")}-01`,
-        photos: [dogPhoto(i + 1), dogPhoto(i + 100)],
-        personality_tags: tags,
-        province,
-        district: null,
-        modes,
-        vaccinated: Math.random() > 0.3 ? true : false,
-        neutered: Math.random() > 0.5 ? false : true,
-        bio: `${DOG_NAMES[i % DOG_NAMES.length]} เป็นน้องหมาที่${tags.slice(0, 2).join("และ")} อาศัยอยู่แถว${province}`,
-      })
-      .select("id")
-      .single();
-
-    if (error) { console.error(`Dog ${i} error:`, error.message); continue; }
-    createdPetIds.push(pet!.id);
-    process.stdout.write("🐕 ");
+  for (const { species, rows, emoji } of cohorts) {
+    console.log(`Creating ${rows.length} ${species}s...`);
+    for (const row of rows) {
+      const { data: pet, error } = await supabase
+        .from("pets")
+        .insert(row)
+        .select("id")
+        .single();
+      if (error) { console.error(`${species} error:`, error.message); continue; }
+      createdPetIds.push(pet!.id);
+      process.stdout.write(emoji);
+    }
+    console.log("\n");
   }
-  console.log("\n");
-
-  // ── Cats (40) ──────────────────────────────────────────────────────────────
-  console.log("Creating 40 cats...");
-  for (let i = 0; i < 40; i++) {
-    const sex = i % 2 === 0 ? "female" : "male";
-    const breed = pick(CAT_BREEDS);
-    const province = pick(PROVINCES_WEIGHTED);
-    const birthYear = randInt(2019, 2024);
-    const birthMonth = randInt(1, 12);
-    const modes: string[] = Math.random() > 0.3
-      ? (Math.random() > 0.4 ? ["playdate", "breeding"] : ["playdate"])
-      : ["breeding"];
-    const tags = pickN(TAGS, randInt(2, 4));
-
-    const { data: pet, error } = await supabase
-      .from("pets")
-      .insert({
-        owner_id: seedUserId,
-        name: CAT_NAMES[i % CAT_NAMES.length],
-        species: "cat",
-        breed,
-        sex,
-        birth_month: `${birthYear}-${String(birthMonth).padStart(2, "0")}-01`,
-        photos: [catPhoto(i + 1), catPhoto(i + 50)],
-        personality_tags: tags,
-        province,
-        district: null,
-        modes,
-        vaccinated: Math.random() > 0.4 ? true : false,
-        neutered: Math.random() > 0.5 ? false : true,
-        bio: `${CAT_NAMES[i % CAT_NAMES.length]} เป็นแมวที่${tags.slice(0, 2).join("และ")} อาศัยอยู่แถว${province}`,
-      })
-      .select("id")
-      .single();
-
-    if (error) { console.error(`Cat ${i} error:`, error.message); continue; }
-    createdPetIds.push(pet!.id);
-    process.stdout.write("🐱 ");
-  }
-  console.log("\n");
 
   // ── Breeding-compatible pets for every real pet with breeding mode on ───
   // Generate a cohort per pet (not just "the" demo pet) — once multi-pet
@@ -251,8 +327,8 @@ async function main() {
     console.log(`Creating 8 breeding-compatible pets for ${dp.id} (${dp.species}, ${dp.breed}, ${oppSex})...`);
 
     for (let i = 0; i < 8; i++) {
-      const province = pick(PROVINCES_WEIGHTED);
-      const tags = pickN(TAGS, randInt(2, 4));
+      const province = pick(PROVINCES);
+      const tags = pickN(PERSONALITY_TAGS, randInt(2, 4));
       const name = cohortNames[i];
       const { data: bp, error } = await supabase
         .from("pets")
@@ -306,9 +382,9 @@ async function main() {
     console.log("\n✅ Pre-likes created — demo user will match instantly when they like back!\n");
   }
 
-  console.log(`\n🎉 Seed complete! Created ${createdPetIds.length} pets (45 dogs + 40 cats + breeding-compatible).`);
+  console.log(`\n🎉 Seed complete! Created ${createdPetIds.length} pets with full breed/tag/province coverage.`);
   console.log(`   Seed user ID: ${seedUserId}`);
-  console.log("   To clean up seed data, delete the seed user from Supabase Auth dashboard.\n");
+  console.log("   Re-running this script auto-removes this batch first, so the deck won't pile up.\n");
 }
 
 main().catch(console.error);
