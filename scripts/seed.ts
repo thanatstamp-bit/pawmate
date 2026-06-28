@@ -71,27 +71,18 @@ const CAT_NAMES = [
   "น้องทิวลิป", "เจ้าลาเวนเดอร์", "น้องดาหลา", "เจ้าชมพู่", "น้องมะปราง",
 ];
 
-// Major provinces get extra weight on top of the all-77 baseline so big cities
-// feel realistically dense. The weights below sum to PROVINCES_EXTRA per species.
-const MAJOR_PROVINCE_WEIGHTS: [string, number][] = [
-  ["กรุงเทพมหานคร", 30],
-  ["เชียงใหม่", 16],
-  ["ชลบุรี", 14],
-  ["นนทบุรี", 12],
-  ["ปทุมธานี", 12],
-  ["สมุทรปราการ", 10],
-  ["ภูเก็ต", 10],
-  ["ขอนแก่น", 8],
-  ["นครราชสีมา", 8],
-  ["เชียงราย", 8],
-  ["สงขลา", 6],
-  ["สุราษฎร์ธานี", 6],
-  ["พระนครศรีอยุธยา", 6],
+// Major provinces — used only to place the small breeding pre-like cohort in
+// plausible big cities (the general pool already covers all 77 provinces).
+const MAJOR_PROVINCES = [
+  "กรุงเทพมหานคร", "เชียงใหม่", "ชลบุรี", "นนทบุรี", "ปทุมธานี",
+  "สมุทรปราการ", "ภูเก็ต", "ขอนแก่น", "นครราชสีมา", "เชียงราย",
 ];
 
-const BASELINE_PER_PROVINCE = 2; // every province → at least this many per species
-const PROVINCES_EXTRA = MAJOR_PROVINCE_WEIGHTS.reduce((s, [, w]) => s + w, 0); // 146
-// Per-species total = 77*2 + 146 = 300.
+// The general pool is generated as a full province × breed grid, K pets per cell,
+// so EVERY (province, breed) combination is populated. This is what makes the
+// swipe filters returnable even when province + breed (+ one more) are stacked.
+// Per-species total = 77 provinces × (breeds) × K.  dogs: 77×21×2=3234, cats: 77×15×2=2310.
+const K_PER_CELL = 2;
 
 // Placeholder photo URLs — use placedog / cataas by varying dimensions
 function dogPhoto(seed: number): string {
@@ -112,22 +103,11 @@ function randInt(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-// Build the province assignment list: every province BASELINE_PER_PROVINCE times,
-// then the weighted major provinces. Length === per-species total.
-function buildProvinceQueue(): string[] {
-  const queue: string[] = [];
-  for (const p of PROVINCES) {
-    for (let k = 0; k < BASELINE_PER_PROVINCE; k++) queue.push(p);
-  }
-  for (const [p, w] of MAJOR_PROVINCE_WEIGHTS) {
-    for (let k = 0; k < w; k++) queue.push(p);
-  }
-  return queue;
-}
-
 // ── Cohort generation ──────────────────────────────────────────────────────────
-// Round-robin counters (not pure random) guarantee every breed / tag / age is
-// evenly covered no matter how many pets we make.
+// Full province × breed grid (K pets per cell). A running counter `n` drives the
+// other attributes round-robin so every tag / age is evenly covered, and the two
+// pets in each cell always get opposite sexes (n alternates) — which also gives
+// breeding mode a same-breed opposite-sex candidate in every single province.
 
 type PetRow = {
   owner_id: string;
@@ -146,62 +126,80 @@ type PetRow = {
   bio: string;
 };
 
-function generateCohort(
-  species: "dog" | "cat",
-  ownerId: string,
-  photoBase: number
-): PetRow[] {
+function generateCohort(species: "dog" | "cat", ownerId: string): PetRow[] {
   const breeds = species === "dog" ? DOG_BREEDS : CAT_BREEDS;
   const names = species === "dog" ? DOG_NAMES : CAT_NAMES;
   const photoFn = species === "dog" ? dogPhoto : catPhoto;
   const speciesWord = species === "dog" ? "น้องหมา" : "แมว";
   const thisYear = new Date().getFullYear();
-  const provinceQueue = buildProvinceQueue();
 
   const rows: PetRow[] = [];
-  for (let i = 0; i < provinceQueue.length; i++) {
-    const province = provinceQueue[i];
-    const sex: "male" | "female" = i % 2 === 0 ? "male" : "female";
-    const breed = breeds[i % breeds.length];                  // every breed evenly
-    const primaryTag = PERSONALITY_TAGS[i % PERSONALITY_TAGS.length]; // every tag as primary
-    const extras = pickN(
-      PERSONALITY_TAGS.filter((t) => t !== primaryTag),
-      randInt(1, 3)
-    );
-    const tags = Array.from(new Set([primaryTag, ...extras]));
+  let n = 0;
+  for (const province of PROVINCES) {
+    for (const breed of breeds) {
+      for (let k = 0; k < K_PER_CELL; k++) {
+        // Opposite sexes within each cell → breeding has both-sex coverage too.
+        const sex: "male" | "female" = n % 2 === 0 ? "male" : "female";
+        const primaryTag = PERSONALITY_TAGS[n % PERSONALITY_TAGS.length];
+        // Generous tag count (4–6) so province+breed+tag combos hit more often.
+        const extras = pickN(
+          PERSONALITY_TAGS.filter((t) => t !== primaryTag),
+          randInt(3, 5)
+        );
+        const tags = Array.from(new Set([primaryTag, ...extras]));
 
-    const ageYears = (i % 10) + 1;                            // ages 1..10 evenly
-    const birthYear = thisYear - ageYears;
-    const birthMonth = randInt(1, 12);
+        const ageYears = (n % 10) + 1;                       // ages 1..10 evenly
+        const birthYear = thisYear - ageYears;
+        const birthMonth = randInt(1, 12);
 
-    const vaccinated = i % 10 < 7;                            // ~70% vaccinated
-    const neutered = i % 4 < 2;                               // ~50%, decorrelated from sex
+        // k===0 is always vaccinated → every cell has ≥1 vaccinated pet, so
+        // province+breed+vaccinated never comes up empty.
+        const vaccinated = k === 0 ? true : n % 3 !== 0;
+        const neutered = n % 4 < 2;                           // ~50%, decorrelated from sex
 
-    // Keep both modes dense; sprinkle in single-mode pets for realism.
-    const modes =
-      i % 7 === 0 ? ["playdate"]
-      : i % 11 === 0 ? ["breeding"]
-      : ["playdate", "breeding"];
+        // Keep both modes dense; sprinkle in single-mode pets for realism.
+        const modes =
+          n % 9 === 0 ? ["playdate"]
+          : n % 13 === 0 ? ["breeding"]
+          : ["playdate", "breeding"];
 
-    const name = names[i % names.length];
-    rows.push({
-      owner_id: ownerId,
-      name,
-      species,
-      breed,
-      sex,
-      birth_month: `${birthYear}-${String(birthMonth).padStart(2, "0")}-01`,
-      photos: [photoFn(photoBase + i), photoFn(photoBase + 1000 + i)],
-      personality_tags: tags,
-      province,
-      district: null,
-      modes,
-      vaccinated,
-      neutered,
-      bio: `${name} เป็น${speciesWord}สายพันธุ์${breed}ที่${tags.slice(0, 2).join("และ")} อาศัยอยู่แถว${province}`,
-    });
+        const name = names[n % names.length];
+        rows.push({
+          owner_id: ownerId,
+          name,
+          species,
+          breed,
+          sex,
+          birth_month: `${birthYear}-${String(birthMonth).padStart(2, "0")}-01`,
+          photos: [photoFn((n % 900) + 1), photoFn(((n * 7) % 900) + 1000)],
+          personality_tags: tags,
+          province,
+          district: null,
+          modes,
+          vaccinated,
+          neutered,
+          bio: `${name} เป็น${speciesWord}สายพันธุ์${breed}ที่${tags.slice(0, 2).join("และ")} อาศัยอยู่แถว${province}`,
+        });
+        n++;
+      }
+    }
   }
   return rows;
+}
+
+// Insert pets in chunks and return their ids (batched → fast even at thousands).
+async function insertPets(rows: PetRow[], label: string): Promise<string[]> {
+  const ids: string[] = [];
+  const CHUNK = 500;
+  for (let i = 0; i < rows.length; i += CHUNK) {
+    const chunk = rows.slice(i, i + CHUNK);
+    const { data, error } = await supabase.from("pets").insert(chunk).select("id");
+    if (error) { console.error(`${label} insert error:`, error.message); continue; }
+    for (const r of data ?? []) ids.push(r.id);
+    process.stdout.write(`  …${Math.min(i + CHUNK, rows.length)}/${rows.length}\r`);
+  }
+  console.log(`  ✅ ${label}: ${ids.length} inserted` + " ".repeat(20));
+  return ids;
 }
 
 // ── Cleanup ──────────────────────────────────────────────────────────────────
@@ -283,26 +281,14 @@ async function main() {
 
   const createdPetIds: string[] = [];
 
-  // ── Generate + insert dogs and cats ─────────────────────────────────────────
-  const cohorts: { species: "dog" | "cat"; rows: PetRow[]; emoji: string }[] = [
-    { species: "dog", rows: generateCohort("dog", seedUserId, 1), emoji: "🐕 " },
-    { species: "cat", rows: generateCohort("cat", seedUserId, 1), emoji: "🐱 " },
-  ];
-
-  for (const { species, rows, emoji } of cohorts) {
-    console.log(`Creating ${rows.length} ${species}s...`);
-    for (const row of rows) {
-      const { data: pet, error } = await supabase
-        .from("pets")
-        .insert(row)
-        .select("id")
-        .single();
-      if (error) { console.error(`${species} error:`, error.message); continue; }
-      createdPetIds.push(pet!.id);
-      process.stdout.write(emoji);
-    }
-    console.log("\n");
-  }
+  // ── Generate + batch-insert the full province × breed grid for dogs & cats ───
+  const dogRows = generateCohort("dog", seedUserId);
+  const catRows = generateCohort("cat", seedUserId);
+  console.log(`Creating ${dogRows.length} dogs (77 provinces × ${DOG_BREEDS.length} breeds × ${K_PER_CELL})...`);
+  createdPetIds.push(...(await insertPets(dogRows, "dogs")));
+  console.log(`Creating ${catRows.length} cats (77 provinces × ${CAT_BREEDS.length} breeds × ${K_PER_CELL})...`);
+  createdPetIds.push(...(await insertPets(catRows, "cats")));
+  console.log("");
 
   // ── Breeding-compatible pets for every real pet with breeding mode on ───
   // Breeding mode locks candidates to the user's pet's EXACT breed + opposite sex,
@@ -320,15 +306,18 @@ async function main() {
     .contains("modes", ["breeding"]);
   const realBreedingPets = (breedingPets ?? []).filter((p) => realUserIds.has(p.owner_id));
 
-  const PRELIKE_COUNT = 4; // how many of the cohort instantly like the pet back
+  // The grid above already puts a same-breed opposite-sex candidate in every
+  // province, so here we only add a few that PRE-LIKE the pet → instant matches
+  // for the demo. (No need for full province coverage anymore.)
+  const COHORT = 6;
   for (const dp of realBreedingPets) {
     const oppSex = dp.sex === "male" ? "female" : "male";
     const names = dp.species === "dog" ? DOG_NAMES : CAT_NAMES;
     const photoFn = dp.species === "dog" ? dogPhoto : catPhoto;
-    console.log(`Creating ${PROVINCES.length} breeding-compatible pets (all provinces) for ${dp.id} (${dp.species}, ${dp.breed}, ${oppSex})...`);
+    console.log(`Creating ${COHORT} breeding pre-like pets for ${dp.id} (${dp.species}, ${dp.breed}, ${oppSex})...`);
 
-    for (let i = 0; i < PROVINCES.length; i++) {
-      const province = PROVINCES[i];
+    for (let i = 0; i < COHORT; i++) {
+      const province = pick(MAJOR_PROVINCES);
       const tags = pickN(PERSONALITY_TAGS, randInt(2, 4));
       const name = names[i % names.length];
       const ageYears = (i % 10) + 1;
@@ -346,8 +335,8 @@ async function main() {
           province,
           district: null,
           modes: ["playdate", "breeding"],
-          vaccinated: i % 5 !== 0, // ~80% vaccinated, so the vaccinated filter still has plenty
-          neutered: i % 3 === 0,
+          vaccinated: true,
+          neutered: false,
           bio: `${name} เป็น${dp.species === "dog" ? "น้องหมา" : "แมว"}สายพันธุ์${dp.breed}ที่${tags[0]} อาศัยอยู่แถว${province}`,
         })
         .select("id")
@@ -355,23 +344,17 @@ async function main() {
 
       if (error) { console.error(`Breeding pet for ${dp.id} error:`, error.message); continue; }
       createdPetIds.push(bp!.id);
-
-      // Pre-like in breeding mode → this pet (only the first few → instant matches)
-      if (i < PRELIKE_COUNT) {
-        await supabase.from("likes").insert({
-          from_pet_id: bp!.id,
-          to_pet_id: dp.id,
-          mode: "breeding",
-        });
-        process.stdout.write("💕 ");
-      } else {
-        process.stdout.write("· ");
-      }
+      await supabase.from("likes").insert({
+        from_pet_id: bp!.id,
+        to_pet_id: dp.id,
+        mode: "breeding",
+      });
+      process.stdout.write("💕 ");
     }
     console.log("");
   }
   if (realBreedingPets.length > 0) {
-    console.log("\n✅ Breeding-compatible pets (full province coverage) + pre-likes created for all real pets!\n");
+    console.log("\n✅ Breeding pre-like pets created (province coverage handled by the grid)!\n");
   }
 
   // ── Pre-likes pointing AT demo's pet (playdate) ───────────────────────────
