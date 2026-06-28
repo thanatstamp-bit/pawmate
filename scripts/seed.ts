@@ -79,10 +79,15 @@ const MAJOR_PROVINCES = [
 ];
 
 // The general pool is generated as a full province × breed grid, K pets per cell,
-// so EVERY (province, breed) combination is populated. This is what makes the
-// swipe filters returnable even when province + breed (+ one more) are stacked.
-// Per-species total = 77 provinces × (breeds) × K.  dogs: 77×21×2=3234, cats: 77×15×2=2310.
-const K_PER_CELL = 2;
+// so EVERY (province, breed) combination is populated. Each cell's K pets are
+// deliberately spread across age bands, vaccinated/neutered states, both sexes and
+// several tags — so age / นิสัย / ใบรับรองสุขภาพ stay filterable even stacked on
+// top of province + breed.
+// Per-species total = 77 provinces × (breeds) × K.  dogs: 77×21×4=6468, cats: 77×15×4=4620.
+const K_PER_CELL = 4;
+
+// Age band per slot k (years) — guarantees young / mid / old in every cell.
+const AGE_BANDS: [number, number][] = [[1, 3], [4, 6], [7, 10], [2, 8]];
 
 // Placeholder photo URLs — use placedog / cataas by varying dimensions
 function dogPhoto(seed: number): string {
@@ -105,9 +110,9 @@ function randInt(min: number, max: number): number {
 
 // ── Cohort generation ──────────────────────────────────────────────────────────
 // Full province × breed grid (K pets per cell). A running counter `n` drives the
-// other attributes round-robin so every tag / age is evenly covered, and the two
-// pets in each cell always get opposite sexes (n alternates) — which also gives
-// breeding mode a same-breed opposite-sex candidate in every single province.
+// each cell's K pets are spread by slot k across sex, age band and health state,
+// and tags rotate globally — so every province gets a same-breed candidate of
+// each sex (breeding coverage) AND age/นิสัย/health stay filterable per cell.
 
 type PetRow = {
   owner_id: string;
@@ -134,34 +139,40 @@ function generateCohort(species: "dog" | "cat", ownerId: string): PetRow[] {
   const thisYear = new Date().getFullYear();
 
   const rows: PetRow[] = [];
-  let n = 0;
+  let n = 0; // global pet counter (drives tag/name rotation)
+  let c = 0; // cell counter (rotates which slot is unvaccinated/neutered)
   for (const province of PROVINCES) {
     for (const breed of breeds) {
       for (let k = 0; k < K_PER_CELL; k++) {
-        // Opposite sexes within each cell → breeding has both-sex coverage too.
-        const sex: "male" | "female" = n % 2 === 0 ? "male" : "female";
+        // Sex alternates by slot → 2♂/2♀ per cell (breeding gets both sexes too).
+        const sex: "male" | "female" = k % 2 === 0 ? "male" : "female";
+
+        // Age band by slot → every cell has a young, a mid, an old and an extra.
+        const [aMin, aMax] = AGE_BANDS[k % AGE_BANDS.length];
+        const ageYears = randInt(aMin, aMax);
+        const birthYear = thisYear - ageYears;
+        const birthMonth = randInt(1, 12);
+
+        // Health states rotate by (cell + slot) so they're NOT tied to sex and so
+        // each cell keeps ≥3 vaccinated (FOR-vaccinated filter never empty) plus a
+        // mix of neutered/un-neutered.
+        const vaccinated = (c + k) % 4 !== 0; // 3 of 4 vaccinated
+        const neutered = (c + k) % 2 === 0;   // 2 of 4 neutered
+
+        // Generous tag count (4–6); primary rotates globally so every tag is well
+        // represented and province+breed+tag combos hit often.
         const primaryTag = PERSONALITY_TAGS[n % PERSONALITY_TAGS.length];
-        // Generous tag count (4–6) so province+breed+tag combos hit more often.
         const extras = pickN(
           PERSONALITY_TAGS.filter((t) => t !== primaryTag),
           randInt(3, 5)
         );
         const tags = Array.from(new Set([primaryTag, ...extras]));
 
-        const ageYears = (n % 10) + 1;                       // ages 1..10 evenly
-        const birthYear = thisYear - ageYears;
-        const birthMonth = randInt(1, 12);
-
-        // k===0 is always vaccinated → every cell has ≥1 vaccinated pet, so
-        // province+breed+vaccinated never comes up empty.
-        const vaccinated = k === 0 ? true : n % 3 !== 0;
-        const neutered = n % 4 < 2;                           // ~50%, decorrelated from sex
-
-        // Keep both modes dense; sprinkle in single-mode pets for realism.
-        const modes =
-          n % 9 === 0 ? ["playdate"]
-          : n % 13 === 0 ? ["breeding"]
-          : ["playdate", "breeding"];
+        // Every grid pet carries BOTH modes. Each cell has only one pet per age
+        // band, so making any of them single-mode would punch holes in
+        // province+breed+age filtering for the other mode. Single-mode variety
+        // lives in the demo-reset showcase (017), not the bulk filter pool.
+        const modes = ["playdate", "breeding"];
 
         const name = names[n % names.length];
         rows.push({
@@ -182,6 +193,7 @@ function generateCohort(species: "dog" | "cat", ownerId: string): PetRow[] {
         });
         n++;
       }
+      c++;
     }
   }
   return rows;
