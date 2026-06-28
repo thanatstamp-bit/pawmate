@@ -392,24 +392,60 @@ export default function SwipePage() {
         ) : cards.length === 0 ? (
           <div className="flex h-full min-h-0 flex-1 flex-col items-center justify-center gap-4 text-center">
             <div className="flex h-20 w-20 items-center justify-center rounded-full bg-coral-soft">
-              <Search size={32} strokeWidth={1.5} className="text-coral" />
+              {countActiveFilters(filters) > 0 ? (
+                <SlidersHorizontal size={32} strokeWidth={1.5} className="text-coral" />
+              ) : (
+                <Search size={32} strokeWidth={1.5} className="text-coral" />
+              )}
             </div>
-            <div>
-              <p className="text-lg font-bold tracking-tight2 text-ink">ดูครบแล้ว!</p>
-              <p className="mt-1.5 text-sm leading-relaxed text-ink-2">
-                ไม่มีน้องใหม่ในตอนนี้
-                <br />
-                ลองกลับมาดูใหม่ในภายหลัง
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={() => fetchCards()}
-              className="flex items-center gap-2 rounded-2xl border-2 border-black/10 bg-white px-6 py-3 font-semibold text-ink transition-transform active:scale-95"
-            >
-              <RefreshCw size={18} />
-              ดูใหม่อีกครั้ง
-            </button>
+            {countActiveFilters(filters) > 0 ? (
+              <>
+                <div>
+                  <p className="text-lg font-bold tracking-tight2 text-ink">ไม่พบสัตว์เลี้ยงที่ค้นหา</p>
+                  <p className="mt-1.5 text-sm leading-relaxed text-ink-2">
+                    ไม่มีน้องที่ตรงกับตัวกรองนี้
+                    <br />
+                    ลองปรับหรือล้างตัวกรองดู
+                  </p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setFilterOpen(true)}
+                    className="flex items-center gap-2 rounded-2xl border-2 border-black/10 bg-white px-5 py-3 font-semibold text-ink transition-transform active:scale-95"
+                  >
+                    <SlidersHorizontal size={18} />
+                    ปรับตัวกรอง
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleFilterChange(DEFAULT_FILTERS)}
+                    className="rounded-2xl bg-gradient-cta px-6 py-3 font-bold tracking-tight2 text-white shadow-cta transition-transform active:scale-[.98]"
+                  >
+                    ล้างตัวกรอง
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <div>
+                  <p className="text-lg font-bold tracking-tight2 text-ink">ดูครบแล้ว!</p>
+                  <p className="mt-1.5 text-sm leading-relaxed text-ink-2">
+                    ไม่มีน้องใหม่ในตอนนี้
+                    <br />
+                    ลองกลับมาดูใหม่ในภายหลัง
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => fetchCards()}
+                  className="flex items-center gap-2 rounded-2xl border-2 border-black/10 bg-white px-6 py-3 font-semibold text-ink transition-transform active:scale-95"
+                >
+                  <RefreshCw size={18} />
+                  ดูใหม่อีกครั้ง
+                </button>
+              </>
+            )}
           </div>
         ) : (
           <div className="flex min-h-0 flex-1 flex-col">
