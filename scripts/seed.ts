@@ -305,11 +305,12 @@ async function main() {
   }
 
   // ── Breeding-compatible pets for every real pet with breeding mode on ───
-  // Generate a cohort per pet (not just "the" demo pet) — once multi-pet
-  // support shipped, any pet whose breed/sex didn't match the single pet
-  // this used to key off of had zero opposite-sex candidates, so its
-  // breeding deck ran dry the moment the few naturally-random same-breed
-  // matches in the general pool got liked.
+  // Breeding mode locks candidates to the user's pet's EXACT breed + opposite sex,
+  // so the general round-robin pool only lands that breed in ~20 provinces. To make
+  // the province filter usable in breeding mode too, generate one opposite-sex,
+  // same-breed candidate in EVERY province (per real/demo breeding pet). The first
+  // few also pre-like the pet so the demo still gets instant matches; the rest are
+  // plain deck candidates (we don't want dozens of instant matches piling up).
   const realUserIds = new Set(
     allUsers.filter((u) => !u.email?.endsWith("@pawmate.internal")).map((u) => u.id)
   );
@@ -319,17 +320,18 @@ async function main() {
     .contains("modes", ["breeding"]);
   const realBreedingPets = (breedingPets ?? []).filter((p) => realUserIds.has(p.owner_id));
 
+  const PRELIKE_COUNT = 4; // how many of the cohort instantly like the pet back
   for (const dp of realBreedingPets) {
     const oppSex = dp.sex === "male" ? "female" : "male";
     const names = dp.species === "dog" ? DOG_NAMES : CAT_NAMES;
     const photoFn = dp.species === "dog" ? dogPhoto : catPhoto;
-    const cohortNames = pickN(names, 8);
-    console.log(`Creating 8 breeding-compatible pets for ${dp.id} (${dp.species}, ${dp.breed}, ${oppSex})...`);
+    console.log(`Creating ${PROVINCES.length} breeding-compatible pets (all provinces) for ${dp.id} (${dp.species}, ${dp.breed}, ${oppSex})...`);
 
-    for (let i = 0; i < 8; i++) {
-      const province = pick(PROVINCES);
+    for (let i = 0; i < PROVINCES.length; i++) {
+      const province = PROVINCES[i];
       const tags = pickN(PERSONALITY_TAGS, randInt(2, 4));
-      const name = cohortNames[i];
+      const name = names[i % names.length];
+      const ageYears = (i % 10) + 1;
       const { data: bp, error } = await supabase
         .from("pets")
         .insert({
@@ -338,14 +340,14 @@ async function main() {
           species: dp.species,
           breed: dp.breed,
           sex: oppSex,
-          birth_month: `${randInt(2019, 2024)}-${String(randInt(1, 12)).padStart(2, "0")}-01`,
-          photos: [photoFn(300 + i), photoFn(350 + i)],
+          birth_month: `${new Date().getFullYear() - ageYears}-${String(randInt(1, 12)).padStart(2, "0")}-01`,
+          photos: [photoFn(300 + i), photoFn(500 + i)],
           personality_tags: tags,
           province,
           district: null,
           modes: ["playdate", "breeding"],
-          vaccinated: true,
-          neutered: false,
+          vaccinated: i % 5 !== 0, // ~80% vaccinated, so the vaccinated filter still has plenty
+          neutered: i % 3 === 0,
           bio: `${name} เป็น${dp.species === "dog" ? "น้องหมา" : "แมว"}สายพันธุ์${dp.breed}ที่${tags[0]} อาศัยอยู่แถว${province}`,
         })
         .select("id")
@@ -354,17 +356,22 @@ async function main() {
       if (error) { console.error(`Breeding pet for ${dp.id} error:`, error.message); continue; }
       createdPetIds.push(bp!.id);
 
-      // Pre-like in breeding mode → this pet
-      await supabase.from("likes").insert({
-        from_pet_id: bp!.id,
-        to_pet_id: dp.id,
-        mode: "breeding",
-      });
-      process.stdout.write("💕 ");
+      // Pre-like in breeding mode → this pet (only the first few → instant matches)
+      if (i < PRELIKE_COUNT) {
+        await supabase.from("likes").insert({
+          from_pet_id: bp!.id,
+          to_pet_id: dp.id,
+          mode: "breeding",
+        });
+        process.stdout.write("💕 ");
+      } else {
+        process.stdout.write("· ");
+      }
     }
+    console.log("");
   }
   if (realBreedingPets.length > 0) {
-    console.log("\n✅ Breeding-compatible pets + pre-likes created for all real pets!\n");
+    console.log("\n✅ Breeding-compatible pets (full province coverage) + pre-likes created for all real pets!\n");
   }
 
   // ── Pre-likes pointing AT demo's pet (playdate) ───────────────────────────

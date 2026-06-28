@@ -150,31 +150,33 @@ export default function FilterSheet({ filters, onChange, onClose, mode, species 
               </div>
             )}
 
-            {/* ── Size ── */}
-            <div>
-              <p className="mb-2 text-sm font-bold text-ink">ขนาด</p>
-              <div className="flex gap-2">
-                {SIZE_OPTIONS.map((opt) => (
-                  <button
-                    key={opt.value}
-                    type="button"
-                    onClick={() =>
-                      setDraft((d) => ({
-                        ...d,
-                        size: d.size === opt.value ? "" : opt.value,
-                      }))
-                    }
-                    className={`flex-1 rounded-full border-2 py-2.5 text-sm font-bold transition-all ${
-                      draft.size === opt.value
-                        ? "border-coral bg-coral text-white"
-                        : "border-black/10 text-ink-2 hover:border-coral/40"
-                    }`}
-                  >
-                    {opt.label}
-                  </button>
-                ))}
+            {/* ── Size (hidden in breeding mode — breed is fixed, so size is too) ── */}
+            {mode !== "breeding" && (
+              <div>
+                <p className="mb-2 text-sm font-bold text-ink">ขนาด</p>
+                <div className="flex gap-2">
+                  {SIZE_OPTIONS.map((opt) => (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      onClick={() =>
+                        setDraft((d) => ({
+                          ...d,
+                          size: d.size === opt.value ? "" : opt.value,
+                        }))
+                      }
+                      className={`flex-1 rounded-full border-2 py-2.5 text-sm font-bold transition-all ${
+                        draft.size === opt.value
+                          ? "border-coral bg-coral text-white"
+                          : "border-black/10 text-ink-2 hover:border-coral/40"
+                      }`}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
             {/* ── Age range ── */}
             <div>

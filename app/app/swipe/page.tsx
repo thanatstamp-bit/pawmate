@@ -186,8 +186,10 @@ export default function SwipePage() {
         ]);
     let result = data.filter((p) => !seen.has(p.id));
 
-    // Client-side filters (size uses breed→size map; tags use overlap check)
-    if (filters.size) {
+    // Client-side filters (size uses breed→size map; tags use overlap check).
+    // Size is meaningless in breeding mode (breed — and therefore size — is fixed
+    // to the user's own pet), so it is never applied there.
+    if (filters.size && mode !== "breeding") {
       result = result.filter(
         (p) => (BREED_SIZE_MAP[p.breed] ?? "medium") === filters.size
       );
@@ -231,10 +233,16 @@ export default function SwipePage() {
     return () => clearTimeout(t);
   }, [cards.length, loading, myPet, fetchCards]);
 
-  // Reset demo counter + recycle guard whenever the swipe mode changes
+  // Reset demo counter + recycle guard whenever the swipe mode changes.
+  // Also drop any size filter carried over from playdate mode — size can't be
+  // chosen in breeding mode (the selector is hidden) and would silently empty
+  // the deck, since every breeding candidate shares the user's pet's breed/size.
   useEffect(() => {
     resetDemoCounter();
     deckExhausted.current = false;
+    if (mode === "breeding") {
+      setFilters((f) => (f.size ? { ...f, size: "" } : f));
+    }
   }, [mode]); // eslint-disable-line react-hooks/exhaustive-deps
 
   async function handleLike() {
